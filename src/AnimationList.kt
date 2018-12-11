@@ -13,5 +13,6 @@ enum class Animations {
     SPARKLECC,
     SPARKLETOCOLOR,
     STACK,
+    STACKOVERFLOW,
     WIPE
 }

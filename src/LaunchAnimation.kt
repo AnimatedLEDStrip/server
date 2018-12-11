@@ -12,6 +12,7 @@ fun runAnimation(args: List<String>) {
         "MTC" -> callMultiPixelRunToColor(args)
         "PXR" -> callPixelRun(args)
         "SCH" -> callSmoothChase(args)
+        "SOF" -> callStackOverflow(args)
         "SPK" -> callSparkle(args)
         "STC" -> callSparkleToColor(args)
         "STK" -> callStack(args)
@@ -54,6 +55,17 @@ fun callWipe(args: List<String>) = try {
     println("Error - Wipe Animation: $e")
 }
 
+fun callStackOverflow(args: List<String>) = try {
+    val color1 = ColorContainer(parseHex(args[1]))
+    val color2 = ColorContainer(parseHex(args[2]))
+
+    val animationMap = mapOf("Animation" to Animations.STACKOVERFLOW, "Color1" to color1, "Color2" to color2)
+    AnimationHandler.addAnimation(animationMap)
+    animationQueue[0] = "NONE"
+} catch (e: Exception) {
+    println("Error - Stack Overflow Animation: $e")
+}
+
 fun callStack(args: List<String>) = try {
     val direction = try {
         when (args[2].toUpperCase()) {
@@ -72,7 +84,7 @@ fun callStack(args: List<String>) = try {
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 } catch (e: Exception) {
-    println("Error - Wipe Animation: $e")
+    println("Error - Stack Animation: $e")
 }
 
 

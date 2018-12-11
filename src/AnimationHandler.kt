@@ -13,7 +13,7 @@ object AnimationHandler {
             singleRunAnimation(params)
             println(Thread.currentThread().name)
         }
-//        println("End addAnimation()x")
+//        println("End addAnimation()")
     }
 }
 
@@ -49,6 +49,8 @@ class singleRunAnimation(params: Map<*, *>) {
 //                println("Stacking")
                 stack(color1, color2, direction)
             }
+            Animations.STACKOVERFLOW ->
+                stackOverflow(color1, color2)
             Animations.WIPE ->
                 wipe(color1, direction)
         }
@@ -128,6 +130,13 @@ class singleRunAnimation(params: Map<*, *>) {
         )
     } catch (e: Exception) {
         println("Handler Error - Stack Animation: $e")
+    }
+
+    private fun stackOverflow(color1: Long, color2: Long?) = try {
+        val c2 = color2 ?: 0xFF
+        leds.stackOverflow(ColorContainer(color1), ColorContainer(c2))
+    } catch (e: Exception) {
+        println("Handler Error - Stack Overflow Animation: $e")
     }
 
 
