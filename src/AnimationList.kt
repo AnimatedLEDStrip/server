@@ -1,0 +1,17 @@
+
+enum class Animations {
+    COLOR1,
+    COLOR2,
+    COLOR3,
+    COLOR4,
+    ALTERNATE,
+    MULTIPIXELRUN,
+    MULTIPIXELRUNTOCOLOR,
+    PIXELRUN,
+    SMOOTHCHASE,
+    SPARKLE,
+    SPARKLECC,
+    SPARKLETOCOLOR,
+    STACK,
+    WIPE
+}
