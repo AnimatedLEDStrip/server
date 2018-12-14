@@ -18,7 +18,7 @@ object LocalSocket {
             val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
 //            val socIn = BufferedReader(InputStreamReader(clientSocket!!.getInputStream()))
             disconnected = false
-            println("Local Connection Established")
+            println("GUI Connection Established")
 //            while (!disconnected) {
 //                GlobalScope.launch {
 //            var input: String?

@@ -3,7 +3,7 @@ import kotlinx.coroutines.launch
 import java.io.PrintWriter
 import java.lang.Exception
 
-val leds = AnimatedLEDStripConcurrent(180, 12)
+val leds = AnimatedLEDStripConcurrent(240, 12)
 
 val animationQueue = mutableListOf<String>("C 0")
 

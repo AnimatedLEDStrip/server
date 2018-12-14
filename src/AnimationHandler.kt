@@ -25,6 +25,7 @@ class singleRunAnimation(params: Map<*, *>) {
                 color2,
                 color3,
                 color4,
+                color5,
                 direction,
                 spacing,
                 delay) = params
@@ -43,19 +44,31 @@ class singleRunAnimation(params: Map<*, *>) {
 //                println("MPR")
                 multiPixelRunToColor(color1, spacing, direction, delay)
             }
+            Animations.PIXELMARATHON ->
+                pixelMarathon(color1, color2, color3, color4, color5)
             Animations.SPARKLETOCOLOR ->
                 sparkleToColor(color1, delay)
             Animations.STACK -> {
 //                println("Stacking")
-                stack(color1, color2, direction)
+                stack(color1, direction)
             }
             Animations.STACKOVERFLOW ->
                 stackOverflow(color1, color2)
             Animations.WIPE ->
                 wipe(color1, direction)
+            Animations.ALTERNATE ->
+                alternate(color1, color2)
         }
 
 
+    }
+
+    private fun alternate(color1: Long, color2: Long?) = try {
+        val c2 = color2 ?: 0x0
+//        while (!quit)
+            leds.multiAlternate(30, 60, ColorContainer(color1), ColorContainer(c2))
+    } catch (e: Exception) {
+        println("Handler Error - Alternate: $e")
     }
 
     private fun color1(color: Long) = try {
@@ -110,6 +123,17 @@ class singleRunAnimation(params: Map<*, *>) {
         println("Handler Error - Multi-Pixel Run To Color Animation: $e")
     }
 
+    private fun pixelMarathon(color1: Long, color2: Long?, color3: Long?, color4: Long?, color5: Long?) = try {
+        val c2 = color2 ?: CCGreen.getColorHex()
+        val c3 = color3 ?: CCYellow.getColorHex()
+        val c4 = color4 ?: CCBlue.getColorHex()
+        val c5 = color5 ?: CCPurple.getColorHex()
+
+        leds.pixelMarathon(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3), ColorContainer(c4), ColorContainer(c5))
+    } catch (e: Exception) {
+        println("Handler Error - Pixel Marathon Animation: $e")
+    }
+
     private fun sparkleToColor(color: Long, delay: Int?) = try {
         val d = delay ?: 10
         leds.sparkleToColor(ColorContainer(color), d)
@@ -117,16 +141,14 @@ class singleRunAnimation(params: Map<*, *>) {
         println("Handler Error - Sparkle to Color Animation: $e")
     }
 
-    private fun stack(color1: Long, color2: Long?, direction: Char?) = try {
-        val c2 = color2 ?: 0x0
+    private fun stack(color1: Long, direction: Char?) = try {
         leds.stack(
             when (direction?.toUpperCase()) {
                 'F' -> Direction.FORWARD
                 'B' -> Direction.BACKWARD
                 else -> Direction.FORWARD
             },
-            ColorContainer(color1),
-            ColorContainer(c2)
+            ColorContainer(color1)
         )
     } catch (e: Exception) {
         println("Handler Error - Stack Animation: $e")

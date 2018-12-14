@@ -16,7 +16,7 @@ object RemoteSocket {
             clientSocket = serverSocket.accept()
             val socIn = BufferedReader(InputStreamReader(clientSocket!!.getInputStream()))
             disconnected = false
-            println("Remote Connection Established")
+            println("Command Line Connection Established")
             var input: String?
 //            while (!disconnected) {
 //                GlobalScope.launch {
