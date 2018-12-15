@@ -3,7 +3,7 @@ import java.io.InputStreamReader
 import java.net.ServerSocket
 import java.net.Socket
 
-object RemoteSocket {
+object CommandLineSocket {
     private val serverSocket = ServerSocket(6)
     private var disconnected = true
     private var clientSocket: Socket? = null
@@ -26,7 +26,7 @@ object RemoteSocket {
                 }
 //                }
 //            }
-            println("Remote Connection Lost")
+            println("Command Line Connection Lost")
         }
     }
 

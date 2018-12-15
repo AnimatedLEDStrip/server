@@ -41,10 +41,10 @@ fun main(args: Array<String>) {
         }
     }
     GlobalScope.launch {
-        LocalSocket.openSocket()
+        GUISocket.openSocket()
     }
     GlobalScope.launch {
-        RemoteSocket.openSocket()
+        CommandLineSocket.openSocket()
     }
 //    val serverSocket = ServerSocket(5)
 //    val remoteServerSocket = ServerSocket(6)
@@ -53,7 +53,7 @@ fun main(args: Array<String>) {
     GlobalScope.launch {
         while (out == null) {
             try {
-                out = PrintWriter(LocalSocket.clientSocket?.getOutputStream(), true)
+                out = PrintWriter(GUISocket.clientSocket?.getOutputStream(), true)
             } catch (e: Exception) {}
         }
     }
@@ -80,11 +80,11 @@ fun main(args: Array<String>) {
         if (animationQueue.size > 1) animationQueue.removeAt(0)
 
 //        try {
-//            val header = "${when(LocalSocket.isDisconnected()){
+//            val header = "${when(GUISocket.isDisconnected()){
 //                true -> "L"
 //                false -> "-"
-//            }}${when(RemoteSocket.isDisconnected()){
-//                true -> "R: ${RemoteSocket.getClientIP()}"
+//            }}${when(CommandLineSocket.isDisconnected()){
+//                true -> "R: ${CommandLineSocket.getClientIP()}"
 //                false -> "-"
 //            }}"
 //            println(header + animationQueue)
@@ -95,7 +95,7 @@ fun main(args: Array<String>) {
 
     fun shutdownServer() {
         leds.setStripColor(0)
-        if (!LocalSocket.isDisconnected()) out?.println("Q")
+        if (!GUISocket.isDisconnected()) out?.println("Q")
         System.exit(0)
     }
 
