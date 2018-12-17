@@ -1,35 +1,59 @@
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.FileInputStream
 import java.io.PrintWriter
-import java.lang.Exception
+import java.util.*
+import kotlin.Exception
 
-val leds = AnimatedLEDStripConcurrent(240, 12)
+val properties = Properties()
+
+//val leds = AnimatedLEDStripConcurrent(240, 12)
+lateinit var leds: AnimatedLEDStripConcurrent
 
 val animationQueue = mutableListOf<String>("C 0")
 
 val palette1 = RGBPalette16(
-        CCRed,
-        ColorContainer(0xD52A00),
-        ColorContainer(0xAB5500),
-        ColorContainer(0xAB7F00),
-        ColorContainer(0xABAB00),
-        ColorContainer(0x56D500),
-        CCGreen,
-        ColorContainer(0x00D52A),
-        ColorContainer(0x00AB55),
-        ColorContainer(0x0056AA),
-        CCBlue,
-        ColorContainer(0x2A00D5),
-        ColorContainer(0x5500AB),
-        ColorContainer(0x7F0081),
-        ColorContainer(0xAB0055),
-        ColorContainer(0xD5002B)
+    CCRed,
+    ColorContainer(0xD52A00),
+    ColorContainer(0xAB5500),
+    ColorContainer(0xAB7F00),
+    ColorContainer(0xABAB00),
+    ColorContainer(0x56D500),
+    CCGreen,
+    ColorContainer(0x00D52A),
+    ColorContainer(0x00AB55),
+    ColorContainer(0x0056AA),
+    CCBlue,
+    ColorContainer(0x2A00D5),
+    ColorContainer(0x5500AB),
+    ColorContainer(0x7F0081),
+    ColorContainer(0xAB0055),
+    ColorContainer(0xD5002B)
 )
 
 //var disconnected = false
 var quit = false
 
 fun main(args: Array<String>) {
+    try {
+        properties.load(FileInputStream("led.config"))
+    } catch (e: Exception) {
+        println("No led.config found")
+    }
+
+    leds = AnimatedLEDStripConcurrent(
+        try {
+            properties.getProperty("numLEDs").toInt()
+        } catch (e: Exception) {
+            240
+        },
+        try {
+            properties.getProperty("pin").toInt()
+        } catch (e: Exception) {
+            12
+        }
+    )
+
     AnimationHandler
     GlobalScope.launch {
         while (!quit) {
@@ -54,7 +78,8 @@ fun main(args: Array<String>) {
         while (out == null) {
             try {
                 out = PrintWriter(GUISocket.clientSocket?.getOutputStream(), true)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
         }
     }
 
