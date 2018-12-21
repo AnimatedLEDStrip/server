@@ -1,5 +1,7 @@
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import tornadofx.App
+import tornadofx.launch
 import java.io.FileInputStream
 import java.io.PrintWriter
 import java.util.*
@@ -7,7 +9,9 @@ import kotlin.Exception
 
 val properties = Properties()
 
-//val leds = AnimatedLEDStripConcurrent(240, 12)
+class EmulatedLEDStripViewer : App(WS281xEmulator::class)
+
+//val leds = AnimatedLEDStripConcurrent(50, 12, emulated = true)
 lateinit var leds: AnimatedLEDStripConcurrent
 
 val animationQueue = mutableListOf<String>("C 0")
@@ -51,8 +55,18 @@ fun main(args: Array<String>) {
             properties.getProperty("pin").toInt()
         } catch (e: Exception) {
             12
+        },
+        emulated = try {
+            when (args[0].toUpperCase()) {
+                "EMULATE" -> true
+                else -> false
+            }
+        } catch (e: Exception) {
+            false
         }
     )
+
+
 
     AnimationHandler
     GlobalScope.launch {
@@ -64,12 +78,17 @@ fun main(args: Array<String>) {
             }
         }
     }
+//    println(leds.getByteBuffer())
     GlobalScope.launch {
         GUISocket.openSocket()
     }
     GlobalScope.launch {
         CommandLineSocket.openSocket()
     }
+//    while (!::leds.isInitialized) {
+//    }
+//    launch<EmulatedGUI>(args)
+    if (leds.isEmulated()) launch<EmulatedLEDStripViewer>(args)
 //    val serverSocket = ServerSocket(5)
 //    val remoteServerSocket = ServerSocket(6)
     var taskList: MutableList<String>

@@ -243,7 +243,7 @@ fun staticColor4(args: List<String>) = try {
     val color3 = ColorContainer(parseHex(args[3]))
     val color4 = ColorContainer(parseHex(args[4]))
 
-    leds.setStripWithGradient(color1, color2, color3, color4)
+//    leds.setStripWithGradient(color1, color2, color3, color4)
     Thread.sleep(1000)
     animationQueue[0] = "NONE"
 } catch (e: Exception) {
@@ -255,7 +255,7 @@ fun staticColor3(args: List<String>) = try {
     val color2 = ColorContainer(parseHex(args[2]))
     val color3 = ColorContainer(parseHex(args[3]))
 
-    leds.setStripWithGradient(color1, color2, color3)
+//    leds.setStripWithGradient(color1, color2, color3)
     Thread.sleep(1000)
 
     animationQueue[0] = "NONE"
@@ -267,7 +267,7 @@ fun staticColor2(args: List<String>) = try {
     val color1 = ColorContainer(parseHex(args[1]))
     val color2 = ColorContainer(parseHex(args[2]))
 
-    leds.setStripWithGradient(color1, color2)
+//    leds.setStripWithGradient(color1, color2)
     Thread.sleep(1000)
     animationQueue[0] = "NONE"
 } catch (e: Exception) {

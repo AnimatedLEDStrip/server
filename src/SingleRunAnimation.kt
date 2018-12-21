@@ -63,7 +63,7 @@ class SingleRunAnimation(params: Map<*, *>) {
     private fun color2(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0x0
 
-        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2))
+//        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2))
         Thread.sleep(1000)
     } catch (e: Exception) {
         println("Handler Error - Static Color 2: $e")
@@ -72,7 +72,7 @@ class SingleRunAnimation(params: Map<*, *>) {
     private fun color3(color1: Long, color2: Long?, color3: Long?) = try {
         val c2 = color2 ?: 0x0
         val c3 = color3 ?: 0x0
-        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3))
+//        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3))
         Thread.sleep(1000)
     } catch (e: Exception) {
         println("Handler Error - Static Color 3: $e")
@@ -82,7 +82,7 @@ class SingleRunAnimation(params: Map<*, *>) {
         val c2 = color2 ?: 0x0
         val c3 = color3 ?: 0x0
         val c4 = color4 ?: 0x0
-        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3), ColorContainer(c4))
+//        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3), ColorContainer(c4))
         Thread.sleep(1000)
     } catch (e: Exception) {
         println("Handler Error - Static Color 3: $e")
