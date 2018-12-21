@@ -11,7 +11,6 @@ class SingleRunAnimation(params: Map<*, *>) {
                 spacing,
                 delay) = params
 
-//        println("Animation Start: $animation")
         when (animation) {
             Animations.COLOR1 ->
                 color1(color1)
@@ -21,18 +20,14 @@ class SingleRunAnimation(params: Map<*, *>) {
                 color3(color1, color2, color3)
             Animations.COLOR4 ->
                 color4(color1, color2, color3, color4)
-            Animations.MULTIPIXELRUNTOCOLOR -> {
-//                println("MPR")
+            Animations.MULTIPIXELRUNTOCOLOR ->
                 multiPixelRunToColor(color1, spacing, direction, delay)
-            }
             Animations.PIXELMARATHON ->
                 pixelMarathon(color1, color2, color3, color4, color5)
             Animations.SPARKLETOCOLOR ->
                 sparkleToColor(color1, delay)
-            Animations.STACK -> {
-//                println("Stacking")
+            Animations.STACK ->
                 stack(color1, direction)
-            }
             Animations.STACKOVERFLOW ->
                 stackOverflow(color1, color2)
             Animations.WIPE ->
@@ -40,14 +35,11 @@ class SingleRunAnimation(params: Map<*, *>) {
             Animations.ALTERNATE ->
                 alternate(color1, color2)
         }
-
-
     }
 
     private fun alternate(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0x0
-//        while (!quit)
-            leds.multiAlternate(30, 60, ColorContainer(color1), ColorContainer(c2))
+        leds.multiAlternate(30, 60, ColorContainer(color1), ColorContainer(c2))
     } catch (e: Exception) {
         println("Handler Error - Alternate: $e")
     }
@@ -62,7 +54,6 @@ class SingleRunAnimation(params: Map<*, *>) {
 
     private fun color2(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0x0
-
 //        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2))
         Thread.sleep(1000)
     } catch (e: Exception) {
@@ -109,7 +100,6 @@ class SingleRunAnimation(params: Map<*, *>) {
         val c3 = color3 ?: CCYellow.getColorHex()
         val c4 = color4 ?: CCBlue.getColorHex()
         val c5 = color5 ?: CCPurple.getColorHex()
-
         leds.pixelMarathon(
             ColorContainer(color1),
             ColorContainer(c2),
@@ -147,7 +137,6 @@ class SingleRunAnimation(params: Map<*, *>) {
     } catch (e: Exception) {
         println("Handler Error - Stack Overflow Animation: $e")
     }
-
 
     private fun wipe(color: Long, direction: Char?) = try {
         leds.wipe(

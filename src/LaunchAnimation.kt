@@ -60,7 +60,11 @@ fun callStackOverflow(args: List<String>) = try {
     val color1 = ColorContainer(parseHex(args[1]))
     val color2 = ColorContainer(parseHex(args[2]))
 
-    val animationMap = mapOf("Animation" to Animations.STACKOVERFLOW, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
+    val animationMap = mapOf(
+        "Animation" to Animations.STACKOVERFLOW,
+        "Color1" to color1.getColorHex(),
+        "Color2" to color2.getColorHex()
+    )
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 } catch (e: Exception) {
@@ -124,8 +128,6 @@ fun callSmoothChase(args: List<String>) = try {
 
 //    leds.smoothChase(palette1, direction)
 
-//    animationQueue[0] = "NONE"
-
     animationQueue[0] = "NONE"
 } catch (e: Exception) {
     println("Error - Smooth Chase Animation: $e")
@@ -155,18 +157,11 @@ fun callPixelRun(args: List<String>) = try {
     val color1 = ColorContainer(parseHex(args[1]))
     val color2 = ColorContainer(parseHex(args[2]))
 
-    val animationMap = mapOf("Animation" to Animations.PIXELRUN, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
+    val animationMap =
+        mapOf("Animation" to Animations.PIXELRUN, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 
-//    try {
-//        when (args[4].toUpperCase()) {
-//            "T" -> leds.pixelRunWithTrail(direction, color1, color2)
-//            else -> leds.pixelRun(direction, color1, color2)
-//        }
-//    } catch (f: Exception) {
-//        leds.pixelRun(direction, color1, color2)
-//    }
 } catch (e: Exception) {
     println("Error - Pixel Run Animation: $e")
 }
@@ -187,7 +182,12 @@ fun callMultiPixelRunToColor(args: List<String>) = try {
 
 //    leds.multiPixelRunToColor(spacing, direction, color1)
     animationQueue[0] = "NONE"
-    val animationMap = mapOf("Animation" to Animations.MULTIPIXELRUNTOCOLOR, "Color1" to color1.getColorHex(), "Spacing" to spacing, "Direction" to direction)
+    val animationMap = mapOf(
+        "Animation" to Animations.MULTIPIXELRUNTOCOLOR,
+        "Color1" to color1.getColorHex(),
+        "Spacing" to spacing,
+        "Direction" to direction
+    )
     AnimationHandler.addAnimation(animationMap)
 } catch (e: Exception) {
     println("Error - Multi-Pixel Run To Color Animation: $e")
@@ -208,7 +208,13 @@ fun callMultiPixelRun(args: List<String>) = try {
     val color1 = ColorContainer(parseHex(args[1]))
     val color2 = ColorContainer(parseHex(args[2]))
 
-    val animationMap = mapOf("Animation" to Animations.MULTIPIXELRUN, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex(), "Spacing" to spacing, "Direction" to direction)
+    val animationMap = mapOf(
+        "Animation" to Animations.MULTIPIXELRUN,
+        "Color1" to color1.getColorHex(),
+        "Color2" to color2.getColorHex(),
+        "Spacing" to spacing,
+        "Direction" to direction
+    )
     AnimationHandler.addAnimation(animationMap)
 
 //    leds.multiPixelRun(spacing, direction, color1, color2)
@@ -220,15 +226,14 @@ fun callMultiPixelRun(args: List<String>) = try {
 
 fun callFadePixel(args: List<String>) {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-
-
 }
 
 fun callAlternate(args: List<String>) = try {
     val color1 = ColorContainer(parseHex(args[1]))
     val color2 = ColorContainer(parseHex(args[2]))
 
-    val animationMap = mapOf("Animation" to Animations.ALTERNATE, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
+    val animationMap =
+        mapOf("Animation" to Animations.ALTERNATE, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 

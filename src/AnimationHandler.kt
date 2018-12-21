@@ -11,9 +11,6 @@ object AnimationHandler {
             SingleRunAnimation(params)
             println("${Thread.currentThread().name} complete")
         }
-//        println("End addAnimation()")
     }
-
-
 }
 

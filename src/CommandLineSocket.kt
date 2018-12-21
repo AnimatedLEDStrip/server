@@ -18,16 +18,11 @@ object CommandLineSocket {
             disconnected = false
             println("Command Line Connection Established")
             var input: String?
-//            while (!disconnected) {
-//                GlobalScope.launch {
-                while (!disconnected) {
-                    input = socIn.readLine()
-                    if (animationQueue.checkForNullAndAdd(input)) disconnected = true
-                }
-//                }
-//            }
+            while (!disconnected) {
+                input = socIn.readLine()
+                if (animationQueue.checkForNullAndAdd(input)) disconnected = true
+            }
             println("Command Line Connection Lost")
         }
     }
-
 }
