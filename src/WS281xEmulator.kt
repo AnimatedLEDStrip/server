@@ -9,20 +9,20 @@ import kotlin.math.*
 class WS281xEmulator : View("WS281x Emulator") {
     private val scale = 22.0
     private val circleList = mutableListOf<Circle>()
-    private val CENTERX = scale * pow(leds.numLEDs.toDouble(), 0.5) + 25.0
-    private val CENTERY = scale * pow(leds.numLEDs.toDouble(), 0.5) + 25.0
+    private val CENTER_X = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
+    private val CENTER_Y = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
 
     init {
         val pixelList = leds.getPixelColorList()
-        var r = 0.0
-        var t = 0.0
+        var r: Double
+        var t: Double
         for (i in 0 until pixelList.size) {
             circleList.add(Circle().apply {
-                radius = 25.0
-                centerX = r * cos(t) + CENTERX
-                centerY = r * sin(t) + CENTERY
-                t = 2.5 * pow(i.toDouble(), 0.5)
-                r = scale * pow(i.toDouble(), 0.5)
+                radius = 20.0
+                t = 2.5 * pow((i + 3).toDouble(), 0.5)
+                r = scale * pow((i + 3).toDouble(), 0.5)
+                centerX = r * cos(t) + CENTER_X
+                centerY = r * sin(t) + CENTER_Y
                 id = i.toString()
                 style {
                     fill = Color.color(
@@ -34,7 +34,6 @@ class WS281xEmulator : View("WS281x Emulator") {
 
                 onMouseClicked = EventHandler {
                     println("pixel: $i\t centerX: ~${centerX.toInt()}\t centerY: ~${centerY.toInt()}\t style: $style")
-
                 }
             })
         }
@@ -83,11 +82,7 @@ class WS281xEmulator : View("WS281x Emulator") {
                             GlobalScope.launch {
 
                                 // Replace with animation call to test
-                                leds.multiPixelRun(
-                                    3,
-                                    Direction.FORWARD,
-                                    ColorContainer(0xFF)
-                                )
+                                leds.sparkle(ColorContainer(0xFFFF))
 
                             }
                         }
