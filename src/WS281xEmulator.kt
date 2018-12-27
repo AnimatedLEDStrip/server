@@ -53,15 +53,16 @@ class WS281xEmulator : View("WS281x Emulator") {
         }
     }
 
+    private val backColor = ColorContainer(0x0)
     override val root = borderpane {
 
         style {
-            backgroundColor += Color.BLACK
+            backgroundColor += backColor.toColor()
         }
 
         center {
             style {
-                backgroundColor += Color.BLACK
+                backgroundColor += backColor.toColor()
                 setMinSize(
                     scale * pow(leds.numLEDs.toDouble(), 0.5) * 2 + 50.0,
                     scale * pow(leds.numLEDs.toDouble(), 0.5) * 2 + 50.0
@@ -82,7 +83,6 @@ class WS281xEmulator : View("WS281x Emulator") {
                             GlobalScope.launch {
 
                                 // Replace with animation call to test
-                                leds.sparkle(ColorContainer(0xFFFF))
 
                             }
                         }

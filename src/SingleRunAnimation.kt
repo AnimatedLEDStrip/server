@@ -96,10 +96,10 @@ class SingleRunAnimation(params: Map<*, *>) {
     }
 
     private fun pixelMarathon(color1: Long, color2: Long?, color3: Long?, color4: Long?, color5: Long?) = try {
-        val c2 = color2 ?: CCGreen.getColorHex()
-        val c3 = color3 ?: CCYellow.getColorHex()
-        val c4 = color4 ?: CCBlue.getColorHex()
-        val c5 = color5 ?: CCPurple.getColorHex()
+        val c2 = color2 ?: CCGreen.hex
+        val c3 = color3 ?: CCYellow.hex
+        val c4 = color4 ?: CCBlue.hex
+        val c5 = color5 ?: CCPurple.hex
         leds.pixelMarathon(
             ColorContainer(color1),
             ColorContainer(c2),
@@ -113,7 +113,7 @@ class SingleRunAnimation(params: Map<*, *>) {
 
     private fun sparkleToColor(color: Long, delay: Int?) = try {
         val d = delay ?: 10
-        leds.sparkleToColor(ColorContainer(color), d)
+        leds.sparkleToColor(ColorContainer(color), delay = d)
     } catch (e: Exception) {
         println("Handler Error - Sparkle to Color Animation: $e")
     }
