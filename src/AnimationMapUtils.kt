@@ -1,23 +1,3 @@
-enum class Animations {
-    COLOR1,
-    COLOR2,
-    COLOR3,
-    COLOR4,
-    ALTERNATE,
-    MULTIPIXELRUN,
-    MULTIPIXELRUNTOCOLOR,
-    PIXELRUN,
-    PIXELMARATHON,
-    SMOOTHCHASE,
-    SPARKLE,
-    SPARKLECC,
-    SPARKLETOCOLOR,
-    STACK,
-    STACKOVERFLOW,
-    WIPE
-}
-
-
 operator fun Map<*, *>.component1() = this["Animation"] as Animations
 operator fun Map<*, *>.component2() = this["Color1"] as Long
 operator fun Map<*, *>.component3() = this["Color2"] as Long?
