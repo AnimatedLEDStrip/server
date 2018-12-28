@@ -7,3 +7,5 @@ operator fun Map<*, *>.component6() = this["Color5"] as Long?
 operator fun Map<*, *>.component7() = this["Direction"] as Char?
 operator fun Map<*, *>.component8() = this["Spacing"] as Int?
 operator fun Map<*, *>.component9() = this["Delay"] as Int?
+operator fun Map<*, *>.component10() = this["Continuous"] as Boolean?
+operator fun Map<*, *>.component11() = this["ID"] as String?
