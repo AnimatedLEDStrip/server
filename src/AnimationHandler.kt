@@ -10,7 +10,7 @@ object AnimationHandler {
     fun addAnimation(params: Map<*, *>) {
         println(params)
         GlobalScope.launch(newSingleThreadContext("Thread ${random()}")) {
-            val (animation, _, _, _, _, _, _, _, _,
+            val (animation, _, _, _, _, _, _, _, _, _,
                     continuous, ID) = params
 
             when (animation) {

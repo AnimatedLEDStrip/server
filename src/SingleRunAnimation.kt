@@ -7,6 +7,7 @@ class SingleRunAnimation(params: Map<*, *>) {
                 color3,
                 color4,
                 color5,
+                colorList,
                 direction,
                 spacing,
                 delay) = params

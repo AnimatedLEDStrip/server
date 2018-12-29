@@ -14,6 +14,7 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
                 color3,
                 color4,
                 color5,
+                colorList,
                 direction,
                 spacing,
                 delay) = params
@@ -28,7 +29,8 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
                 pixelRun(color1, color2, direction, delay)
             Animations.PIXELRUNWITHTRAIL ->
                 pixelRunWithTrail(color1, color2, direction, delay)
-            Animations.SMOOTHCHASE -> TODO()
+            Animations.SMOOTHCHASE ->
+                smoothChase(colorList, direction, delay)
             Animations.SPARKLE ->
                 sparkle(color1, delay)
             Animations.STACKOVERFLOW ->
@@ -126,6 +128,26 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
         }
     } catch (e: Exception) {
         println("Handler Error - Pixel Run With Trail Animation: $e")
+    }
+
+    private fun smoothChase(colorList: List<*>?, direction: Char?, delay: Int?) = try {
+        val d = delay ?: 50
+        val cList = mutableListOf<ColorContainer>()
+        colorList?.forEach { c -> cList.add(ColorContainer(c as Long)) }
+        println("$colorList = $cList")
+        while (continueAnimation) {
+            leds.smoothChase(
+                cList,
+                when (direction?.toUpperCase()) {
+                    'F' -> Direction.FORWARD
+                    'B' -> Direction.BACKWARD
+                    else -> Direction.FORWARD
+                },
+                delay = d
+            )
+        }
+    } catch (e: Exception) {
+        println("Handler Error - Smooth Chase Animation: $e")
     }
 
     private fun sparkle(color: Long, delay: Int?) = try {
