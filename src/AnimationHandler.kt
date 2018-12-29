@@ -5,7 +5,7 @@ import java.lang.Math.random
 
 object AnimationHandler {
 
-    private val continuousAnimations = mutableMapOf<String, ContinuousRunAnimation>()
+    val continuousAnimations = mutableMapOf<String, ContinuousRunAnimation>()
 
     fun addAnimation(params: Map<*, *>) {
         println(params)

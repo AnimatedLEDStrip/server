@@ -17,6 +17,9 @@ object GUISocket {
             clientSocket = serverSocket.accept()
             val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
             socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+            AnimationHandler.continuousAnimations.forEach {
+                it.value.sendAnimation()        // Send all current continuous animations to newly connected GUI
+            }
             disconnected = false
             println("GUI Connection Established")
             var input: Map<*, *>

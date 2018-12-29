@@ -3,36 +3,8 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
     private var continueAnimation = true
 
     init {
-//        val (animation,
-//                color1,
-//                color2,
-//                color3,
-//                color4,
-//                color5,
-//                direction,
-//                spacing,
-//                delay) = params
-
-        GUISocket.sendAnimation(params, id)
-        println(id)
-
-//        when (animation) {
-//            Animations.ALTERNATE ->
-//                alternate(color1, color2)
-//            Animations.MULTIPIXELRUN ->
-//                multiPixelRun(color1, spacing, direction, delay)
-//            Animations.PIXELMARATHON ->
-//                pixelMarathon(color1, color2, color3, color4, color5)
-//            Animations.PIXELRUN ->
-//                pixelRun(color1, color2, direction, delay)
-//            Animations.PIXELRUNWITHTRAIL ->
-//                pixelRunWithTrail(color1, color2, direction, delay)
-//            Animations.SMOOTHCHASE -> TODO()
-//            Animations.SPARKLE ->
-//                sparkle(color1, delay)
-//            Animations.STACKOVERFLOW ->
-//                stackOverflow(color1, color2)
-//        }
+        sendAnimation()
+//        println(id)
     }
 
     fun startAnimation() {
@@ -67,6 +39,10 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
     fun endAnimation() {
         println("Animation $id ending")
         continueAnimation = false
+    }
+
+    fun sendAnimation() {
+        GUISocket.sendAnimation(params, id)
     }
 
 
