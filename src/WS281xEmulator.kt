@@ -6,11 +6,20 @@ import tornadofx.*
 import java.lang.Math.pow
 import kotlin.math.*
 
+
+/**
+ * A GUI that shows an emulated LED strip using circles arranged in a spiral
+ * The equation y = x^(1/2) is used to determine the polar coordinates for each circle to create a spiral.
+ *
+ * A button labeled "Test Animation" is located at the bottom of the window. This can be set to test different
+ * animations by adding an animation call in the action lambda for the button (labeled with "Put animation
+ * call to test here" in the code below).
+ */
 class WS281xEmulator : View("WS281x Emulator") {
-    private val scale = 22.0
-    private val circleList = mutableListOf<Circle>()
-    private val CENTER_X = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
-    private val CENTER_Y = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
+    private val scale = 22.0                                                    // Scaling for r component
+    private val circleList = mutableListOf<Circle>()                            // List of Circles
+    private val CENTER_X = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0     // X center of pane
+    private val CENTER_Y = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0     // Y center of pane
 
     init {
         val pixelList = leds.getPixelColorList()
@@ -18,12 +27,12 @@ class WS281xEmulator : View("WS281x Emulator") {
         var t: Double
         for (i in 0 until pixelList.size) {
             circleList.add(Circle().apply {
-                radius = 20.0
-                t = 2.5 * pow((i + 3).toDouble(), 0.5)
-                r = scale * pow((i + 3).toDouble(), 0.5)
-                centerX = r * cos(t) + CENTER_X
-                centerY = r * sin(t) + CENTER_Y
-                id = i.toString()
+                radius = 20.0                                   // Size of circle
+                t = 2.5 * pow((i + 3).toDouble(), 0.5)          // t-component
+                r = scale * pow((i + 3).toDouble(), 0.5)        // r-component
+                centerX = r * cos(t) + CENTER_X                 // Convert polar coordinates to cartesian x
+                centerY = r * sin(t) + CENTER_Y                 // Convert polar coordinates to cartesian y
+                id = i.toString()                               // Create id for circle
                 style {
                     fill = Color.color(
                         ((pixelList[i] shr 16 and 0xFF) / 255.0),
@@ -37,6 +46,12 @@ class WS281xEmulator : View("WS281x Emulator") {
                 }
             })
         }
+
+        /*  Start continuous loop in a separate thread that constantly updates colors of circles
+        *   Probably should be done differently - currently the source of various glitches in GUI,
+        *   especially when colors are updating quickly.
+        *   (Technically your aren't supposed to change things in the GUI from a different thread)
+        */
         GlobalScope.launch {
             while (true) {
                 val pixels = leds.getPixelColorList()
@@ -54,6 +69,7 @@ class WS281xEmulator : View("WS281x Emulator") {
     }
 
     private val backColor = ColorContainer(0x0)
+
     override val root = borderpane {
 
         style {
@@ -63,13 +79,13 @@ class WS281xEmulator : View("WS281x Emulator") {
         center {
             style {
                 backgroundColor += backColor.toColor()
-                setMinSize(
+                setMinSize(                                 // Set size of pane based on number of circles/pixels
                     scale * pow(leds.numLEDs.toDouble(), 0.5) * 2 + 50.0,
                     scale * pow(leds.numLEDs.toDouble(), 0.5) * 2 + 50.0
                 )
             }
             pane {
-                for (i in 0 until leds.numLEDs) {
+                for (i in 0 until leds.numLEDs) {   // Add circles to pane
                     this += circleList[i]
                 }
             }
@@ -82,7 +98,7 @@ class WS281xEmulator : View("WS281x Emulator") {
                         action {
                             GlobalScope.launch {
 
-                                // Replace with animation call to test
+                                // Put animation call to test here
 
                             }
                         }

@@ -1,12 +1,22 @@
-class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
+/**
+ * Class for running an animation that repeats until stopped
+ *
+ * @param id A string to identify the animation, such as the thread it is running in
+ * @param params A Map<String, Any?> containing data about the animation to be run
+ */
+class ContinuousRunAnimation(private val id: String, private val params: Map<*, *>) {
 
-    private var continueAnimation = true
+    private var continueAnimation = true        // Variable controlling while loops in animation functions
+
 
     init {
-        sendAnimation()
-//        println(id)
+        sendAnimation()                 // Send animation to GUI
     }
 
+
+    /**
+     * Determine which animation is being called and call the corresponding function
+     */
     fun startAnimation() {
         val (animation,
                 color1,
@@ -17,7 +27,8 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
                 colorList,
                 direction,
                 spacing,
-                delay) = params
+                delay) = params         // Decompose params map into separate variables
+
         when (animation) {
             Animations.ALTERNATE ->
                 alternate(color1, color2)
@@ -38,15 +49,25 @@ class ContinuousRunAnimation(val id: String, val params: Map<*, *>) {
         }
     }
 
+
+    /**
+     * Stop animation
+     */
     fun endAnimation() {
         println("Animation $id ending")
         continueAnimation = false
     }
 
+
+    /**
+     *  Send animation data to GUI
+     */
     fun sendAnimation() {
         GUISocket.sendAnimation(params, id)
     }
 
+
+    /*  Functions for calling animations */
 
     private fun alternate(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0x0

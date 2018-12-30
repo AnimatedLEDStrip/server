@@ -1,4 +1,9 @@
-class SingleRunAnimation(params: Map<*, *>) {
+/**
+ * Class for running an animation that runs once before stopping
+ *
+ * @param params A Map<String, Any?> containing data about the animation to be run
+ */
+class SingleRunAnimation(private val params: Map<*, *>) {
 
     init {
         val (animation,
@@ -10,7 +15,7 @@ class SingleRunAnimation(params: Map<*, *>) {
                 colorList,
                 direction,
                 spacing,
-                delay) = params
+                delay) = params         // Decompose params map into separate variables
 
         when (animation) {
             Animations.COLOR1 ->
@@ -46,6 +51,12 @@ class SingleRunAnimation(params: Map<*, *>) {
                 wipe(color1, direction)
         }
     }
+
+
+    /*  Functions for calling animations
+    *   Note that only the animation and first color are guaranteed to be non-null,
+    *   thus there are null checks and defaults for all other arguments
+    */
 
     private fun alternate(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0x0

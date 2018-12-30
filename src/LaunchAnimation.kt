@@ -1,5 +1,9 @@
 import java.lang.Long.parseLong
 
+/*  Functions used to parse arguments from a terminal
+ *  Probably will be replaced soon so I'm not going to add comments
+ */
+
 fun runAnimation(args: List<String>) {
     when (args[0].toUpperCase()) {
         "COL1", "C1", "C" -> staticColor1(args)
@@ -29,7 +33,6 @@ fun runAnimation(args: List<String>) {
             return
         }
     }
-
 }
 
 

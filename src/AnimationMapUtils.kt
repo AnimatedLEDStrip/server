@@ -1,3 +1,5 @@
+/*  Operator functions for simplifying decomposition of a Map */
+
 operator fun Map<*, *>.component1() = this["Animation"] as Animations
 operator fun Map<*, *>.component2() = this["Color1"] as Long
 operator fun Map<*, *>.component3() = this["Color2"] as Long?
