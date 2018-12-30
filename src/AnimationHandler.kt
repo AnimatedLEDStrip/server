@@ -6,7 +6,7 @@ import java.lang.Math.random
 
 /**
  * An object that creates SingleRunAnimation and ContinuousRunAnimation
- * instances for animations and keeps track of
+ * instances for animations and keeps track of currently running animations
  */
 object AnimationHandler {
 
