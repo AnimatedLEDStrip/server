@@ -1,6 +1,7 @@
 package server
 
-import leds.*
+import animatedledstrip.leds.*
+import animatedledstrip.ccpresets.*
 
 /**
  * Class for running an animation that repeats until stopped

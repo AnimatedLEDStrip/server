@@ -1,6 +1,6 @@
 package server
 
-import leds.*
+import animatedledstrip.leds.Animations
 
 /*  Operator functions for simplifying decomposition of a Map */
 

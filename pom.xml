@@ -71,6 +71,14 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <perPackageOptions>
+                        <packageOptions>
+                            <prefix>server</prefix>
+                            <includeNonPublic>true</includeNonPublic>
+                        </packageOptions>
+                    </perPackageOptions>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -88,7 +96,7 @@
         <dependency>
             <groupId>io.github.animatedledstrip</groupId>
             <artifactId>animatedledstrip-kotlin-pi</artifactId>
-            <version>LATEST</version>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>no.tornado</groupId>

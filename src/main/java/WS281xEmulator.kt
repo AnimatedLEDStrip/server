@@ -1,6 +1,6 @@
 package server
 
-import leds.*
+import animatedledstrip.leds.*
 import javafx.event.EventHandler
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle

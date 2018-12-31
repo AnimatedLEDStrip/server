@@ -1,6 +1,6 @@
 package server
 
-import leds.*
+import animatedledstrip.leds.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import tornadofx.App
