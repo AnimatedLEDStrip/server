@@ -55,6 +55,7 @@
                 </executions>
                 <configuration>
                     <jvmTarget>1.8</jvmTarget>
+                    <apiVersion>${kotlin.version}</apiVersion>
                 </configuration>
             </plugin>
             <plugin>
