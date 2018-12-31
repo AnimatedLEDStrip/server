@@ -20,10 +20,30 @@ import kotlin.math.*
  * call to test here" in the code below).
  */
 class WS281xEmulator : View("WS281x Emulator") {
-    private val scale = 22.0                                                    // Scaling for r component
-    private val circleList = mutableListOf<Circle>()                            // List of Circles
-    private val CENTER_X = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0     // X center of pane
-    private val CENTER_Y = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0     // Y center of pane
+
+    /**
+     * Scaling for r component.
+     */
+    private val scale = 22.0
+
+    /**
+     * List of Circle instances (circle index == pixel index)
+     */
+    private val circleList = mutableListOf<Circle>()
+
+    /**
+     * X center of pane
+     *
+     * Takes furthest circle center (largest r) and adds 20
+     */
+    private val CENTER_X = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
+
+    /**
+     * Y center of pane
+     *
+     * Takes furthest circle center (largest r) and adds 20
+     */
+    private val CENTER_Y = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
 
     init {
         val pixelList = leds.getPixelColorList()
@@ -51,10 +71,14 @@ class WS281xEmulator : View("WS281x Emulator") {
             })
         }
 
-        /*  Start continuous loop in a separate thread that constantly updates colors of circles
-        *   Probably should be done differently - currently the source of various glitches in GUI,
-        *   especially when colors are updating quickly.
-        *   (Technically your aren't supposed to change things in the GUI from a different thread)
+        /*
+        * Start continuous loop in a separate thread that constantly updates
+        * colors of circles.
+        *
+        * Probably should be done differently - currently the source of various
+        * glitches in GUI, especially when colors are updating quickly.
+        * (Technically your aren't supposed to change things in the GUI from
+        * a different thread)
         */
         GlobalScope.launch {
             while (true) {
@@ -72,6 +96,9 @@ class WS281xEmulator : View("WS281x Emulator") {
         }
     }
 
+    /**
+     * Color of the pane background
+     */
     private val backColor = ColorContainer(0x0)
 
     override val root = borderpane {
