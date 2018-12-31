@@ -1,3 +1,6 @@
+package server
+
+import leds.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import tornadofx.App

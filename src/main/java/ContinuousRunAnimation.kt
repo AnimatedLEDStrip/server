@@ -1,3 +1,7 @@
+package server
+
+import leds.*
+
 /**
  * Class for running an animation that repeats until stopped
  *

@@ -1,3 +1,6 @@
+package server
+
+import leds.*
 import javafx.event.EventHandler
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
@@ -8,7 +11,8 @@ import kotlin.math.*
 
 
 /**
- * A GUI that shows an emulated LED strip using circles arranged in a spiral
+ * A GUI that shows an emulated LED strip using circles arranged in a spiral.
+ *
  * The equation y = x^(1/2) is used to determine the polar coordinates for each circle to create a spiral.
  *
  * A button labeled "Test Animation" is located at the bottom of the window. This can be set to test different

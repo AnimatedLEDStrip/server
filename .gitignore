@@ -3,3 +3,4 @@
 *.MF
 *.xml
 *.iml
+!pom.xml

@@ -1,3 +1,7 @@
+package server
+
+import leds.*
+
 /*  Operator functions for simplifying decomposition of a Map */
 
 operator fun Map<*, *>.component1() = this["Animation"] as Animations

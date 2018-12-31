@@ -1,3 +1,6 @@
+package server
+
+import leds.*
 import java.lang.Long.parseLong
 
 /*  Functions used to parse arguments from a terminal
