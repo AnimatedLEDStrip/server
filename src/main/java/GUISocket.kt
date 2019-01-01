@@ -22,9 +22,11 @@ object GUISocket {
 
     /**
      * Accept communication and start loop that listens for input
-     * If the server is not shutting down (quit == false)
-     *      Accept a new connection
-     *      While connected, get input and pass on to the animationQueue
+     *
+     * If the server is not shutting down (quit == false):
+     *      Accept a new connection,
+     *      While connected, get input and pass on to the animationQueue.
+     *
      * (If there is a disconnection and the server is not shutting down, wait for a new connection)
      */
     fun openSocket() {

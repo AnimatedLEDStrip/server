@@ -15,7 +15,8 @@ object AnimationHandler {
 
     /**
      * Map tracking what continuous animations are currently running
-     * key = id of animation
+     *
+     * key = id of animation,
      * value = ContinuousRunAnimation instance
      */
     val continuousAnimations = mutableMapOf<String, ContinuousRunAnimation>()
@@ -23,12 +24,14 @@ object AnimationHandler {
 
     /**
      * Adds a new animation.
-     * If params["Continuous"] is false or null
-     *      Creates a SingleRunAnimation instance in a new thread
-     * If params["Continuous"] is true
-     *      Creates a ContinuousRunAnimation instance in a new thread
+     *
+     * If params["Continuous"] is false or null:
+     *      Creates a SingleRunAnimation instance in a new thread.
+     *
+     * If params["Continuous"] is true:
+     *      Creates a ContinuousRunAnimation instance in a new thread,
      *      Adds pair with the animation ID and ContinuousRunAnimation instance
-     *      to continuousAnimations
+     *      to continuousAnimations.
      *
      * @param params A Map<String, Any?> containing data about the animation to be run
      */

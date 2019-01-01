@@ -11,7 +11,10 @@ import animatedledstrip.ccpresets.*
  */
 class ContinuousRunAnimation(private val id: String, private val params: Map<*, *>) {
 
-    private var continueAnimation = true        // Variable controlling while loops in animation functions
+    /**
+     * Variable controlling while loops in animation functions
+     */
+    private var continueAnimation = true
 
 
     init {
