@@ -85,7 +85,7 @@
     </build>
     <repositories>
         <repository>
-            <id>sonotype-snapshots</id>
+            <id>sonatype-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>io.github.animatedledstrip</groupId>
             <artifactId>animatedledstrip-kotlin-pi</artifactId>
-            <version>0.1</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>no.tornado</groupId>
