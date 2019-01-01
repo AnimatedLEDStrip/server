@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>AnimationHandler.addAnimation - ledServer</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">ledServer</a>&nbsp;/&nbsp;<a href="../index.html">server</a>&nbsp;/&nbsp;<a href="index.html">AnimationHandler</a>&nbsp;/&nbsp;<a href="./add-animation.html">addAnimation</a><br/>
+<br/>
+<h1>addAnimation</h1>
+<a name="server.AnimationHandler$addAnimation(kotlin.collections.Map((kotlin.Any, )))"></a>
+<code><span class="keyword">fun </span><span class="identifier">addAnimation</span><span class="symbol">(</span><span class="identifier" id="server.AnimationHandler$addAnimation(kotlin.collections.Map((kotlin.Any, )))/params">params</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">,</span>&nbsp;<span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Adds a new animation.
+If params<a href="#">Continuous</a> is false or null
+    Creates a SingleRunAnimation instance in a new thread
+If params<a href="#">Continuous</a> is true
+    Creates a ContinuousRunAnimation instance in a new thread
+    Adds pair with the animation ID and ContinuousRunAnimation instance
+    to continuousAnimations</p>
+<h3>Parameters</h3>
+<p><a name="params"></a>
+<code>params</code> - A Map&lt;String, Any?&gt; containing data about the animation to be run</p>
+</BODY>
+</HTML>
