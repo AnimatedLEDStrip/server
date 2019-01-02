@@ -25,10 +25,10 @@ object AnimationHandler {
     /**
      * Adds a new animation.
      *
-     * If params["Continuous"] is false or null:
+     * If params&#91;"Continuous"&#93; is false or null:
      *      Creates a SingleRunAnimation instance in a new thread.
      *
-     * If params["Continuous"] is true:
+     * If params&#91;"Continuous"&#93; is true:
      *      Creates a ContinuousRunAnimation instance in a new thread,
      *      Adds pair with the animation ID and ContinuousRunAnimation instance
      *      to continuousAnimations.
