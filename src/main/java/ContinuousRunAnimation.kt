@@ -163,7 +163,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
         val d = delay ?: 50
         val cList = mutableListOf<ColorContainer>()
         colorList?.forEach { c -> cList.add(ColorContainer(c as Long)) }
-        println("$colorList = $cList")
+//        println("$colorList = $cList")
         while (continueAnimation) {
             leds.smoothChase(
                 cList,

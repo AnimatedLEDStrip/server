@@ -3,6 +3,8 @@ package server
 import animatedledstrip.leds.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import org.apache.commons.logging.LogFactory
 import tornadofx.App
 import tornadofx.launch
 import java.io.FileInputStream
@@ -21,26 +23,40 @@ val animationQueue = mutableListOf<String>("C 0")
 var quit = false    // Tracks if loops should continue
 
 fun main(args: Array<String>) {
+
+
+
+    val log = LogFactory.getLog("Main")
+
     try {
+        log.debug("Loading led.config")
         properties.load(FileInputStream("led.config"))          // Load config file
     } catch (e: Exception) {
-        println("No led.config found")
+        log.warn("No led.config found")
     }
 
     leds = AnimatedLEDStripConcurrent(
         try {
+            log.debug("Trying to load numLEDs from led.config")
             properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
         } catch (e: Exception) {
+            log.warn("No numLEDs in led.config or led.config does not exist")
             240                                                 // Else default
         },
         try {
+            log.debug("Trying to load pin from led.config")
             properties.getProperty("pin").toInt()               // If config file has pin property
         } catch (e: Exception) {
-            12                                                  // Else default
+            log.warn("No pin in led.config or led.config does not exist")
+            10                                                  // Else default
         },
         emulated = try {
+            log.debug("Checking command line arguments for 'emulate'")
             when (args[0].toUpperCase()) {
-                "EMULATE" -> true                               // If first command line argument is emulate, true
+                "EMULATE" -> {
+                    log.info("Emulating LED strip")
+                    true
+                }                               // If first command line argument is emulate, true
                 else -> false                                   // Else if argument exists but is different, false
             }
         } catch (e: Exception) {
@@ -48,13 +64,19 @@ fun main(args: Array<String>) {
         }
     )
 
+    log.debug("Initializing AnimationHandler")
     AnimationHandler                                            // Initialize AnimationHandler object
 
+    AnimationHandler.addAnimation(mapOf("Animation" to Animations.COLOR1, "Color1" to 0x0.toLong()))
     /*  Launch loop to read from local terminal, mainly for a 'q' from the user */
-    GlobalScope.launch {
+    GlobalScope.launch(newSingleThreadContext("Local Terminal")){
+        val log = LogFactory.getLog("Local Terminal Thread")
+        log.debug("Launching local terminal tread")
         while (!quit) {
             val strIn = readLine()
+            log.debug("Read line")
             if (strIn?.toUpperCase() == "Q") {
+                log.debug("'Q' received, shutting down server")
                 leds.setStripColor(0)
                 quit = true
             }
@@ -62,29 +84,34 @@ fun main(args: Array<String>) {
     }
 
     /*  Start GUI Socket in separate thread */
-    GlobalScope.launch {
+    GlobalScope.launch(newSingleThreadContext("GUIConnection")) {
+        val log = LogFactory.getLog("GUISocket thread")
+        log.debug("Launching GUISocket thread")
         GUISocket.openSocket()
     }
 
     /*  Start Command Line Socket in separate thread */
-    GlobalScope.launch {
-        CommandLineSocket.openSocket()
-    }
+//    GlobalScope.launch {
+//        CommandLineSocket.openSocket()
+//    }
 
     /*  If we told the LEDs to use EmulatedWS281x as their superclass, start the emulation GUI */
-    if (leds.isEmulated()) launch<EmulatedLEDStripViewer>(args)
+    if (leds.isEmulated()) {
+        log.debug("Starting emulated LED strip GUI")
+        launch<EmulatedLEDStripViewer>(args)
+    }
 
     /*  Legacy code that might be able to be removed */
     var taskList: MutableList<String>
     var out: PrintWriter? = null
-    GlobalScope.launch {
-        while (out == null) {
-            try {
-                out = PrintWriter(GUISocket.clientSocket?.getOutputStream(), true)
-            } catch (e: Exception) {
-            }
-        }
-    }
+//    GlobalScope.launch(newSingleThreadContext(random().toString())) {
+//        while (out == null) {
+//            try {
+//                out = PrintWriter(GUISocket.clientSocketOut?.getOutputStream(), true)
+//            } catch (e: Exception) {
+//            }
+//        }
+//    }
 
     /*  Checks for new animation in queue and if it exists, runs it */
     while (!quit) {

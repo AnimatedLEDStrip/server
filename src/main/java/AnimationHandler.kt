@@ -4,6 +4,7 @@ import animatedledstrip.leds.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import org.apache.commons.logging.LogFactory
 import java.lang.Math.random
 
 
@@ -12,6 +13,8 @@ import java.lang.Math.random
  * instances for animations and keeps track of currently running animations
  */
 object AnimationHandler {
+
+    private val log = LogFactory.getLog(this::class.java)
 
     /**
      * Map tracking what continuous animations are currently running
@@ -37,9 +40,12 @@ object AnimationHandler {
      */
     fun addAnimation(params: Map<*, *>) {
         GlobalScope.launch(newSingleThreadContext("Thread ${random()}")) {
+            log.debug("Launching new thread for new animation")
+            log.debug("Decomposing params map")
             val (animation, _, _, _, _, _, _, _, _, _,
                     continuous, ID) = params
 
+            log.info(params)
             when (animation) {
                 /*  Animations that are only run once because they change the color of the strip */
                 Animations.COLOR1,
@@ -50,6 +56,7 @@ object AnimationHandler {
                 Animations.SPARKLETOCOLOR,
                 Animations.STACK,
                 Animations.WIPE -> {
+                    log.info("Single Run Animation called")
                     SingleRunAnimation(params)
                     println("${Thread.currentThread().name} complete")
                 }
@@ -63,6 +70,7 @@ object AnimationHandler {
                 Animations.SPARKLE,
                 Animations.STACKOVERFLOW -> {
                     if (continuous == true) {
+                        log.info("Continuous Animation called")
                         val id = random().toString()
                         continuousAnimations[id] =
                                 ContinuousRunAnimation(id, params)
@@ -70,16 +78,18 @@ object AnimationHandler {
                         println(continuousAnimations)
                         println("${Thread.currentThread().name} complete")
                     } else {
+                        log.info("Single Run Animation called")
                         SingleRunAnimation(params)
                         println("${Thread.currentThread().name} complete")
                     }
                 }
                 /*  Special "Animation" type that the GUI sends to end an animation */
                 Animations.ENDANIMATION -> {
+                    log.info("Ending an animation")
                     continuousAnimations[ID]?.endAnimation()        // End animation
                     continuousAnimations.remove(ID)                 // Remove it from the continuousAnimations map
                 }
-                else -> println("Animation $animation not supported by server")
+                else -> log.warn("Animation $animation not supported by server")
             }
         }
     }

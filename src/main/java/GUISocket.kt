@@ -1,5 +1,6 @@
 package server
 
+import org.apache.commons.logging.LogFactory
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -12,8 +13,11 @@ import java.net.SocketException
  * An object that handles communication with the GUI via port 5
  */
 object GUISocket {
-    private val serverSocket = ServerSocket(5)
-    var clientSocket: Socket? = null
+    private val log = LogFactory.getLog(this::class.java)
+    private val serverSocketOut = ServerSocket(5)
+    private val serverSocketIn = ServerSocket(4)
+    var clientSocketOut: Socket? = null
+    var clientSocketIn: Socket? = null
     private var disconnected = true
     private var socOut: ObjectOutputStream? = null
 
@@ -31,19 +35,25 @@ object GUISocket {
      */
     fun openSocket() {
         while (!quit) {
-            clientSocket = serverSocket.accept()
-            val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
-            socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+            clientSocketOut = serverSocketOut.accept()
+            clientSocketIn = serverSocketIn.accept()
+            log.debug("Accepted new connection")
+            log.debug("Initializing input stream")
+            val socIn = ObjectInputStream(BufferedInputStream(clientSocketIn!!.getInputStream()))
+            log.debug("Initializing output stream")
+            socOut = ObjectOutputStream(clientSocketOut!!.getOutputStream())
+            log.debug("Sending currently running animations to GUI")
             AnimationHandler.continuousAnimations.forEach {
                 it.value.sendAnimation()    // Send all current running continuous animations to newly connected GUI
             }
             disconnected = false
-            println("GUI Connection Established")
+            log.info("GUI Connection Established")
             var input: Map<*, *>
             try {
                 while (!disconnected) {
+                    log.debug("Waiting for input")
                     input = socIn.readObject() as Map<*, *>
-
+                    log.debug("Input received")
                     /*  Check if GUI is sending Quit command */
                     val remoteQuit = input["Quit"] as Boolean? ?: false
                     if (remoteQuit)
@@ -52,7 +62,7 @@ object GUISocket {
                         AnimationHandler.addAnimation(input)
                 }
             } catch (e: SocketException) {  // Catch disconnections
-                println("GUI Connection Lost: $e")
+                log.warn("GUI Connection Lost: $e")
             }
         }
     }
