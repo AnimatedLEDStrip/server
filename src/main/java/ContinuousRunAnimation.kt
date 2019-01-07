@@ -2,6 +2,7 @@ package server
 
 import animatedledstrip.leds.*
 import animatedledstrip.ccpresets.*
+import org.pmw.tinylog.Logger
 
 /**
  * Class for running an animation that repeats until stopped
@@ -37,6 +38,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
                 spacing,
                 delay) = params         // Decompose params map into separate variables
 
+        Logger.trace("params: $params")
         when (animation) {
             Animations.ALTERNATE ->
                 alternate(color1, color2)
@@ -62,7 +64,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
      * Stop animation
      */
     fun endAnimation() {
-        println("Animation $id ending")
+        Logger.debug("Animation $id ending")
         continueAnimation = false
     }
 
@@ -71,6 +73,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
      *  Send animation data to GUI
      */
     fun sendAnimation() {
+        Logger.trace("Sending animation to GUI")
         GUISocket.sendAnimation(params, id)
     }
 
@@ -81,7 +84,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
         val c2 = color2 ?: 0x0
         while (continueAnimation) leds.alternate(ColorContainer(color1), ColorContainer(c2))
     } catch (e: Exception) {
-        println("Handler Error - Alternate: $e")
+        Logger.error("Handler Error - Alternate: $e")
     }
 
     private fun multiPixelRun(color: Long, spacing: Int?, direction: Char?, delay: Int?) = try {
@@ -100,7 +103,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
             )
         }
     } catch (e: Exception) {
-        println("Handler Error - Multi-Pixel Run Animation: $e")
+        Logger.error("Handler Error - Multi-Pixel Run Animation: $e")
     }
 
     private fun pixelMarathon(color1: Long, color2: Long?, color3: Long?, color4: Long?, color5: Long?) = try {
@@ -118,7 +121,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
             )
         }
     } catch (e: Exception) {
-        println("Handler Error - Pixel Marathon Animation: $e")
+        Logger.error("Handler Error - Pixel Marathon Animation: $e")
     }
 
     private fun pixelRun(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
@@ -137,7 +140,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
             )
         }
     } catch (e: Exception) {
-        println("Handler Error - Pixel Run Animation: $e")
+        Logger.error("Handler Error - Pixel Run Animation: $e")
     }
 
     private fun pixelRunWithTrail(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
@@ -156,7 +159,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
             )
         }
     } catch (e: Exception) {
-        println("Handler Error - Pixel Run With Trail Animation: $e")
+        Logger.error("Handler Error - Pixel Run With Trail Animation: $e")
     }
 
     private fun smoothChase(colorList: List<*>?, direction: Char?, delay: Int?) = try {
@@ -176,21 +179,21 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
             )
         }
     } catch (e: Exception) {
-        println("Handler Error - Smooth Chase Animation: $e")
+        Logger.error("Handler Error - Smooth Chase Animation: $e")
     }
 
     private fun sparkle(color: Long, delay: Int?) = try {
         val d = delay ?: 10
         while (continueAnimation) leds.sparkle(ColorContainer(color), delay = d)
     } catch (e: Exception) {
-        println("Handler Error - Sparkle to Color Animation: $e")
+        Logger.error("Handler Error - Sparkle to Color Animation: $e")
     }
 
     private fun stackOverflow(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0xFF
         while (continueAnimation) leds.stackOverflow(ColorContainer(color1), ColorContainer(c2))
     } catch (e: Exception) {
-        println("Handler Error - Stack Overflow Animation: $e")
+        Logger.error("Handler Error - Stack Overflow Animation: $e")
     }
 
 }

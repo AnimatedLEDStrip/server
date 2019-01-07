@@ -1,5 +1,6 @@
 package server
 
+import org.pmw.tinylog.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.ServerSocket
@@ -14,7 +15,6 @@ object CommandLineSocket {
     private var clientSocket: Socket? = null
 
     fun isDisconnected() = !disconnected
-    fun getClientIP() = clientSocket!!.remoteSocketAddress
 
 
     /**
@@ -27,16 +27,20 @@ object CommandLineSocket {
     fun openSocket() {
         while (!quit) {
             clientSocket = serverSocket.accept()
+            Logger.trace("Accepted new connection on port 6")
+            Logger.trace("Initializing input stream")
             val socIn = BufferedReader(InputStreamReader(clientSocket!!.getInputStream()))
             disconnected = false
-            println("Command Line Connection Established")
+            Logger.info("Command Line Connection Established")
             var input: String?
             while (!disconnected) {
+                Logger.trace("Waiting for input")
                 input = socIn.readLine()
+                Logger.trace("Input received")
                 /*  If checkForNullAndAdd returns true, then the remote client has disconnected or is about to */
                 if (animationQueue.checkForNullAndAdd(input)) disconnected = true
             }
-            println("Command Line Connection Lost")
+            Logger.warn("Command Line Connection Lost")
         }
     }
 }

@@ -1,6 +1,6 @@
 package server
 
-import org.apache.commons.logging.LogFactory
+import org.pmw.tinylog.Logger
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -13,11 +13,8 @@ import java.net.SocketException
  * An object that handles communication with the GUI via port 5
  */
 object GUISocket {
-    private val log = LogFactory.getLog(this::class.java)
-    private val serverSocketOut = ServerSocket(5)
-    private val serverSocketIn = ServerSocket(4)
-    var clientSocketOut: Socket? = null
-    var clientSocketIn: Socket? = null
+    private val serverSocket = ServerSocket(5)
+    var clientSocket: Socket? = null
     private var disconnected = true
     private var socOut: ObjectOutputStream? = null
 
@@ -35,25 +32,24 @@ object GUISocket {
      */
     fun openSocket() {
         while (!quit) {
-            clientSocketOut = serverSocketOut.accept()
-            clientSocketIn = serverSocketIn.accept()
-            log.debug("Accepted new connection")
-            log.debug("Initializing input stream")
-            val socIn = ObjectInputStream(BufferedInputStream(clientSocketIn!!.getInputStream()))
-            log.debug("Initializing output stream")
-            socOut = ObjectOutputStream(clientSocketOut!!.getOutputStream())
-            log.debug("Sending currently running animations to GUI")
+            clientSocket = serverSocket.accept()
+            Logger.trace("Accepted new connection on port 5")
+            Logger.trace("Initializing input stream")
+            val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
+            Logger.trace("Initializing output stream")
+            socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+            Logger.trace("Sending currently running animations to GUI")
             AnimationHandler.continuousAnimations.forEach {
                 it.value.sendAnimation()    // Send all current running continuous animations to newly connected GUI
             }
             disconnected = false
-            log.info("GUI Connection Established")
+            Logger.info("GUI Connection Established")
             var input: Map<*, *>
             try {
                 while (!disconnected) {
-                    log.debug("Waiting for input")
+                    Logger.trace("Waiting for input")
                     input = socIn.readObject() as Map<*, *>
-                    log.debug("Input received")
+                    Logger.trace("Input received")
                     /*  Check if GUI is sending Quit command */
                     val remoteQuit = input["Quit"] as Boolean? ?: false
                     if (remoteQuit)
@@ -62,7 +58,7 @@ object GUISocket {
                         AnimationHandler.addAnimation(input)
                 }
             } catch (e: SocketException) {  // Catch disconnections
-                log.warn("GUI Connection Lost: $e")
+                Logger.warn("GUI Connection Lost: $e")
             }
         }
     }
@@ -76,6 +72,7 @@ object GUISocket {
     fun sendAnimation(animation: Map<*, *>, id: String) {
         if (!isDisconnected()) {
             socOut!!.writeObject(mapOf("Animation" to animation, "ID" to id))
+            Logger.trace("Sent animation to GUI:\n$animation : $id")
         }
     }
 }

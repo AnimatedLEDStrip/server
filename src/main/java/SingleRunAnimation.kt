@@ -2,6 +2,7 @@ package server
 
 import animatedledstrip.leds.*
 import animatedledstrip.ccpresets.*
+import org.pmw.tinylog.Logger
 
 /**
  * Class for running an animation that runs once before stopping
@@ -67,15 +68,14 @@ class SingleRunAnimation(private val params: Map<*, *>) {
         val c2 = color2 ?: 0x0
         leds.multiAlternate(30, 60, ColorContainer(color1), ColorContainer(c2))
     } catch (e: Exception) {
-        println("Handler Error - Alternate: $e")
+        Logger.error("Handler Error - Alternate: $e")
     }
 
     private fun color1(color: Long) = try {
         leds.setStripColor(color)
         Thread.sleep(1000)
     } catch (e: Exception) {
-        println("Handler Error - Static Color 1: $e")
-        color2(0x0, null)
+        Logger.error("Handler Error - Static Color 1: $e")
     }
 
     private fun color2(color1: Long, color2: Long?) = try {
@@ -83,7 +83,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
 //        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2))
         Thread.sleep(1000)
     } catch (e: Exception) {
-        println("Handler Error - Static Color 2: $e")
+        Logger.error("Handler Error - Static Color 2: $e")
     }
 
     private fun color3(color1: Long, color2: Long?, color3: Long?) = try {
@@ -92,7 +92,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
 //        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3))
         Thread.sleep(1000)
     } catch (e: Exception) {
-        println("Handler Error - Static Color 3: $e")
+        Logger.error("Handler Error - Static Color 3: $e")
     }
 
     private fun color4(color1: Long, color2: Long?, color3: Long?, color4: Long?) = try {
@@ -102,7 +102,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
 //        leds.setStripWithGradient(ColorContainer(color1), ColorContainer(c2), ColorContainer(c3), ColorContainer(c4))
         Thread.sleep(1000)
     } catch (e: Exception) {
-        println("Handler Error - Static Color 3: $e")
+        Logger.error("Handler Error - Static Color 3: $e")
     }
 
     private fun multiPixelRun(color: Long, spacing: Int?, direction: Char?, delay: Int?) = try {
@@ -119,7 +119,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             delay = d
         )
     } catch (e: Exception) {
-        println("Handler Error - Multi-Pixel Run Animation: $e")
+        Logger.error("Handler Error - Multi-Pixel Run Animation: $e")
     }
 
     private fun multiPixelRunToColor(color: Long, spacing: Int?, direction: Char?, delay: Int?) = try {
@@ -136,7 +136,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             delay = d
         )
     } catch (e: Exception) {
-        println("Handler Error - Multi-Pixel Run To Color Animation: $e")
+        Logger.error("Handler Error - Multi-Pixel Run To Color Animation: $e")
     }
 
     private fun pixelMarathon(color1: Long, color2: Long?, color3: Long?, color4: Long?, color5: Long?) = try {
@@ -152,7 +152,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             ColorContainer(c5)
         )
     } catch (e: Exception) {
-        println("Handler Error - Pixel Marathon Animation: $e")
+        Logger.error("Handler Error - Pixel Marathon Animation: $e")
     }
 
     private fun pixelRun(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
@@ -169,7 +169,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             d
         )
     } catch (e: Exception) {
-        println("Handler Error - Pixel Run Animation: $e")
+        Logger.error("Handler Error - Pixel Run Animation: $e")
     }
 
     private fun pixelRunWithTrail(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
@@ -186,21 +186,21 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             delay = d
         )
     } catch (e: Exception) {
-        println("Handler Error - Pixel Run With Trail Animation: $e")
+        Logger.error("Handler Error - Pixel Run With Trail Animation: $e")
     }
 
     private fun sparkle(color: Long, delay: Int?) = try {
         val d = delay ?: 10
         leds.sparkle(ColorContainer(color), delay = d)
     } catch (e: Exception) {
-        println("Handler Error - Sparkle to Color Animation: $e")
+        Logger.error("Handler Error - Sparkle to Color Animation: $e")
     }
 
     private fun sparkleToColor(color: Long, delay: Int?) = try {
         val d = delay ?: 10
         leds.sparkleToColor(ColorContainer(color), delay = d)
     } catch (e: Exception) {
-        println("Handler Error - Sparkle to Color Animation: $e")
+        Logger.error("Handler Error - Sparkle to Color Animation: $e")
     }
 
     private fun stack(color1: Long, direction: Char?) = try {
@@ -213,14 +213,14 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             ColorContainer(color1)
         )
     } catch (e: Exception) {
-        println("Handler Error - Stack Animation: $e")
+        Logger.error("Handler Error - Stack Animation: $e")
     }
 
     private fun stackOverflow(color1: Long, color2: Long?) = try {
         val c2 = color2 ?: 0xFF
         leds.stackOverflow(ColorContainer(color1), ColorContainer(c2))
     } catch (e: Exception) {
-        println("Handler Error - Stack Overflow Animation: $e")
+        Logger.error("Handler Error - Stack Overflow Animation: $e")
     }
 
     private fun wipe(color: Long, direction: Char?) = try {
@@ -233,7 +233,7 @@ class SingleRunAnimation(private val params: Map<*, *>) {
             }
         )
     } catch (e: Exception) {
-        println("Handler Error - Wipe Animation: $e")
+        Logger.error("Handler Error - Wipe Animation: $e")
     }
 
 }

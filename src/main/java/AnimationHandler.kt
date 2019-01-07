@@ -4,7 +4,7 @@ import animatedledstrip.leds.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
-import org.apache.commons.logging.LogFactory
+import org.pmw.tinylog.Logger
 import java.lang.Math.random
 
 
@@ -13,8 +13,6 @@ import java.lang.Math.random
  * instances for animations and keeps track of currently running animations
  */
 object AnimationHandler {
-
-    private val log = LogFactory.getLog(this::class.java)
 
     /**
      * Map tracking what continuous animations are currently running
@@ -39,13 +37,13 @@ object AnimationHandler {
      * @param params A Map<String, Any?> containing data about the animation to be run
      */
     fun addAnimation(params: Map<*, *>) {
+        Logger.trace("Launching new thread for new animation")
         GlobalScope.launch(newSingleThreadContext("Thread ${random()}")) {
-            log.debug("Launching new thread for new animation")
-            log.debug("Decomposing params map")
+            Logger.trace("Decomposing params map")
             val (animation, _, _, _, _, _, _, _, _, _,
                     continuous, ID) = params
 
-            log.info(params)
+            Logger.debug(params)
             when (animation) {
                 /*  Animations that are only run once because they change the color of the strip */
                 Animations.COLOR1,
@@ -56,9 +54,9 @@ object AnimationHandler {
                 Animations.SPARKLETOCOLOR,
                 Animations.STACK,
                 Animations.WIPE -> {
-                    log.info("Single Run Animation called")
+                    Logger.trace("Calling Single Run Animation")
                     SingleRunAnimation(params)
-                    println("${Thread.currentThread().name} complete")
+                    Logger.debug("${Thread.currentThread().name} complete")
                 }
                 /*  Animations that can be run repeatedly */
                 Animations.ALTERNATE,
@@ -70,26 +68,26 @@ object AnimationHandler {
                 Animations.SPARKLE,
                 Animations.STACKOVERFLOW -> {
                     if (continuous == true) {
-                        log.info("Continuous Animation called")
+                        Logger.trace("Calling Continuous Animation")
                         val id = random().toString()
                         continuousAnimations[id] =
                                 ContinuousRunAnimation(id, params)
                         continuousAnimations[id]?.startAnimation()
-                        println(continuousAnimations)
-                        println("${Thread.currentThread().name} complete")
+                        Logger.debug(continuousAnimations)
+                        Logger.debug("${Thread.currentThread().name} complete")
                     } else {
-                        log.info("Single Run Animation called")
+                        Logger.trace("Calling Single Run Animation")
                         SingleRunAnimation(params)
-                        println("${Thread.currentThread().name} complete")
+                        Logger.debug("${Thread.currentThread().name} complete")
                     }
                 }
                 /*  Special "Animation" type that the GUI sends to end an animation */
                 Animations.ENDANIMATION -> {
-                    log.info("Ending an animation")
+                    Logger.debug("Ending an animation")
                     continuousAnimations[ID]?.endAnimation()        // End animation
                     continuousAnimations.remove(ID)                 // Remove it from the continuousAnimations map
                 }
-                else -> log.warn("Animation $animation not supported by server")
+                else -> Logger.warn("Animation $animation not supported by server")
             }
         }
     }
