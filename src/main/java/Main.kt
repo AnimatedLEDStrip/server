@@ -20,7 +20,7 @@ val properties = Properties()
 
 class EmulatedLEDStripViewer : App(WS281xEmulator::class)
 
-lateinit var leds: AnimatedLEDStripConcurrent       // Our LED strip instance - will be initialized in main
+lateinit var leds: AnimatedLEDStrip       // Our LED strip instance - will be initialized in main
 
 val animationQueue = mutableListOf<String>("C 0")
 
@@ -56,7 +56,7 @@ fun main(args: Array<String>) {
         Logger.warn("No led.config found")
     }
 
-    leds = AnimatedLEDStripConcurrent(
+    leds = AnimatedLEDStrip(
         try {
             Logger.trace("Trying to load numLEDs from led.config")
             properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
