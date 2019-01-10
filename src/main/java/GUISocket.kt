@@ -71,6 +71,7 @@ object GUISocket {
      */
     fun sendAnimation(animation: Map<*, *>, id: String) {
         if (!isDisconnected()) {
+            Logger.trace("Animation to send: $animation")
             socOut!!.writeObject(mapOf("Animation" to animation, "ID" to id))
             Logger.trace("Sent animation to GUI:\n$animation : $id")
         }

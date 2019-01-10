@@ -186,7 +186,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
         val d = delay ?: 10
         while (continueAnimation) leds.sparkle(ColorContainer(color), delay = d)
     } catch (e: Exception) {
-        Logger.error("Handler Error - Sparkle to Color Animation: $e")
+        Logger.error("Handler Error - Sparkle Animation: $e")
     }
 
     private fun stackOverflow(color1: Long, color2: Long?) = try {

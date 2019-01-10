@@ -46,10 +46,8 @@ object AnimationHandler {
             Logger.debug(params)
             when (animation) {
                 /*  Animations that are only run once because they change the color of the strip */
-                Animations.COLOR1,
-                Animations.COLOR2,
-                Animations.COLOR3,
-                Animations.COLOR4,
+                Animations.COLOR,
+                Animations.MULTICOLOR,
                 Animations.MULTIPIXELRUNTOCOLOR,
                 Animations.SPARKLETOCOLOR,
                 Animations.STACK,
@@ -87,6 +85,10 @@ object AnimationHandler {
                     continuousAnimations[ID]?.endAnimation()        // End animation
                     continuousAnimations.remove(ID)                 // Remove it from the continuousAnimations map
                 }
+                Animations.COLOR1,
+                Animations.COLOR2,
+                Animations.COLOR3,
+                Animations.COLOR4 -> Logger.warn("COLOR1, COLOR2, COLOR3 and COLOR4 are deprecated")
                 else -> Logger.warn("Animation $animation not supported by server")
             }
         }
