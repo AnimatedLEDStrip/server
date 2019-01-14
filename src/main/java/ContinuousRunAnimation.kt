@@ -125,7 +125,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
     }
 
     private fun pixelRun(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
-        val d = delay ?: 50
+        val d = delay ?: 30
         val c2 = color2 ?: 0x0
         while (continueAnimation) {
             leds.pixelRun(
@@ -144,7 +144,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
     }
 
     private fun pixelRunWithTrail(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
-        val d = delay ?: 50
+        val d = delay ?: 30
         val c2 = color2 ?: 0x0
         while (continueAnimation) {
             leds.pixelRunWithTrail(
@@ -190,6 +190,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
     }
 
     private fun stackOverflow(color1: Long, color2: Long?) = try {
+        throw Exception("Method and/or animation needs fixing before usage of this method is permitted")
         val c2 = color2 ?: 0xFF
         while (continueAnimation) leds.stackOverflow(ColorContainer(color1), ColorContainer(c2))
     } catch (e: Exception) {

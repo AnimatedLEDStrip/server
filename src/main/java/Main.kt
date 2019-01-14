@@ -1,6 +1,7 @@
 package server
 
 import animatedledstrip.leds.*
+import com.diozero.ws281xj.PixelAnimations.delay
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
@@ -33,6 +34,7 @@ fun main(args: Array<String>) {
     options.addOption("t", "Enable trace debugging")
     options.addOption("v", "Enable verbose log statements")
     options.addOption("e", "Emulate LED strip and launch emulator")
+    options.addOption("i", "Enable image debugging")
 
     val cmdline = DefaultParser().parse(options, args)
 
@@ -44,6 +46,7 @@ fun main(args: Array<String>) {
         when {
             cmdline.hasOption("t") -> Level.TRACE
             cmdline.hasOption("d") -> Level.DEBUG
+            cmdline.hasOption("i") -> Level.OFF
             else -> Level.INFO
         }
 
@@ -136,6 +139,9 @@ fun main(args: Array<String>) {
      */
     fun shutdownServer() {
         leds.setStripColor(0)
+        delay(500)
+        leds.stopRender = true
+        delay(2000)
         if (!GUISocket.isDisconnected()) out?.println("Q")
         System.exit(0)
     }
