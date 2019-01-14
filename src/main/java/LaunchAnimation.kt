@@ -54,7 +54,7 @@ fun callWipe(args: List<String>) = try {
 
     val color = ColorContainer(parseHex(args[1]))
 
-    val animationMap = mapOf("Animation" to Animations.WIPE, "Color1" to color.getColorHex(), "Direction" to direction)
+    val animationMap = mapOf("Animation" to Animation.WIPE, "Color1" to color.getColorHex(), "Direction" to direction)
     AnimationHandler.addAnimation(animationMap)
 //    leds.wipe(color, direction)
     animationQueue[0] = "NONE"
@@ -67,7 +67,7 @@ fun callStackOverflow(args: List<String>) = try {
     val color2 = ColorContainer(parseHex(args[2]))
 
     val animationMap = mapOf(
-        "Animation" to Animations.STACKOVERFLOW,
+        "Animation" to Animation.STACKOVERFLOW,
         "Color1" to color1.getColorHex(),
         "Color2" to color2.getColorHex()
     )
@@ -91,7 +91,7 @@ fun callStack(args: List<String>) = try {
     val color = ColorContainer(parseHex(args[1]))
 
 //    leds.stack(direction, color)
-    val animationMap = mapOf("Animation" to Animations.STACK, "Color1" to color.getColorHex(), "Direction" to direction)
+    val animationMap = mapOf("Animation" to Animation.STACK, "Color1" to color.getColorHex(), "Direction" to direction)
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 } catch (e: Exception) {
@@ -101,7 +101,7 @@ fun callStack(args: List<String>) = try {
 
 fun callSparkleToColor(args: List<String>) = try {
     val color = ColorContainer(parseHex(args[1]))
-    val animationMap = mapOf("Animation" to Animations.SPARKLETOCOLOR, "Color1" to color.getColorHex())
+    val animationMap = mapOf("Animation" to Animation.SPARKLETOCOLOR, "Color1" to color.getColorHex())
     AnimationHandler.addAnimation(animationMap)
 //    leds.sparkleToColor(color)
     animationQueue[0] = "NONE"
@@ -112,7 +112,7 @@ fun callSparkleToColor(args: List<String>) = try {
 fun callSparkle(args: List<String>) = try {
     val color = ColorContainer(parseHex(args[1]))
 //    leds.sparkleCC(color)
-    val animationMap = mapOf("Animation" to Animations.SPARKLE, "Color1" to color.getColorHex())
+    val animationMap = mapOf("Animation" to Animation.SPARKLE, "Color1" to color.getColorHex())
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 
@@ -142,7 +142,7 @@ fun callSmoothChase(args: List<String>) = try {
 fun callPixelMarathon(args: List<String>) = try {
     println("PXM Start")
     val color1 = ColorContainer(parseHex(args[1]))
-    val animationMap = mapOf("Animation" to Animations.PIXELMARATHON, "Color1" to color1.getColorHex())
+    val animationMap = mapOf("Animation" to Animation.PIXELMARATHON, "Color1" to color1.getColorHex())
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 } catch (e: Exception) {
@@ -164,7 +164,7 @@ fun callPixelRun(args: List<String>) = try {
     val color2 = ColorContainer(parseHex(args[2]))
 
     val animationMap =
-        mapOf("Animation" to Animations.PIXELRUN, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
+        mapOf("Animation" to Animation.PIXELRUN, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 
@@ -189,7 +189,7 @@ fun callMultiPixelRunToColor(args: List<String>) = try {
 //    leds.multiPixelRunToColor(spacing, direction, color1)
     animationQueue[0] = "NONE"
     val animationMap = mapOf(
-        "Animation" to Animations.MULTIPIXELRUNTOCOLOR,
+        "Animation" to Animation.MULTIPIXELRUNTOCOLOR,
         "Color1" to color1.getColorHex(),
         "Spacing" to spacing,
         "Direction" to direction
@@ -215,7 +215,7 @@ fun callMultiPixelRun(args: List<String>) = try {
     val color2 = ColorContainer(parseHex(args[2]))
 
     val animationMap = mapOf(
-        "Animation" to Animations.MULTIPIXELRUN,
+        "Animation" to Animation.MULTIPIXELRUN,
         "Color1" to color1.getColorHex(),
         "Color2" to color2.getColorHex(),
         "Spacing" to spacing,
@@ -239,7 +239,7 @@ fun callAlternate(args: List<String>) = try {
     val color2 = ColorContainer(parseHex(args[2]))
 
     val animationMap =
-        mapOf("Animation" to Animations.ALTERNATE, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
+        mapOf("Animation" to Animation.ALTERNATE, "Color1" to color1.getColorHex(), "Color2" to color2.getColorHex())
     AnimationHandler.addAnimation(animationMap)
     animationQueue[0] = "NONE"
 

@@ -1,10 +1,10 @@
 package server
 
-import animatedledstrip.leds.Animations
+import animatedledstrip.leds.Animation
 
 /*  Operator functions for simplifying decomposition of a Map */
 
-operator fun Map<*, *>.component1() = this["Animation"] as Animations
+operator fun Map<*, *>.component1() = this["Animation"] as Animation
 operator fun Map<*, *>.component2() = this["Color1"] as Long
 operator fun Map<*, *>.component3() = this["Color2"] as Long?
 operator fun Map<*, *>.component4() = this["Color3"] as Long?

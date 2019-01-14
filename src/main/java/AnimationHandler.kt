@@ -46,25 +46,25 @@ object AnimationHandler {
             Logger.debug(params)
             when (animation) {
                 /*  Animations that are only run once because they change the color of the strip */
-                Animations.COLOR,
-                Animations.MULTICOLOR,
-                Animations.MULTIPIXELRUNTOCOLOR,
-                Animations.SPARKLETOCOLOR,
-                Animations.STACK,
-                Animations.WIPE -> {
+                Animation.COLOR,
+                Animation.MULTICOLOR,
+                Animation.MULTIPIXELRUNTOCOLOR,
+                Animation.SPARKLETOCOLOR,
+                Animation.STACK,
+                Animation.WIPE -> {
                     Logger.trace("Calling Single Run Animation")
                     SingleRunAnimation(params)
                     Logger.debug("${Thread.currentThread().name} complete")
                 }
                 /*  Animations that can be run repeatedly */
-                Animations.ALTERNATE,
-                Animations.MULTIPIXELRUN,
-                Animations.PIXELRUN,
-                Animations.PIXELRUNWITHTRAIL,
-                Animations.PIXELMARATHON,
-                Animations.SMOOTHCHASE,
-                Animations.SPARKLE,
-                Animations.STACKOVERFLOW -> {
+                Animation.ALTERNATE,
+                Animation.MULTIPIXELRUN,
+                Animation.PIXELRUN,
+                Animation.PIXELRUNWITHTRAIL,
+                Animation.PIXELMARATHON,
+                Animation.SMOOTHCHASE,
+                Animation.SPARKLE,
+                Animation.STACKOVERFLOW -> {
                     if (continuous == true) {
                         Logger.trace("Calling Continuous Animation")
                         val id = random().toString()
@@ -80,15 +80,15 @@ object AnimationHandler {
                     }
                 }
                 /*  Special "Animation" type that the GUI sends to end an animation */
-                Animations.ENDANIMATION -> {
+                Animation.ENDANIMATION -> {
                     Logger.debug("Ending an animation")
                     continuousAnimations[ID]?.endAnimation()        // End animation
                     continuousAnimations.remove(ID)                 // Remove it from the continuousAnimations map
                 }
-                Animations.COLOR1,
-                Animations.COLOR2,
-                Animations.COLOR3,
-                Animations.COLOR4 -> Logger.warn("COLOR1, COLOR2, COLOR3 and COLOR4 are deprecated")
+                Animation.COLOR1,
+                Animation.COLOR2,
+                Animation.COLOR3,
+                Animation.COLOR4 -> Logger.warn("COLOR1, COLOR2, COLOR3 and COLOR4 are deprecated")
                 else -> Logger.warn("Animation $animation not supported by server")
             }
         }

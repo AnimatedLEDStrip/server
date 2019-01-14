@@ -40,21 +40,21 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
 
         Logger.trace("params: $params")
         when (animation) {
-            Animations.ALTERNATE ->
+            Animation.ALTERNATE ->
                 alternate(color1, color2)
-            Animations.MULTIPIXELRUN ->
+            Animation.MULTIPIXELRUN ->
                 multiPixelRun(color1, spacing, direction, delay)
-            Animations.PIXELMARATHON ->
+            Animation.PIXELMARATHON ->
                 pixelMarathon(color1, color2, color3, color4, color5)
-            Animations.PIXELRUN ->
+            Animation.PIXELRUN ->
                 pixelRun(color1, color2, direction, delay)
-            Animations.PIXELRUNWITHTRAIL ->
+            Animation.PIXELRUNWITHTRAIL ->
                 pixelRunWithTrail(color1, color2, direction, delay)
-            Animations.SMOOTHCHASE ->
+            Animation.SMOOTHCHASE ->
                 smoothChase(colorList, direction, delay)
-            Animations.SPARKLE ->
+            Animation.SPARKLE ->
                 sparkle(color1, delay)
-            Animations.STACKOVERFLOW ->
+            Animation.STACKOVERFLOW ->
                 stackOverflow(color1, color2)
         }
     }

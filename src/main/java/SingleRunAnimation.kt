@@ -24,36 +24,36 @@ class SingleRunAnimation(private val params: Map<*, *>) {
                 delay) = params         // Decompose params map into separate variables
 
         when (animation) {
-            Animations.COLOR1 ->
+            Animation.COLOR1 ->
                 color1(color1)
-            Animations.COLOR2 ->
+            Animation.COLOR2 ->
                 color2(color1, color2)
-            Animations.COLOR3 ->
+            Animation.COLOR3 ->
                 color3(color1, color2, color3)
-            Animations.COLOR4 ->
+            Animation.COLOR4 ->
                 color4(color1, color2, color3, color4)
-            Animations.ALTERNATE ->
+            Animation.ALTERNATE ->
                 alternate(color1, color2)
-            Animations.MULTIPIXELRUN ->
+            Animation.MULTIPIXELRUN ->
                 multiPixelRun(color1, spacing, direction, delay)
-            Animations.MULTIPIXELRUNTOCOLOR ->
+            Animation.MULTIPIXELRUNTOCOLOR ->
                 multiPixelRunToColor(color1, spacing, direction, delay)
-            Animations.PIXELMARATHON ->
+            Animation.PIXELMARATHON ->
                 pixelMarathon(color1, color2, color3, color4, color5)
-            Animations.PIXELRUN ->
+            Animation.PIXELRUN ->
                 pixelRun(color1, color2, direction, delay)
-            Animations.PIXELRUNWITHTRAIL ->
+            Animation.PIXELRUNWITHTRAIL ->
                 pixelRunWithTrail(color1, color2, direction, delay)
-            Animations.SMOOTHCHASE -> TODO()
-            Animations.SPARKLE ->
+            Animation.SMOOTHCHASE -> TODO()
+            Animation.SPARKLE ->
                 sparkle(color1, delay)
-            Animations.SPARKLETOCOLOR ->
+            Animation.SPARKLETOCOLOR ->
                 sparkleToColor(color1, delay)
-            Animations.STACK ->
+            Animation.STACK ->
                 stack(color1, direction)
-            Animations.STACKOVERFLOW ->
+            Animation.STACKOVERFLOW ->
                 stackOverflow(color1, color2)
-            Animations.WIPE ->
+            Animation.WIPE ->
                 wipe(color1, direction)
         }
     }
