@@ -1,6 +1,6 @@
 [![KDoc](https://img.shields.io/badge/KDoc-read-green.svg)](https://animatedledstrip.github.io/LED_Server/led-server/index.html)
 
-# LED_Server
+# AnimatedLEDStripServer
 
 A server that is built around the AnimatedLEDStripKotlinPi library.
 
