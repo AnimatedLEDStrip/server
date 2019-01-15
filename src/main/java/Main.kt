@@ -80,7 +80,7 @@ fun main(args: Array<String>) {
     Logger.trace("Initializing AnimationHandler")
     AnimationHandler                                            // Initialize AnimationHandler object
 
-    AnimationHandler.addAnimation(mapOf("Animation" to Animations.COLOR1, "Color1" to 0x0.toLong()))
+    AnimationHandler.addAnimation(AnimationData(mapOf("Animation" to Animation.COLOR1, "Color1" to 0x0.toLong())))
     /*  Launch loop to read from local terminal, mainly for a 'q' from the user */
     Logger.trace("Launching local terminal tread")
     GlobalScope.launch(newSingleThreadContext("Local Terminal")) {

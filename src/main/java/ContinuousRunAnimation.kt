@@ -10,7 +10,7 @@ import org.pmw.tinylog.Logger
  * @param id A string to identify the animation, such as the thread it is running in
  * @param params A Map<String, Any?> containing data about the animation to be run
  */
-class ContinuousRunAnimation(private val id: String, private val params: Map<*, *>) {
+class ContinuousRunAnimation(private val id: String, private val params: AnimationData) {
 
     /**
      * Variable controlling while loops in animation functions
@@ -27,35 +27,24 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
      * Determine which animation is being called and call the corresponding function
      */
     fun startAnimation() {
-        val (animation,
-                color1,
-                color2,
-                color3,
-                color4,
-                color5,
-                colorList,
-                direction,
-                spacing,
-                delay) = params         // Decompose params map into separate variables
-
         Logger.trace("params: $params")
-        when (animation) {
+        when (params.animation) {
             Animation.ALTERNATE ->
-                alternate(color1, color2)
+                leds.alternate(params)
             Animation.MULTIPIXELRUN ->
-                multiPixelRun(color1, spacing, direction, delay)
+                leds.multiPixelRun(params)
             Animation.PIXELMARATHON ->
-                pixelMarathon(color1, color2, color3, color4, color5)
+                leds.pixelMarathon(params)
             Animation.PIXELRUN ->
-                pixelRun(color1, color2, direction, delay)
+                leds.pixelRun(params)
             Animation.PIXELRUNWITHTRAIL ->
-                pixelRunWithTrail(color1, color2, direction, delay)
+                leds.pixelRunWithTrail(params)
             Animation.SMOOTHCHASE ->
-                smoothChase(colorList, direction, delay)
+                leds.smoothChase(params)
             Animation.SPARKLE ->
-                sparkle(color1, delay)
+                leds.sparkle(params)
             Animation.STACKOVERFLOW ->
-                stackOverflow(color1, color2)
+                leds.stackOverflow(params)
         }
     }
 
@@ -74,127 +63,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Map<*, 
      */
     fun sendAnimation() {
         Logger.trace("Sending animation to GUI")
-        GUISocket.sendAnimation(params, id)
-    }
-
-
-    /*  Functions for calling animations */
-
-    private fun alternate(color1: Long, color2: Long?) = try {
-        val c2 = color2 ?: 0x0
-        while (continueAnimation) leds.alternate(ColorContainer(color1), ColorContainer(c2))
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Alternate: $e")
-    }
-
-    private fun multiPixelRun(color: Long, spacing: Int?, direction: Char?, delay: Int?) = try {
-        val s = spacing ?: 4
-        val d = delay ?: 150
-        while (continueAnimation) {
-            leds.multiPixelRun(
-                s,
-                when (direction?.toUpperCase()) {
-                    'F' -> Direction.FORWARD
-                    'B' -> Direction.BACKWARD
-                    else -> Direction.FORWARD
-                },
-                ColorContainer(color),
-                delay = d
-            )
-        }
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Multi-Pixel Run Animation: $e")
-    }
-
-    private fun pixelMarathon(color1: Long, color2: Long?, color3: Long?, color4: Long?, color5: Long?) = try {
-        val c2 = color2 ?: CCGreen.hex
-        val c3 = color3 ?: CCYellow.hex
-        val c4 = color4 ?: CCBlue.hex
-        val c5 = color5 ?: CCPurple.hex
-        while (continueAnimation) {
-            leds.pixelMarathon(
-                ColorContainer(color1),
-                ColorContainer(c2),
-                ColorContainer(c3),
-                ColorContainer(c4),
-                ColorContainer(c5)
-            )
-        }
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Pixel Marathon Animation: $e")
-    }
-
-    private fun pixelRun(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
-        val d = delay ?: 30
-        val c2 = color2 ?: 0x0
-        while (continueAnimation) {
-            leds.pixelRun(
-                when (direction?.toUpperCase()) {
-                    'F' -> Direction.FORWARD
-                    'B' -> Direction.BACKWARD
-                    else -> Direction.FORWARD
-                },
-                ColorContainer(color1),
-                ColorContainer(c2),
-                d
-            )
-        }
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Pixel Run Animation: $e")
-    }
-
-    private fun pixelRunWithTrail(color1: Long, color2: Long?, direction: Char?, delay: Int?) = try {
-        val d = delay ?: 30
-        val c2 = color2 ?: 0x0
-        while (continueAnimation) {
-            leds.pixelRunWithTrail(
-                when (direction?.toUpperCase()) {
-                    'F' -> Direction.FORWARD
-                    'B' -> Direction.BACKWARD
-                    else -> Direction.FORWARD
-                },
-                ColorContainer(color1),
-                ColorContainer(c2),
-                delay = d
-            )
-        }
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Pixel Run With Trail Animation: $e")
-    }
-
-    private fun smoothChase(colorList: List<*>?, direction: Char?, delay: Int?) = try {
-        val d = delay ?: 50
-        val cList = mutableListOf<ColorContainer>()
-        colorList?.forEach { c -> cList.add(ColorContainer(c as Long)) }
-//        println("$colorList = $cList")
-        while (continueAnimation) {
-            leds.smoothChase(
-                cList,
-                when (direction?.toUpperCase()) {
-                    'F' -> Direction.FORWARD
-                    'B' -> Direction.BACKWARD
-                    else -> Direction.FORWARD
-                },
-                delay = d
-            )
-        }
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Smooth Chase Animation: $e")
-    }
-
-    private fun sparkle(color: Long, delay: Int?) = try {
-        val d = delay ?: 10
-        while (continueAnimation) leds.sparkle(ColorContainer(color), delay = d)
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Sparkle Animation: $e")
-    }
-
-    private fun stackOverflow(color1: Long, color2: Long?) = try {
-        throw Exception("Method and/or animation needs fixing before usage of this method is permitted")
-        val c2 = color2 ?: 0xFF
-        while (continueAnimation) leds.stackOverflow(ColorContainer(color1), ColorContainer(c2))
-    } catch (e: Exception) {
-        Logger.error("Handler Error - Stack Overflow Animation: $e")
+        GUISocket.sendAnimation(params.toMap(), id)
     }
 
 }

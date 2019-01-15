@@ -36,15 +36,12 @@ object AnimationHandler {
      *
      * @param params A Map<String, Any?> containing data about the animation to be run
      */
-    fun addAnimation(params: Map<*, *>) {
+    fun addAnimation(params: AnimationData) {
         Logger.trace("Launching new thread for new animation")
         GlobalScope.launch(newSingleThreadContext("Thread ${random()}")) {
             Logger.trace("Decomposing params map")
-            val (animation, _, _, _, _, _, _, _, _, _,
-                    continuous, ID) = params
-
             Logger.debug(params)
-            when (animation) {
+            when (params.animation) {
                 /*  Animations that are only run once because they change the color of the strip */
                 Animation.COLOR,
                 Animation.MULTICOLOR,
@@ -65,7 +62,7 @@ object AnimationHandler {
                 Animation.SMOOTHCHASE,
                 Animation.SPARKLE,
                 Animation.STACKOVERFLOW -> {
-                    if (continuous == true) {
+                    if (params.continuous) {
                         Logger.trace("Calling Continuous Animation")
                         val id = random().toString()
                         continuousAnimations[id] =
@@ -82,14 +79,14 @@ object AnimationHandler {
                 /*  Special "Animation" type that the GUI sends to end an animation */
                 Animation.ENDANIMATION -> {
                     Logger.debug("Ending an animation")
-                    continuousAnimations[ID]?.endAnimation()        // End animation
-                    continuousAnimations.remove(ID)                 // Remove it from the continuousAnimations map
+                    continuousAnimations[params.id]?.endAnimation()        // End animation
+                    continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
                 }
                 Animation.COLOR1,
                 Animation.COLOR2,
                 Animation.COLOR3,
                 Animation.COLOR4 -> Logger.warn("COLOR1, COLOR2, COLOR3 and COLOR4 are deprecated")
-                else -> Logger.warn("Animation $animation not supported by server")
+                else -> Logger.warn("Animation ${params.animation} not supported by server")
             }
         }
     }

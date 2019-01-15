@@ -1,5 +1,6 @@
 package server
 
+import animatedledstrip.leds.*
 import org.pmw.tinylog.Logger
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
@@ -51,14 +52,19 @@ object GUISocket {
                     input = socIn.readObject() as Map<*, *>
                     Logger.trace("Input received")
                     /*  Check if GUI is sending Quit command */
-                    val remoteQuit = input["Quit"] as Boolean? ?: false
-                    if (remoteQuit)
-                        disconnected = true
-                    else    // Else send animation data to the AnimationHandler
-                        AnimationHandler.addAnimation(input)
+//                    val remoteQuit = try {
+//                        input.quit
+//                    } catch (e: UninitializedPropertyAccessException) {
+//                        false
+//                    }!!
+//                    if (remoteQuit)
+//                        disconnected = true
+//                    else    // Else send animation data to the AnimationHandler
+                        AnimationHandler.addAnimation(AnimationData(input))
                 }
             } catch (e: SocketException) {  // Catch disconnections
                 Logger.warn("GUI Connection Lost: $e")
+                disconnected = true
             }
         }
     }
