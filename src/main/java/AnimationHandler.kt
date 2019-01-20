@@ -41,27 +41,24 @@ object AnimationHandler {
         GlobalScope.launch(newSingleThreadContext("Thread ${random()}")) {
             Logger.trace("Decomposing params map")
             Logger.debug(params)
-            when (params.animation) {
+
+            /*  Special "Animation" type that the GUI sends to end an animation */
+            if (params.animation == Animation.ENDANIMATION) {
+                Logger.debug("Ending an animation")
+                continuousAnimations[params.id]?.endAnimation()        // End animation
+                continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
+                return@launch
+            }
+
+            when (params.animation::class.java.annotations.find { it is NonRepetitive } is NonRepetitive) {
                 /*  Animations that are only run once because they change the color of the strip */
-                Animation.COLOR,
-                Animation.MULTICOLOR,
-                Animation.MULTIPIXELRUNTOCOLOR,
-                Animation.SPARKLETOCOLOR,
-                Animation.STACK,
-                Animation.WIPE -> {
+                true -> {
                     Logger.trace("Calling Single Run Animation")
-                    SingleRunAnimation(params)
+                    leds.run(params)
                     Logger.debug("${Thread.currentThread().name} complete")
                 }
                 /*  Animations that can be run repeatedly */
-                Animation.ALTERNATE,
-                Animation.MULTIPIXELRUN,
-                Animation.PIXELRUN,
-                Animation.PIXELRUNWITHTRAIL,
-                Animation.PIXELMARATHON,
-                Animation.SMOOTHCHASE,
-                Animation.SPARKLE,
-                Animation.STACKOVERFLOW -> {
+                false -> {
                     if (params.continuous) {
                         Logger.trace("Calling Continuous Animation")
                         val id = random().toString()
@@ -72,17 +69,10 @@ object AnimationHandler {
                         Logger.debug("${Thread.currentThread().name} complete")
                     } else {
                         Logger.trace("Calling Single Run Animation")
-                        SingleRunAnimation(params)
+                        leds.run(params)
                         Logger.debug("${Thread.currentThread().name} complete")
                     }
                 }
-                /*  Special "Animation" type that the GUI sends to end an animation */
-                Animation.ENDANIMATION -> {
-                    Logger.debug("Ending an animation")
-                    continuousAnimations[params.id]?.endAnimation()        // End animation
-                    continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
-                }
-                else -> Logger.warn("Animation ${params.animation} not supported by server")
             }
         }
     }
