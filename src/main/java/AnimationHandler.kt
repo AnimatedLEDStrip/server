@@ -82,10 +82,6 @@ object AnimationHandler {
                     continuousAnimations[params.id]?.endAnimation()        // End animation
                     continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
                 }
-                Animation.COLOR1,
-                Animation.COLOR2,
-                Animation.COLOR3,
-                Animation.COLOR4 -> Logger.warn("COLOR1, COLOR2, COLOR3 and COLOR4 are deprecated")
                 else -> Logger.warn("Animation ${params.animation} not supported by server")
             }
         }

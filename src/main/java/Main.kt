@@ -1,5 +1,6 @@
 package server
 
+import animatedledstrip.ccpresets.CCBlack
 import animatedledstrip.leds.*
 import com.diozero.ws281xj.PixelAnimations.delay
 import kotlinx.coroutines.GlobalScope
@@ -80,7 +81,7 @@ fun main(args: Array<String>) {
     Logger.trace("Initializing AnimationHandler")
     AnimationHandler                                            // Initialize AnimationHandler object
 
-    AnimationHandler.addAnimation(AnimationData(mapOf("Animation" to Animation.COLOR1, "Color1" to 0x0.toLong())))
+    AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlack))
     /*  Launch loop to read from local terminal, mainly for a 'q' from the user */
     Logger.trace("Launching local terminal tread")
     GlobalScope.launch(newSingleThreadContext("Local Terminal")) {

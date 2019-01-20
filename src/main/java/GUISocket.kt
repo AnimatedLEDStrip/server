@@ -51,16 +51,7 @@ object GUISocket {
                     Logger.trace("Waiting for input")
                     input = socIn.readObject() as Map<*, *>
                     Logger.trace("Input received")
-                    /*  Check if GUI is sending Quit command */
-//                    val remoteQuit = try {
-//                        input.quit
-//                    } catch (e: UninitializedPropertyAccessException) {
-//                        false
-//                    }!!
-//                    if (remoteQuit)
-//                        disconnected = true
-//                    else    // Else send animation data to the AnimationHandler
-                        AnimationHandler.addAnimation(AnimationData(input))
+                    AnimationHandler.addAnimation(AnimationData(input))
                 }
             } catch (e: SocketException) {  // Catch disconnections
                 Logger.warn("GUI Connection Lost: $e")
