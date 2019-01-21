@@ -47,7 +47,6 @@ fun main(args: Array<String>) {
         when {
             cmdline.hasOption("t") -> Level.TRACE
             cmdline.hasOption("d") -> Level.DEBUG
-            cmdline.hasOption("i") -> Level.OFF
             else -> Level.INFO
         }
 
@@ -75,7 +74,8 @@ fun main(args: Array<String>) {
             Logger.warn("No pin in led.config or led.config does not exist")
             10                                                  // Else default
         },
-        emulated = cmdline.hasOption("e")
+        emulated = cmdline.hasOption("e"),
+        imageDebugging = cmdline.hasOption("i")
     )
 
     Logger.trace("Initializing AnimationHandler")
