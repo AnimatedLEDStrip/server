@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>CommandLineSocket - animatedledstrip-server</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">animatedledstrip-server</a>&nbsp;/&nbsp;<a href="../index.html">server</a>&nbsp;/&nbsp;<a href="./index.html">CommandLineSocket</a><br/>
+<br/>
+<h1>CommandLineSocket</h1>
+<code><span class="keyword">object </span><span class="identifier">CommandLineSocket</span></code>
+<p>An object that handles communication with a remote terminal via port 6</p>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="client-socket.html">clientSocket</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">clientSocket</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="disconnected.html">disconnected</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">disconnected</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="server-socket.html">serverSocket</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">serverSocket</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/6/docs/api/java/net/ServerSocket.html"><span class="identifier">ServerSocket</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="is-disconnected.html">isDisconnected</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">isDisconnected</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="open-socket.html">openSocket</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">openSocket</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Accept communication and start loop that listens for input
+If the server is not shutting down (quit == false)
+    Accept a new connection
+    While connected, get input and pass on to the animationQueue
+(If there is a disconnection and the server is not shutting down, wait for a new connection)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
