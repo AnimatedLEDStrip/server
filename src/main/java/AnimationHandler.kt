@@ -51,7 +51,7 @@ object AnimationHandler {
             Logger.trace("Decomposing params map")
             Logger.debug(params)
 
-            when (params.animation::class.java.annotations.find { it is NonRepetitive } is NonRepetitive) {
+            when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
                 /*  Animations that are only run once because they change the color of the strip */
                 true -> {
                     Logger.trace("Calling Single Run Animation")

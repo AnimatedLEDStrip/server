@@ -141,7 +141,7 @@ fun main(args: Array<String>) {
     fun shutdownServer() {
         leds.setStripColor(0)
         delay(500)
-        leds.stopRender = true
+        leds.toggleRender()
         delay(2000)
         if (!GUISocket.isDisconnected()) out?.println("Q")
         System.exit(0)

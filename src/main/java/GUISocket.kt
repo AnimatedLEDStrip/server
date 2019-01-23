@@ -3,6 +3,7 @@ package server
 import animatedledstrip.leds.*
 import org.pmw.tinylog.Logger
 import java.io.BufferedInputStream
+import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.ServerSocket
@@ -54,6 +55,9 @@ object GUISocket {
                     AnimationHandler.addAnimation(AnimationData(input))
                 }
             } catch (e: SocketException) {  // Catch disconnections
+                Logger.warn("GUI Connection Lost: $e")
+                disconnected = true
+            } catch (e: EOFException) {
                 Logger.warn("GUI Connection Lost: $e")
                 disconnected = true
             }
