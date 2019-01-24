@@ -62,7 +62,7 @@ object AnimationHandler {
                 false -> {
                     if (params.continuous) {
                         Logger.trace("Calling Continuous Animation")
-                        val id = random().toString()
+                        val id = random().toString().removePrefix("0.")
                         continuousAnimations[id] =
                                 ContinuousRunAnimation(id, params)
                         continuousAnimations[id]?.startAnimation()
