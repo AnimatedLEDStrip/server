@@ -19,7 +19,7 @@ val options: Options = Options()
     .addOption("delay", true, "Delay")
     .addOption("dmod", true, "DelayMod")
     .addOption("s", true, "Spacing")
-    .addOption("e", "test")
+    .addOption("e", true, "End an animation")
 
 fun main(){
     AnimationData().parseText(readLine()!!)
@@ -32,6 +32,14 @@ fun AnimationData.parseText(argString: String) {
     val args = argString.split(" ").toTypedArray()
     val parser = DefaultParser()
     val cmd = parser.parse(options, args)
+
+    if(cmd.getOptionValue("e") != null) {
+        this.animation = Animation.ENDANIMATION
+        this.id = cmd.getOptionValue("e")
+        println(this)
+        return
+    }
+
 
     this.animation = when(cmd.getOptionValue("a").toUpperCase()) {
         "COL1", "C1", "C", "COLOR" -> Animation.COLOR
