@@ -22,8 +22,11 @@ val options: Options = Options()
     .addOption("e", true, "End an animation")
 
 fun main(){
-    AnimationData().parseText(readLine()!!)
-    AnimationData().parseText(readLine()!!)
+//    AnimationData().parseText(readLine()!!)
+//    AnimationData().parseText(readLine()!!)
+
+    val x = mapOf("Test" to Animation.ENDANIMATION) as Map<*, *>
+    println(x["Test"] is String)
 }
 
 

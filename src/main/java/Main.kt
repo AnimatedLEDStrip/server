@@ -99,7 +99,15 @@ fun main(args: Array<String>) {
     /*  Start GUI Socket in separate thread */
     Logger.trace("Launching GUISocket thread")
     GlobalScope.launch(newSingleThreadContext("GUIConnection")) {
-        GUISocket.openSocket()
+        SocketConnections.add(5).apply{
+            openSocket()
+        }
+    }
+
+    GlobalScope.launch(newSingleThreadContext("AppConnection")) {
+        SocketConnections.add(6).apply{
+            openSocket()
+        }
     }
 
     /*  Start Command Line Socket in separate thread */
@@ -127,10 +135,10 @@ fun main(args: Array<String>) {
 
     /*  Checks for new animation in queue and if it exists, runs it */
     while (!quit) {
-        val taskString: String = animationQueue[0]
-        taskList = taskString.split(" ").toMutableList()
-        runAnimation(taskList)
-        out?.println("C")
+//        val taskString: String = animationQueue[0]
+//        taskList = taskString.split(" ").toMutableList()
+//        runAnimation(taskList)
+//        out?.println("C")
         if (animationQueue.size > 1)
             animationQueue.removeAt(0) // If there are more animations waiting, remove the first one
     }
@@ -143,7 +151,6 @@ fun main(args: Array<String>) {
         delay(500)
         leds.toggleRender()
         delay(2000)
-        if (!GUISocket.isDisconnected()) out?.println("Q")
         System.exit(0)
     }
 
