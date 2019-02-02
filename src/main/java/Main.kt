@@ -148,37 +148,14 @@ fun main(args: Array<String>) {
         }
     }
 
-    /*  Start Command Line Socket in separate thread */
-//    GlobalScope.launch {
-//        CommandLineSocket.openSocket()
-//    }
-
     /*  If we told the LEDs to use EmulatedWS281x as their superclass, start the emulation GUI */
-    if (leds.isEmulated()) {
+    if (leds is EmulatedAnimatedLEDStrip) {
         Logger.trace("Starting emulated LED strip GUI")
         launch<EmulatedLEDStripViewer>(args)
     }
 
-    /*  Legacy code that might be able to be removed */
-//    var taskList: MutableList<String>
-//    var out: PrintWriter? = null
-//    GlobalScope.launch(newSingleThreadContext(random().toString())) {
-//        while (out == null) {
-//            try {
-//                out = PrintWriter(GUISocket.clientSocketOut?.getOutputStream(), true)
-//            } catch (e: Exception) {
-//            }
-//        }
-//    }
-
-    /*  Checks for new animation in queue and if it exists, runs it */
+    /* Endless loop that will break when the server is told to quit */
     while (!quit) {
-//        val taskString: String = animationQueue[0]
-//        taskList = taskString.split(" ").toMutableList()
-//        runAnimation(taskList)
-//        out?.println("C")
-        if (animationQueue.size > 1)
-            animationQueue.removeAt(0) // If there are more animations waiting, remove the first one
     }
 
     /**
