@@ -48,12 +48,10 @@ keeps track of currently running animations.</p>
 </tr>
 <tr>
 <td>
-<p><a href="-g-u-i-socket/index.html">GUISocket</a></p>
+<p><a href="-socket-connections/index.html">SocketConnections</a></p>
 </td>
 <td>
-<code><span class="keyword">object </span><span class="identifier">GUISocket</span></code>
-<p>An object that handles communication with the GUI via port 5</p>
-</td>
+<code><span class="keyword">object </span><span class="identifier">SocketConnections</span></code></td>
 </tr>
 <tr>
 <td>
@@ -69,6 +67,13 @@ keeps track of currently running animations.</p>
 <h3>Extensions for External Classes</h3>
 <table>
 <tbody>
+<tr>
+<td>
+<p><a href="animatedledstrip.leds.-animation-data/index.html">animatedledstrip.leds.AnimationData</a></p>
+</td>
+<td>
+</td>
+</tr>
 <tr>
 <td>
 <p><a href="kotlin.collections.-map/index.html">kotlin.collections.Map</a></p>
@@ -104,6 +109,13 @@ keeps track of currently running animations.</p>
 </tr>
 <tr>
 <td>
+<p><a href="options.html">options</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">options</span><span class="symbol">: </span><span class="identifier">Options</span></code></td>
+</tr>
+<tr>
+<td>
 <p><a href="properties.html">properties</a></p>
 </td>
 <td>
@@ -123,136 +135,11 @@ keeps track of currently running animations.</p>
 <tbody>
 <tr>
 <td>
-<p><a href="call-alternate.html">callAlternate</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callAlternate</span><span class="symbol">(</span><span class="identifier" id="server$callAlternate(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-fade-pixel.html">callFadePixel</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callFadePixel</span><span class="symbol">(</span><span class="identifier" id="server$callFadePixel(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-multi-pixel-run.html">callMultiPixelRun</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callMultiPixelRun</span><span class="symbol">(</span><span class="identifier" id="server$callMultiPixelRun(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-multi-pixel-run-to-color.html">callMultiPixelRunToColor</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callMultiPixelRunToColor</span><span class="symbol">(</span><span class="identifier" id="server$callMultiPixelRunToColor(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-pixel-marathon.html">callPixelMarathon</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callPixelMarathon</span><span class="symbol">(</span><span class="identifier" id="server$callPixelMarathon(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-pixel-run.html">callPixelRun</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callPixelRun</span><span class="symbol">(</span><span class="identifier" id="server$callPixelRun(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-smooth-chase.html">callSmoothChase</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callSmoothChase</span><span class="symbol">(</span><span class="identifier" id="server$callSmoothChase(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-sparkle.html">callSparkle</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callSparkle</span><span class="symbol">(</span><span class="identifier" id="server$callSparkle(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-sparkle-to-color.html">callSparkleToColor</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callSparkleToColor</span><span class="symbol">(</span><span class="identifier" id="server$callSparkleToColor(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-stack.html">callStack</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callStack</span><span class="symbol">(</span><span class="identifier" id="server$callStack(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-stack-overflow.html">callStackOverflow</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callStackOverflow</span><span class="symbol">(</span><span class="identifier" id="server$callStackOverflow(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="call-wipe.html">callWipe</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">callWipe</span><span class="symbol">(</span><span class="identifier" id="server$callWipe(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
 <p><a href="main.html">main</a></p>
 </td>
 <td>
+<code><span class="keyword">fun </span><span class="identifier">main</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code><br/>
 <code><span class="keyword">fun </span><span class="identifier">main</span><span class="symbol">(</span><span class="identifier" id="server$main(kotlin.Array((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html"><span class="identifier">Array</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="parse-hex.html">parseHex</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">parseHex</span><span class="symbol">(</span><span class="identifier" id="server$parseHex(kotlin.String)/string">string</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="run-animation.html">runAnimation</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">runAnimation</span><span class="symbol">(</span><span class="identifier" id="server$runAnimation(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="static-color1.html">staticColor1</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">staticColor1</span><span class="symbol">(</span><span class="identifier" id="server$staticColor1(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="static-color2.html">staticColor2</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">staticColor2</span><span class="symbol">(</span><span class="identifier" id="server$staticColor2(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="static-color3.html">staticColor3</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">staticColor3</span><span class="symbol">(</span><span class="identifier" id="server$staticColor3(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="static-color4.html">staticColor4</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">staticColor4</span><span class="symbol">(</span><span class="identifier" id="server$staticColor4(kotlin.collections.List((kotlin.String)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 </tbody>
 </table>

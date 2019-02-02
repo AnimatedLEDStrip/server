@@ -13,4 +13,5 @@ $dokka.location:server$component6(kotlin.collections.Map((kotlin.Any, )))server
 $dokka.location:server$component7(kotlin.collections.Map((kotlin.Any, )))server/kotlin.collections.-map/component7.html
 $dokka.location:server$component8(kotlin.collections.Map((kotlin.Any, )))server/kotlin.collections.-map/component8.html
 $dokka.location:server$component9(kotlin.collections.Map((kotlin.Any, )))server/kotlin.collections.-map/component9.html
+$dokka.location:server$parseText(animatedledstrip.leds.AnimationData, kotlin.String)server/animatedledstrip.leds.-animation-data/parse-text.html
 server
