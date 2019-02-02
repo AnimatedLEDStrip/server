@@ -128,7 +128,6 @@ class WS281xEmulator : View("WS281x Emulator") {
                     button("Test Animation") {
                         action {
                             GlobalScope.launch {
-
                                 // Put animation call to test here
 
                             }

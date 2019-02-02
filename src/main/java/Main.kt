@@ -1,5 +1,6 @@
 package server
 
+import animatedledstrip.ccpresets.CCBlack
 import animatedledstrip.leds.*
 import com.diozero.ws281xj.PixelAnimations.delay
 import kotlinx.coroutines.GlobalScope
@@ -27,6 +28,7 @@ val animationQueue = mutableListOf<String>("C 0")
 
 var quit = false    // Tracks if loops should continue
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 fun main(args: Array<String>) {
 
     val options = Options()
@@ -46,7 +48,6 @@ fun main(args: Array<String>) {
         when {
             cmdline.hasOption("t") -> Level.TRACE
             cmdline.hasOption("d") -> Level.DEBUG
-            cmdline.hasOption("i") -> Level.OFF
             else -> Level.INFO
         }
 
@@ -59,28 +60,66 @@ fun main(args: Array<String>) {
         Logger.warn("No led.config found")
     }
 
-    leds = AnimatedLEDStrip(
-        try {
-            Logger.trace("Trying to load numLEDs from led.config")
-            properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
-        } catch (e: Exception) {
-            Logger.warn("No numLEDs in led.config or led.config does not exist")
-            240                                                 // Else default
-        },
-        try {
-            Logger.trace("Trying to load pin from led.config")
-            properties.getProperty("pin").toInt()               // If config file has pin property
-        } catch (e: Exception) {
-            Logger.warn("No pin in led.config or led.config does not exist")
-            10                                                  // Else default
-        },
-        emulated = cmdline.hasOption("e")
-    )
+    leds = when (cmdline.hasOption("e")) {
+        false -> {
+            AnimatedLEDStripKotlinPi(
+                try {
+                    Logger.trace("Trying to load numLEDs from led.config")
+                    properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
+                } catch (e: Exception) {
+                    Logger.warn("No numLEDs in led.config or led.config does not exist")
+                    240                                                 // Else default
+                },
+                try {
+                    Logger.trace("Trying to load pin from led.config")
+                    properties.getProperty("pin").toInt()               // If config file has pin property
+                } catch (e: Exception) {
+                    Logger.warn("No pin in led.config or led.config does not exist")
+                    10                                                  // Else default
+                },
+                imageDebugging = cmdline.hasOption("i")
+            )
+        }
+        true -> {
+            EmulatedAnimatedLEDStrip(
+                try {
+                    Logger.trace("Trying to load numLEDs from led.config")
+                    properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
+                } catch (e: Exception) {
+                    Logger.warn("No numLEDs in led.config or led.config does not exist")
+                    240                                                 // Else default
+                },
+                try {
+                    Logger.trace("Trying to load pin from led.config")
+                    properties.getProperty("pin").toInt()               // If config file has pin property
+                } catch (e: Exception) {
+                    Logger.warn("No pin in led.config or led.config does not exist")
+                    10                                                  // Else default
+                },
+                imageDebugging = cmdline.hasOption("i")
+            )
+        }
+
+    }
+
+//    leds.addCustomAnimation(
+//        """
+//            import animatedledstrip.leds.*
+//            val leds = bindings["leds"]!! as AnimatedLEDStrip
+//            var animation = bindings["animation"] as AnimationData
+//            with(leds){
+//                setStripColor(animation.color1)
+//                Thread.sleep(1000)
+//                setStripColor(animation.color2)
+//                run(AnimationData(mapOf("Animation" to "WIP", "Color1" to animation.color3.hex, "Direction" to 'F')))
+//            }""".trimIndent(),
+//        "COL2"
+//    )
 
     Logger.trace("Initializing AnimationHandler")
     AnimationHandler                                            // Initialize AnimationHandler object
 
-    AnimationHandler.addAnimation(AnimationData(mapOf("Animation" to Animation.COLOR1, "Color1" to 0x0.toLong())))
+    AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlack))
     /*  Launch loop to read from local terminal, mainly for a 'q' from the user */
     Logger.trace("Launching local terminal tread")
     GlobalScope.launch(newSingleThreadContext("Local Terminal")) {
@@ -98,7 +137,15 @@ fun main(args: Array<String>) {
     /*  Start GUI Socket in separate thread */
     Logger.trace("Launching GUISocket thread")
     GlobalScope.launch(newSingleThreadContext("GUIConnection")) {
-        GUISocket.openSocket()
+        SocketConnections.add(5).apply {
+            openSocket()
+        }
+    }
+
+    GlobalScope.launch(newSingleThreadContext("AppConnection")) {
+        SocketConnections.add(6).apply {
+            openSocket()
+        }
     }
 
     /*  Start Command Line Socket in separate thread */
@@ -113,8 +160,8 @@ fun main(args: Array<String>) {
     }
 
     /*  Legacy code that might be able to be removed */
-    var taskList: MutableList<String>
-    var out: PrintWriter? = null
+//    var taskList: MutableList<String>
+//    var out: PrintWriter? = null
 //    GlobalScope.launch(newSingleThreadContext(random().toString())) {
 //        while (out == null) {
 //            try {
@@ -126,10 +173,10 @@ fun main(args: Array<String>) {
 
     /*  Checks for new animation in queue and if it exists, runs it */
     while (!quit) {
-        val taskString: String = animationQueue[0]
-        taskList = taskString.split(" ").toMutableList()
-        runAnimation(taskList)
-        out?.println("C")
+//        val taskString: String = animationQueue[0]
+//        taskList = taskString.split(" ").toMutableList()
+//        runAnimation(taskList)
+//        out?.println("C")
         if (animationQueue.size > 1)
             animationQueue.removeAt(0) // If there are more animations waiting, remove the first one
     }
@@ -140,14 +187,14 @@ fun main(args: Array<String>) {
     fun shutdownServer() {
         leds.setStripColor(0)
         delay(500)
-        leds.stopRender = true
+        leds.toggleRender()
         delay(2000)
-        if (!GUISocket.isDisconnected()) out?.println("Q")
         System.exit(0)
     }
 
     shutdownServer()
 }
+
 
 
 /**

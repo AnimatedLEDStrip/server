@@ -1,7 +1,6 @@
 package server
 
 import animatedledstrip.leds.*
-import animatedledstrip.ccpresets.*
 import org.pmw.tinylog.Logger
 
 /**
@@ -28,24 +27,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Animati
      */
     fun startAnimation() {
         Logger.trace("params: $params")
-        when (params.animation) {
-            Animation.ALTERNATE ->
-                leds.alternate(params)
-            Animation.MULTIPIXELRUN ->
-                leds.multiPixelRun(params)
-            Animation.PIXELMARATHON ->
-                leds.pixelMarathon(params)
-            Animation.PIXELRUN ->
-                leds.pixelRun(params)
-            Animation.PIXELRUNWITHTRAIL ->
-                leds.pixelRunWithTrail(params)
-            Animation.SMOOTHCHASE ->
-                leds.smoothChase(params)
-            Animation.SPARKLE ->
-                leds.sparkle(params)
-            Animation.STACKOVERFLOW ->
-                leds.stackOverflow(params)
-        }
+        while (continueAnimation) leds.run(params)
     }
 
 
@@ -61,9 +43,9 @@ class ContinuousRunAnimation(private val id: String, private val params: Animati
     /**
      *  Send animation data to GUI
      */
-    fun sendAnimation() {
+    fun sendAnimation(connection: SocketConnections.Connection? = null) {
         Logger.trace("Sending animation to GUI")
-        GUISocket.sendAnimation(params.toMap(), id)
+        SocketConnections.sendAnimation(params.toMap(), id, connection)
     }
 
 }
