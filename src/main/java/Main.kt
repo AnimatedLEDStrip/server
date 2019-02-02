@@ -28,6 +28,7 @@ val animationQueue = mutableListOf<String>("C 0")
 
 var quit = false    // Tracks if loops should continue
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 fun main(args: Array<String>) {
 
     val options = Options()
@@ -59,24 +60,61 @@ fun main(args: Array<String>) {
         Logger.warn("No led.config found")
     }
 
-    leds = AnimatedLEDStrip(
-        try {
-            Logger.trace("Trying to load numLEDs from led.config")
-            properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
-        } catch (e: Exception) {
-            Logger.warn("No numLEDs in led.config or led.config does not exist")
-            240                                                 // Else default
-        },
-        try {
-            Logger.trace("Trying to load pin from led.config")
-            properties.getProperty("pin").toInt()               // If config file has pin property
-        } catch (e: Exception) {
-            Logger.warn("No pin in led.config or led.config does not exist")
-            10                                                  // Else default
-        },
-        emulated = cmdline.hasOption("e"),
-        imageDebugging = cmdline.hasOption("i")
-    )
+    leds = when (cmdline.hasOption("e")) {
+        false -> {
+            AnimatedLEDStripKotlinPi(
+                try {
+                    Logger.trace("Trying to load numLEDs from led.config")
+                    properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
+                } catch (e: Exception) {
+                    Logger.warn("No numLEDs in led.config or led.config does not exist")
+                    240                                                 // Else default
+                },
+                try {
+                    Logger.trace("Trying to load pin from led.config")
+                    properties.getProperty("pin").toInt()               // If config file has pin property
+                } catch (e: Exception) {
+                    Logger.warn("No pin in led.config or led.config does not exist")
+                    10                                                  // Else default
+                },
+                imageDebugging = cmdline.hasOption("i")
+            )
+        }
+        true -> {
+            EmulatedAnimatedLEDStrip(
+                try {
+                    Logger.trace("Trying to load numLEDs from led.config")
+                    properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
+                } catch (e: Exception) {
+                    Logger.warn("No numLEDs in led.config or led.config does not exist")
+                    240                                                 // Else default
+                },
+                try {
+                    Logger.trace("Trying to load pin from led.config")
+                    properties.getProperty("pin").toInt()               // If config file has pin property
+                } catch (e: Exception) {
+                    Logger.warn("No pin in led.config or led.config does not exist")
+                    10                                                  // Else default
+                },
+                imageDebugging = cmdline.hasOption("i")
+            )
+        }
+
+    }
+
+//    leds.addCustomAnimation(
+//        """
+//            import animatedledstrip.leds.*
+//            val leds = bindings["leds"]!! as AnimatedLEDStrip
+//            var animation = bindings["animation"] as AnimationData
+//            with(leds){
+//                setStripColor(animation.color1)
+//                Thread.sleep(1000)
+//                setStripColor(animation.color2)
+//                run(AnimationData(mapOf("Animation" to "WIP", "Color1" to animation.color3.hex, "Direction" to 'F')))
+//            }""".trimIndent(),
+//        "COL2"
+//    )
 
     Logger.trace("Initializing AnimationHandler")
     AnimationHandler                                            // Initialize AnimationHandler object
@@ -99,13 +137,13 @@ fun main(args: Array<String>) {
     /*  Start GUI Socket in separate thread */
     Logger.trace("Launching GUISocket thread")
     GlobalScope.launch(newSingleThreadContext("GUIConnection")) {
-        SocketConnections.add(5).apply{
+        SocketConnections.add(5).apply {
             openSocket()
         }
     }
 
     GlobalScope.launch(newSingleThreadContext("AppConnection")) {
-        SocketConnections.add(6).apply{
+        SocketConnections.add(6).apply {
             openSocket()
         }
     }
@@ -122,8 +160,8 @@ fun main(args: Array<String>) {
     }
 
     /*  Legacy code that might be able to be removed */
-    var taskList: MutableList<String>
-    var out: PrintWriter? = null
+//    var taskList: MutableList<String>
+//    var out: PrintWriter? = null
 //    GlobalScope.launch(newSingleThreadContext(random().toString())) {
 //        while (out == null) {
 //            try {
@@ -156,6 +194,7 @@ fun main(args: Array<String>) {
 
     shutdownServer()
 }
+
 
 
 /**

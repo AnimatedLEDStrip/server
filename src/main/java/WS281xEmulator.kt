@@ -129,11 +129,6 @@ class WS281xEmulator : View("WS281x Emulator") {
                         action {
                             GlobalScope.launch {
                                 // Put animation call to test here
-                                leds.addCustomAnimation("""
-                                    import animatedledstrip.leds.AnimatedLEDStrip
-                                    val leds = bindings["leds"]!! as AnimatedLEDStrip
-                                    leds.setStripColor(0xFF)""".trimIndent(), "COL2")
-                                leds.run(AnimationData(mapOf("Animation" to Animation.CUSTOMANIMATION, "ID" to "COL2")))
 
                             }
                         }

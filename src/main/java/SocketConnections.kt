@@ -68,15 +68,18 @@ object SocketConnections {
                                 if (input["ClientData"] as Boolean? == true) {
                                     textBased = input["TextBased"] as Boolean? ?: textBased
                                     Logger.debug("Client info: $input")
-                                } else if (input["AnimationDefinition"] as Boolean? == true) {
-                                    if (input["AnimationCode"] as String? != null &&
-                                        input["CustomAnimationID"] as String? != null
-                                    ) {
-                                        leds.addCustomAnimation(
-                                            input["AnimationCode"] as String,
-                                            input["CustomAnimationID"] as String
-                                        )
-                                    }
+
+//                                } else if (input["AnimationDefinition"] as Boolean? == true) {
+//
+//                                    if (input["AnimationCode"] as String? != null &&
+//                                        input["CustomAnimationID"] as String? != null
+//                                    ) {
+//                                        leds.addCustomAnimation(
+//                                            input["AnimationCode"] as String,
+//                                            input["CustomAnimationID"] as String
+//                                        )
+//                                    }
+
                                 } else AnimationHandler.addAnimation(AnimationData(input))
                             }
                         }
