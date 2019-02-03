@@ -2,7 +2,7 @@
 
 # AnimatedLEDStripServer
 
-A server that is built around the AnimatedLEDStripKotlinPi library.
+A server for Raspberry Pis that is built around the AnimatedLEDStrip library.
 
 ## Uses Java 9
 Because we use the dokka plugin to generate our documentation, we must use Java <=9
