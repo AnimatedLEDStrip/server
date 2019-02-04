@@ -89,13 +89,6 @@ fun main(args: Array<String>) {
                     Logger.warn("No numLEDs in led.config or led.config does not exist")
                     240                                                 // Else default
                 },
-                try {
-                    Logger.trace("Trying to load pin from led.config")
-                    properties.getProperty("pin").toInt()               // If config file has pin property
-                } catch (e: Exception) {
-                    Logger.warn("No pin in led.config or led.config does not exist")
-                    10                                                  // Else default
-                },
                 imageDebugging = cmdline.hasOption("i")
             )
         }

@@ -46,7 +46,7 @@ class WS281xEmulator : View("WS281x Emulator") {
     private val CENTER_Y = scale * pow(leds.numLEDs.toDouble(), 0.5) + 20.0
 
     init {
-        val pixelList = leds.getPixelColorList()
+        val pixelList = leds.pixelColorList
         var r: Double
         var t: Double
         for (i in 0 until pixelList.size) {
@@ -82,7 +82,7 @@ class WS281xEmulator : View("WS281x Emulator") {
         */
         GlobalScope.launch {
             while (true) {
-                val pixels = leds.getPixelColorList()
+                val pixels = leds.pixelColorList
                 for (i in 0 until leds.numLEDs) {
                     circleList[i].style {
                         fill = Color.color(

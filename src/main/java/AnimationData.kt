@@ -76,9 +76,9 @@ fun AnimationData.parseText(argString: String) {
         c -> colorList.add(ColorContainer(parseHex(c as String? ?: "0")))
     }
 
-    this.delay = cmd.getOptionValue("delay")?.toInt() ?: when (animationInfoMap[animation]?.delay) {
+    this.delay = cmd.getOptionValue("delay")?.toLong() ?: when (animationInfoMap[animation]?.delay) {
         ReqLevel.REQUIRED -> throw Exception("Animation delay required for $animation")
-        else -> 0
+        else -> 0L
     }
 
     this.delayMod = cmd.getOptionValue("dmod")?.toDouble() ?: 1.0
