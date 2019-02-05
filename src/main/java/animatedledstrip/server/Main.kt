@@ -14,9 +14,7 @@ import org.pmw.tinylog.Logger
 import tornadofx.App
 import tornadofx.launch
 import java.io.FileInputStream
-import java.io.PrintWriter
 import java.util.*
-import kotlin.Exception
 
 val properties = Properties()
 
