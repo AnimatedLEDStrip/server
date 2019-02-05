@@ -4,6 +4,7 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.server.isTest
 import animatedledstrip.server.quit
 import kotlinx.coroutines.*
+import org.junit.Ignore
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
@@ -24,6 +25,7 @@ class SocketConnectionsTest {
     }
 
     @Test
+    @Ignore
     fun testOpenSocket() = runBlocking {
         withTimeout(60000) {
             Configurator.defaultConfig().level(Level.TRACE).activate()
