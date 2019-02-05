@@ -1,9 +1,9 @@
 package animatedledstrip.test
 
 import animatedledstrip.leds.EmulatedAnimatedLEDStrip
+import animatedledstrip.server.AnimationHandler
+import animatedledstrip.server.leds
 import org.junit.Test
-import server.AnimationHandler
-import server.leds
 import kotlin.test.assertTrue
 
 class AnimationHandlerTest {

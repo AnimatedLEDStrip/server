@@ -1,4 +1,4 @@
-package server
+package animatedledstrip.server
 
 import animatedledstrip.leds.*
 import org.apache.commons.cli.DefaultParser

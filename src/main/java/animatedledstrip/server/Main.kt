@@ -1,4 +1,4 @@
-package server
+package animatedledstrip.server
 
 import animatedledstrip.ccpresets.CCBlack
 import animatedledstrip.leds.*
