@@ -125,6 +125,7 @@ fun main(args: Array<String>) {
     Logger.trace("Launching local terminal tread")
     GlobalScope.launch(newSingleThreadContext("Local Terminal")) {
         while (!quit) {
+            Logger.trace("Local terminal waiting for input")
             val strIn = readLine()
             Logger.trace("Read line")
             if (strIn?.toUpperCase() == "Q") {

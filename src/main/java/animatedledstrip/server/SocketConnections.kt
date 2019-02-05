@@ -18,11 +18,11 @@ import java.net.SocketException
 
 object SocketConnections {
 
-    private val connections = mutableListOf<Connection>()
+    val connections = mutableMapOf<Int, Connection>()
 
     fun add(port: Int): Connection {
         val connection = Connection(port)
-        connections.add(connection)
+        connections[port] = connection
         return connection
     }
 
@@ -35,7 +35,7 @@ object SocketConnections {
         var clientSocket: Socket? = null
         private var disconnected = true
         private var socOut: ObjectOutputStream? = null
-        private var textBased = false
+        var textBased = false
 
         fun isDisconnected() = disconnected
 
@@ -120,13 +120,18 @@ object SocketConnections {
                 }
             }
         }
+
+
+        override fun toString(): String {
+            return "Connection@${serverSocket.inetAddress.toString().removePrefix("/")}:$port"
+        }
     }
 
     fun sendAnimation(animation: Map<*, *>, id: String, connection: Connection? = null) {
         if (connection != null) connection.sendAnimation(animation, id)
         else connections.forEach {
-            it.sendAnimation(animation, id)
-            Logger.trace("Sent animation to connection on port ${it.port}")
+            it.value.sendAnimation(animation, id)
+            Logger.trace("Sent animation to connection on port ${it.key}")
         }
     }
 
