@@ -25,11 +25,13 @@ lateinit var leds: AnimatedLEDStrip       // Our LED strip instance - will be in
 
 val animationQueue = mutableListOf<String>("C 0")
 
-var quit = false    // Tracks if loops should continue
+var quit = false    // Tracks if server should remain alive
 
 var socketPort1 = 5
 
 var socketPort2 = 6
+
+var isTest = false
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 fun main(args: Array<String>) {
@@ -38,7 +40,9 @@ fun main(args: Array<String>) {
     options.addOption("d", "Enable debugging")
     options.addOption("t", "Enable trace debugging")
     options.addOption("v", "Enable verbose log statements")
+    options.addOption("q", "Disable log outputs")
     options.addOption("e", "Emulate LED strip and launch emulator")
+    options.addOption("E", "Emulate LED strip but do NOT launch emulator")
     options.addOption("i", "Enable image debugging")
 
     val cmdline = DefaultParser().parse(options, args)
@@ -51,6 +55,7 @@ fun main(args: Array<String>) {
         when {
             cmdline.hasOption("t") -> Level.TRACE
             cmdline.hasOption("d") -> Level.DEBUG
+            cmdline.hasOption("q") -> Level.OFF
             else -> Level.INFO
         }
 
@@ -63,7 +68,7 @@ fun main(args: Array<String>) {
         Logger.warn("No led.config found")
     }
 
-    leds = when (cmdline.hasOption("e")) {
+    leds = when (cmdline.hasOption("e") || cmdline.hasOption("E")) {
         false -> {
             AnimatedLEDStripKotlinPi(
                 try {
@@ -145,7 +150,7 @@ fun main(args: Array<String>) {
     }
 
     /*  If we told the LEDs to use EmulatedWS281x as their superclass, start the emulation GUI */
-    if (leds is EmulatedAnimatedLEDStrip) {
+    if (leds is EmulatedAnimatedLEDStrip && !cmdline.hasOption("E")) {
         Logger.trace("Starting emulated LED strip GUI")
         GlobalScope.launch {
             launch<EmulatedLEDStripViewer>(args)

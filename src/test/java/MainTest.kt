@@ -10,15 +10,15 @@ import org.junit.Test
 
 class MainTest {
 
-    private fun setSocketPorts() {
-        socketPort1 = 1105
-        socketPort2 = 1106
+    private fun setSocketPorts(port1: Int, port2: Int) {
+        socketPort1 = port1
+        socketPort2 = port2
+        isTest = true
     }
 
     @Test
     fun testMainStart() {
-
-        setSocketPorts()
+        setSocketPorts(1105, 1106)
 
         @Suppress("EXPERIMENTAL_API_USAGE")
         GlobalScope.launch(newSingleThreadContext("Test")) {
@@ -27,7 +27,20 @@ class MainTest {
             quit = true
         }
 
-        main(arrayOf("-e"))
+        main(arrayOf("-Eq"))
+    }
+
+    @Test
+    fun testLocalTerminalThread() {
+        setSocketPorts(1107, 1108)
+
+        @Suppress("EXPERIMENTAL_API_USAGE")
+        GlobalScope.launch(newSingleThreadContext("Test")) {
+            delay(5000)
+            quit = true
+        }
+
+        main(arrayOf("-Eq"))
     }
 
 }

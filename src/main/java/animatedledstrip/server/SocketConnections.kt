@@ -1,6 +1,6 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.*
+import animatedledstrip.leds.AnimationData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -10,6 +10,7 @@ import java.io.BufferedInputStream
 import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
@@ -26,7 +27,11 @@ object SocketConnections {
     }
 
     class Connection(val port: Int) {
-        private val serverSocket = ServerSocket(port)
+        private val serverSocket = ServerSocket(
+            port,
+            0,
+            if (!isTest) null else InetAddress.getByName("0.0.0.0")
+        )
         var clientSocket: Socket? = null
         private var disconnected = true
         private var socOut: ObjectOutputStream? = null
@@ -44,6 +49,7 @@ object SocketConnections {
          * (If there is a disconnection and the server is not shutting down, wait for a new connection)
          */
         fun openSocket() {
+            Logger.debug("Socket at port $port started")
             while (!quit) {
                 clientSocket = serverSocket.accept()
                 Logger.trace("Accepted new connection on port $port")
