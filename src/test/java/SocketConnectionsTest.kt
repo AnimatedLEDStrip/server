@@ -5,6 +5,8 @@ import animatedledstrip.server.isTest
 import animatedledstrip.server.quit
 import kotlinx.coroutines.*
 import org.junit.Test
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -24,6 +26,7 @@ class SocketConnectionsTest {
     @Test
     fun testOpenSocket() = runBlocking {
         withTimeout(60000) {
+            Configurator.defaultConfig().level(Level.TRACE).activate()
             val c = SocketConnections.add(1201)
 
             isTest = true
@@ -40,6 +43,7 @@ class SocketConnectionsTest {
                     runBlocking { delay(5000) }
 
                     quit = true
+                    socket.shutdownOutput()
                 }
             }
 
