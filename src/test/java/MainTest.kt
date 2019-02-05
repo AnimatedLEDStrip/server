@@ -51,6 +51,7 @@ class MainTest {
             setSocketPorts(1109, 1110)
 
             GlobalScope.launch {
+                delay(5000)
                 withContext(Dispatchers.IO) {
                     val socket = Socket("0.0.0.0", 1109)
                     val socOut = ObjectOutputStream(socket.getOutputStream())
