@@ -20,47 +20,52 @@ class MainTest {
     }
 
     @Test
-    fun testMainStart() {
-        setSocketPorts(1105, 1106)
+    fun testMainStart() = runBlocking {
+        withTimeout(60000) {
+            setSocketPorts(1105, 1106)
 
-        GlobalScope.launch {
-            delay(2000)
-            checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0)
-            quit = true
-        }
-
-        main(arrayOf("-Eq"))
-    }
-
-    @Test
-    fun testLocalTerminalThread() {
-        setSocketPorts(1107, 1108)
-        val stream = ByteArrayInputStream("q".toByteArray())
-        System.setIn(stream)
-
-        main(arrayOf("-Eq"))
-    }
-
-    @Test
-    fun testConnection1() {
-        setSocketPorts(1109, 1110)
-
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                val socket = Socket("0.0.0.0", 1109)
-                val socOut = ObjectOutputStream(socket.getOutputStream())
-                ObjectInputStream(BufferedInputStream(socket.getInputStream()))
-                socOut.writeObject(mapOf("ClientData" to true, "TextBased" to false))
-
-                assertFalse{ SocketConnections.connections[1109]!!.textBased }
-
-                socOut.writeObject(mapOf("ClientData" to true, "TextBased" to true))
-
+            GlobalScope.launch {
+                delay(2000)
+                checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0)
                 quit = true
             }
-        }
 
-        main(arrayOf("-Eq"))
+            main(arrayOf("-Eq"))
+        }
     }
 
+    @Test
+    fun testLocalTerminalThread() = runBlocking {
+        withTimeout(60000) {
+            setSocketPorts(1107, 1108)
+            val stream = ByteArrayInputStream("q".toByteArray())
+            System.setIn(stream)
+
+            main(arrayOf("-Eq"))
+        }
+    }
+
+    @Test
+    fun testConnection1() = runBlocking {
+        withTimeout(60000) {
+            setSocketPorts(1109, 1110)
+
+            GlobalScope.launch {
+                withContext(Dispatchers.IO) {
+                    val socket = Socket("0.0.0.0", 1109)
+                    val socOut = ObjectOutputStream(socket.getOutputStream())
+                    ObjectInputStream(BufferedInputStream(socket.getInputStream()))
+                    socOut.writeObject(mapOf("ClientData" to true, "TextBased" to false))
+
+                    assertFalse { SocketConnections.connections[1109]!!.textBased }
+
+                    socOut.writeObject(mapOf("ClientData" to true, "TextBased" to true))
+
+                    quit = true
+                }
+            }
+
+            main(arrayOf("-Eq"))
+        }
+    }
 }

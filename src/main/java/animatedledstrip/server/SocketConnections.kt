@@ -48,32 +48,33 @@ object SocketConnections {
          *
          * (If there is a disconnection and the server is not shutting down, wait for a new connection)
          */
-        fun openSocket() {
-            Logger.debug("Socket at port $port started")
-            while (!quit) {
-                clientSocket = serverSocket.accept()
-                Logger.trace("Accepted new connection on port $port")
-                Logger.trace("Initializing input stream")
-                val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
-                Logger.trace("Initializing output stream")
-                socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
-                Logger.trace("Sending currently running animations to GUI")
-                AnimationHandler.continuousAnimations.forEach {
-                    it.value.sendAnimation(this)    // Send all current running continuous animations to newly connected GUI
-                }
-                disconnected = false
-                Logger.info("Connection on port $port Established")
-                var input: Any?
-                try {
-                    while (!disconnected) {
-                        Logger.trace("Waiting for input")
-                        input = socIn.readObject()
-                        Logger.trace("Input received")
-                        when (input) {
-                            is Map<*, *> -> {
-                                if (input["ClientData"] as Boolean? == true) {
-                                    textBased = input["TextBased"] as Boolean? ?: textBased
-                                    Logger.debug("Client info: $input")
+        suspend fun openSocket() {
+            withContext(Dispatchers.IO) {
+                Logger.debug("Socket at port $port started")
+                while (!quit) {
+                    clientSocket = serverSocket.accept()
+                    Logger.trace("Accepted new connection on port $port")
+                    Logger.trace("Initializing input stream")
+                    val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
+                    Logger.trace("Initializing output stream")
+                    socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+                    Logger.trace("Sending currently running animations to GUI")
+                    AnimationHandler.continuousAnimations.forEach {
+                        it.value.sendAnimation(this@Connection)    // Send all current running continuous animations to newly connected GUI
+                    }
+                    disconnected = false
+                    Logger.info("Connection on port $port Established")
+                    var input: Any?
+                    try {
+                        while (!disconnected) {
+                            Logger.trace("Waiting for input")
+                            input = socIn.readObject()
+                            Logger.trace("Input received")
+                            when (input) {
+                                is Map<*, *> -> {
+                                    if (input["ClientData"] as Boolean? == true) {
+                                        textBased = input["TextBased"] as Boolean? ?: textBased
+                                        Logger.debug("Client info: $input")
 
 //                                } else if (input["AnimationDefinition"] as Boolean? == true) {
 //
@@ -86,17 +87,18 @@ object SocketConnections {
 //                                        )
 //                                    }
 
-                                } else AnimationHandler.addAnimation(AnimationData(input))
+                                    } else AnimationHandler.addAnimation(AnimationData(input))
+                                }
                             }
                         }
+                    } catch (e: SocketException) {
+                        // Catch disconnections
+                        Logger.warn("Connection on port $port Lost: $e")
+                        disconnected = true
+                    } catch (e: EOFException) {
+                        Logger.warn("Connection on port $port Lost: $e")
+                        disconnected = true
                     }
-                } catch (e: SocketException) {
-                    // Catch disconnections
-                    Logger.warn("Connection on port $port Lost: $e")
-                    disconnected = true
-                } catch (e: EOFException) {
-                    Logger.warn("Connection on port $port Lost: $e")
-                    disconnected = true
                 }
             }
         }
