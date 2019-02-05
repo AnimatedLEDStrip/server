@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
+import kotlin.test.assertFails
 import kotlin.test.assertTrue
 
 class AnimationHandlerTest {
@@ -61,7 +62,13 @@ class AnimationHandlerTest {
 
         runBlocking { delay(1000) }
         checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0x0)
+    }
 
+    @Test
+    fun testRemoveNonExistentAnimation() {
+        assertFails {
+            AnimationHandler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
+        }
     }
 
 }

@@ -1,6 +1,8 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.*
+import animatedledstrip.leds.Animation
+import animatedledstrip.leds.AnimationData
+import animatedledstrip.leds.NonRepetitive
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
@@ -41,7 +43,8 @@ object AnimationHandler {
         /*  Special "Animation" type that the GUI sends to end an animation */
         if (params.animation == Animation.ENDANIMATION) {
             Logger.debug("Ending an animation")
-            continuousAnimations[params.id]?.endAnimation()        // End animation
+            continuousAnimations[params.id]?.endAnimation()       // End animation
+                ?: throw Exception("Animation ${params.id} not running")
             continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
             return
         }
@@ -64,8 +67,8 @@ object AnimationHandler {
                         Logger.trace("Calling Continuous Animation")
                         val id = random().toString().removePrefix("0.")
                         continuousAnimations[id] =
-                                ContinuousRunAnimation(id, params)
-                        continuousAnimations[id]?.startAnimation()
+                            ContinuousRunAnimation(id, params)
+                        continuousAnimations[id]!!.startAnimation()
                         Logger.debug(continuousAnimations)
                         Logger.debug("${Thread.currentThread().name} complete")
                     } else {
