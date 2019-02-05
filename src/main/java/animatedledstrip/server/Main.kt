@@ -6,6 +6,7 @@ import com.diozero.ws281xj.PixelAnimations.delay
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.pmw.tinylog.Configurator
@@ -25,6 +26,10 @@ lateinit var leds: AnimatedLEDStrip       // Our LED strip instance - will be in
 val animationQueue = mutableListOf<String>("C 0")
 
 var quit = false    // Tracks if loops should continue
+
+var socketPort1 = 5
+
+var socketPort2 = 6
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 fun main(args: Array<String>) {
@@ -128,13 +133,13 @@ fun main(args: Array<String>) {
     /*  Start GUI Socket in separate thread */
     Logger.trace("Launching GUISocket thread")
     GlobalScope.launch(newSingleThreadContext("GUIConnection")) {
-        SocketConnections.add(5).apply {
+        SocketConnections.add(socketPort1).apply {
             openSocket()
         }
     }
 
     GlobalScope.launch(newSingleThreadContext("AppConnection")) {
-        SocketConnections.add(6).apply {
+        SocketConnections.add(socketPort2).apply {
             openSocket()
         }
     }
@@ -142,12 +147,17 @@ fun main(args: Array<String>) {
     /*  If we told the LEDs to use EmulatedWS281x as their superclass, start the emulation GUI */
     if (leds is EmulatedAnimatedLEDStrip) {
         Logger.trace("Starting emulated LED strip GUI")
-        launch<EmulatedLEDStripViewer>(args)
+        GlobalScope.launch {
+            launch<EmulatedLEDStripViewer>(args)
+        }
     }
 
     /* Endless loop that will break when the server is told to quit */
     while (!quit) {
+        runBlocking { delay(1) }
     }
+
+    Logger.debug("Quit has become true")
 
     /**
      *  Turns off LEDs and sends a 'Q' to the GUI
@@ -157,7 +167,7 @@ fun main(args: Array<String>) {
         delay(500)
         leds.toggleRender()
         delay(2000)
-        System.exit(0)
+        return
     }
 
     shutdownServer()
