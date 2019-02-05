@@ -1,17 +1,5 @@
 $dokka.format:html
 $dokka.linkExtension:html
 $dokka.location:animatedledstrip.server$checkForNullAndAdd(kotlin.collections.MutableList((kotlin.String)), kotlin.String)animatedledstrip.server/kotlin.collections.-mutable-list/check-for-null-and-add.html
-$dokka.location:animatedledstrip.server$component1(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component1.html
-$dokka.location:animatedledstrip.server$component10(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component10.html
-$dokka.location:animatedledstrip.server$component11(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component11.html
-$dokka.location:animatedledstrip.server$component12(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component12.html
-$dokka.location:animatedledstrip.server$component2(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component2.html
-$dokka.location:animatedledstrip.server$component3(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component3.html
-$dokka.location:animatedledstrip.server$component4(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component4.html
-$dokka.location:animatedledstrip.server$component5(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component5.html
-$dokka.location:animatedledstrip.server$component6(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component6.html
-$dokka.location:animatedledstrip.server$component7(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component7.html
-$dokka.location:animatedledstrip.server$component8(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component8.html
-$dokka.location:animatedledstrip.server$component9(kotlin.collections.Map((kotlin.Any, )))animatedledstrip.server/kotlin.collections.-map/component9.html
 $dokka.location:animatedledstrip.server$parseText(animatedledstrip.leds.AnimationData, kotlin.String)animatedledstrip.server/animatedledstrip.leds.-animation-data/parse-text.html
 animatedledstrip.server
