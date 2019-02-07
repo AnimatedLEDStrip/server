@@ -18,8 +18,20 @@ import java.net.SocketException
 
 object SocketConnections {
 
+    /**
+     * A Map<Int, Connection> of all opened ports mapped to their respective
+     * Connection instances.
+     */
     val connections = mutableMapOf<Int, Connection>()
 
+    /**
+     * Initialize a new connection. Creates a Connection instance with the
+     * specified port, then adds the port and Connection instance to
+     * [connections] before returning the Connection instance.
+     *
+     * @param port The port to use when creating the ServerSocket in the
+     * connection
+     */
     fun add(port: Int): Connection {
         val connection = Connection(port)
         connections[port] = connection
@@ -28,9 +40,9 @@ object SocketConnections {
 
     class Connection(val port: Int) {
         private val serverSocket = ServerSocket(
-            port,
-            0,
-            if (!isTest) null else InetAddress.getByName("0.0.0.0")
+                port,
+                0,
+                if (hostIP == null) null else InetAddress.getByName(hostIP)
         )
         var clientSocket: Socket? = null
         private var disconnected = true
@@ -129,11 +141,20 @@ object SocketConnections {
         }
     }
 
-    fun sendAnimation(animation: Map<*, *>, id: String, connection: Connection? = null) {
-        if (connection != null) connection.sendAnimation(animation, id)
+
+    /**
+     * Send animation data to one or all client(s).
+     *
+     * @param animation A Map<*, *> containing info about the animation
+     * @param id The ID for the animation
+     * @param client Used to specify which client should receive the data. If
+     * null, data is sent to all clients
+     */
+    fun sendAnimation(animation: Map<*, *>, id: String, client: Connection? = null) {
+        if (client != null) client.sendAnimation(animation, id)
         else connections.forEach {
             it.value.sendAnimation(animation, id)
-            Logger.trace("Sent animation to connection on port ${it.key}")
+            Logger.trace("Sent animation to client on port ${it.key}")
         }
     }
 

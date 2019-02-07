@@ -16,16 +16,17 @@ class MainTest {
     private fun setSocketPorts(port1: Int, port2: Int) {
         socketPort1 = port1
         socketPort2 = port2
-        isTest = true
+        hostIP = "0.0.0.0"
     }
 
     @Test
     fun testMainStart() = runBlocking {
+        quit = false
         withTimeout(60000) {
             setSocketPorts(1105, 1106)
 
             GlobalScope.launch {
-                delay(2000)
+                delay(5000)
                 checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0)
                 quit = true
             }
@@ -36,6 +37,7 @@ class MainTest {
 
     @Test
     fun testLocalTerminalThread() = runBlocking {
+        quit = false
         withTimeout(60000) {
             setSocketPorts(1107, 1108)
             val stream = ByteArrayInputStream("q".toByteArray())
@@ -47,6 +49,7 @@ class MainTest {
 
     @Test
     fun testConnection1() = runBlocking {
+        quit = false
         withTimeout(60000) {
             setSocketPorts(1109, 1110)
 

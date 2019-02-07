@@ -12,8 +12,7 @@ import org.apache.commons.cli.Options
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
-import tornadofx.App
-import tornadofx.launch
+import tornadofx.*
 import java.io.FileInputStream
 import java.util.*
 
@@ -31,7 +30,7 @@ var socketPort1 = 5
 
 var socketPort2 = 6
 
-var isTest = false
+var hostIP: String? = null
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 fun main(args: Array<String>) {
