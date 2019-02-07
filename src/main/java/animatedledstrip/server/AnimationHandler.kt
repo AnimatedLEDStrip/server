@@ -5,7 +5,7 @@ import animatedledstrip.leds.AnimationData
 import animatedledstrip.leds.NonRepetitive
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.newFixedThreadPoolContext
 import org.pmw.tinylog.Logger
 import java.lang.Math.random
 
@@ -15,6 +15,9 @@ import java.lang.Math.random
  * keeps track of currently running animations.
  */
 object AnimationHandler {
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    val animationThreadPool = newFixedThreadPoolContext(100, "AnimationThreads")
 
     /**
      * Map tracking what continuous animations are currently running
@@ -50,7 +53,7 @@ object AnimationHandler {
         }
 
         Logger.trace("Launching new thread for new animation")
-        GlobalScope.launch(newSingleThreadContext("Thread ${random()}")) {
+        GlobalScope.launch(animationThreadPool) {
             Logger.trace("Decomposing params map")
             Logger.debug(params)
 
@@ -59,7 +62,7 @@ object AnimationHandler {
                 true -> {
                     Logger.trace("Calling Single Run Animation")
                     leds.run(params)
-                    Logger.debug("${Thread.currentThread().name} complete")
+                    Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
                 }
                 /*  Animations that can be run repeatedly */
                 false -> {
@@ -68,13 +71,13 @@ object AnimationHandler {
                         val id = random().toString().removePrefix("0.")
                         continuousAnimations[id] =
                             ContinuousRunAnimation(id, params)
+                        Logger.trace(continuousAnimations)
                         continuousAnimations[id]!!.startAnimation()
-                        Logger.debug(continuousAnimations)
-                        Logger.debug("${Thread.currentThread().name} complete")
+                        Logger.debug("$id complete")
                     } else {
                         Logger.trace("Calling Single Run Animation")
                         leds.run(params)
-                        Logger.debug("${Thread.currentThread().name} complete")
+                        Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
                     }
                 }
             }
