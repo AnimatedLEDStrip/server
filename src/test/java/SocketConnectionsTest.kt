@@ -26,6 +26,7 @@ class SocketConnectionsTest {
     @Test
     fun testOpenSocket() = runBlocking {
         withTimeout(60000) {
+            Configurator.defaultConfig().level(Level.TRACE).activate()
             hostIP = "0.0.0.0"
             println("a")
             Configurator.defaultConfig().level(Level.TRACE).activate()
