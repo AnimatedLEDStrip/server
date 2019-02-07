@@ -1,10 +1,9 @@
 package animatedledstrip.test
 
 import animatedledstrip.server.SocketConnections
-import animatedledstrip.server.isTest
+import animatedledstrip.server.hostIP
 import animatedledstrip.server.quit
 import kotlinx.coroutines.*
-import org.junit.Ignore
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
@@ -18,7 +17,7 @@ class SocketConnectionsTest {
 
     @Test
     fun testAdd() {
-        isTest = true
+        hostIP = "0.0.0.0"
         SocketConnections.add(1200)
 
         assertTrue { SocketConnections.connections.containsKey(1200) }
@@ -27,14 +26,12 @@ class SocketConnectionsTest {
     @Test
     fun testOpenSocket() = runBlocking {
         withTimeout(60000) {
+            hostIP = "0.0.0.0"
             println("a")
             Configurator.defaultConfig().level(Level.TRACE).activate()
             println("b")
             val c = SocketConnections.add(1201)
-            println("c")
-
-            isTest = true
-            println("d")
+            println("cd")
             GlobalScope.launch {
                 println("e")
                 c.openSocket()

@@ -16,7 +16,7 @@ class MainTest {
     private fun setSocketPorts(port1: Int, port2: Int) {
         socketPort1 = port1
         socketPort2 = port2
-        isTest = true
+        hostIP = "0.0.0.0"
     }
 
     @Test
