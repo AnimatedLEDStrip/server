@@ -9,12 +9,13 @@
 <br/>
 <h1>ContinuousRunAnimation</h1>
 <code><span class="keyword">class </span><span class="identifier">ContinuousRunAnimation</span></code>
-<p>Class for running an animation that repeats until stopped</p>
+<p>Class for running an animation that repeats until stopped.</p>
 <h3>Parameters</h3>
 <p><a name="id"></a>
-<code>id</code> - A string to identify the animation, such as the thread it is running in</p>
+<code>id</code> - A string to identify the animation, usually a random number</p>
 <p><a name="params"></a>
-<code>params</code> - A Map&lt;String, Any?&gt; containing data about the animation to be run</p>
+<code>params</code> - An AnimationData instance containing data about the animation
+to be run</p>
 <h3>Constructors</h3>
 <table>
 <tbody>
@@ -24,7 +25,7 @@
 </td>
 <td>
 <code><span class="identifier">ContinuousRunAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.leds.AnimationData)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.leds.AnimationData)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">)</span></code>
-<p>Class for running an animation that repeats until stopped</p>
+<p>Class for running an animation that repeats until stopped.</p>
 </td>
 </tr>
 </tbody>
@@ -38,7 +39,7 @@
 </td>
 <td>
 <code><span class="keyword">var </span><span class="identifier">continueAnimation</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
-<p>Variable controlling while loops in animation functions</p>
+<p>Variable controlling while loops in animation functions.</p>
 </td>
 </tr>
 <tr>
@@ -47,7 +48,7 @@
 </td>
 <td>
 <code><span class="keyword">val </span><span class="identifier">id</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
-<p>A string to identify the animation, such as the thread it is running in</p>
+<p>A string to identify the animation, usually a random number</p>
 </td>
 </tr>
 <tr>
@@ -56,7 +57,8 @@
 </td>
 <td>
 <code><span class="keyword">val </span><span class="identifier">params</span><span class="symbol">: </span><span class="identifier">AnimationData</span></code>
-<p>A Map&lt;String, Any?&gt; containing data about the animation to be run</p>
+<p>An AnimationData instance containing data about the animation
+to be run</p>
 </td>
 </tr>
 </tbody>
@@ -70,7 +72,7 @@
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">endAnimation</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Stop animation</p>
+<p>Stop animation by setting the loop guard to false.</p>
 </td>
 </tr>
 <tr>
@@ -79,7 +81,7 @@
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$sendAnimation(animatedledstrip.server.SocketConnections.Connection)/connection">connection</span><span class="symbol">:</span>&nbsp;<a href="../-socket-connections/-connection/index.html"><span class="identifier">Connection</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Send animation data to GUI</p>
+<p>Send animation data to GUI.</p>
 </td>
 </tr>
 <tr>
@@ -88,7 +90,7 @@
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">startAnimation</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Determine which animation is being called and call the corresponding function</p>
+<p>Determine which animation is being called and call the corresponding function.</p>
 </td>
 </tr>
 </tbody>
