@@ -5,8 +5,6 @@ import animatedledstrip.server.hostIP
 import animatedledstrip.server.quit
 import kotlinx.coroutines.*
 import org.junit.Test
-import org.pmw.tinylog.Configurator
-import org.pmw.tinylog.Level
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -25,12 +23,10 @@ class SocketConnectionsTest {
 
     @Test
     fun testOpenSocket() = runBlocking {
+        quit = false
         withTimeout(60000) {
-            Configurator.defaultConfig().level(Level.TRACE).activate()
             hostIP = "0.0.0.0"
-            println("a")
-            Configurator.defaultConfig().level(Level.TRACE).activate()
-            println("b")
+            println("ab")
             val c = SocketConnections.add(1201)
             println("cd")
             GlobalScope.launch {

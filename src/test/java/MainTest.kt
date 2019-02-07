@@ -21,6 +21,7 @@ class MainTest {
 
     @Test
     fun testMainStart() = runBlocking {
+        quit = false
         withTimeout(60000) {
             setSocketPorts(1105, 1106)
 
@@ -36,6 +37,7 @@ class MainTest {
 
     @Test
     fun testLocalTerminalThread() = runBlocking {
+        quit = false
         withTimeout(60000) {
             setSocketPorts(1107, 1108)
             val stream = ByteArrayInputStream("q".toByteArray())
@@ -47,6 +49,7 @@ class MainTest {
 
     @Test
     fun testConnection1() = runBlocking {
+        quit = false
         withTimeout(60000) {
             setSocketPorts(1109, 1110)
 
