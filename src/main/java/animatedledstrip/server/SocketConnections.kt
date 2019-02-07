@@ -52,20 +52,20 @@ object SocketConnections {
             withContext(Dispatchers.IO) {
                 Logger.debug("Socket at port $port started")
                 while (!quit) {
-                    clientSocket = serverSocket.accept()
-                    Logger.trace("Accepted new connection on port $port")
-                    Logger.trace("Initializing input stream")
-                    val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
-                    Logger.trace("Initializing output stream")
-                    socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
-                    Logger.trace("Sending currently running animations to GUI")
-                    AnimationHandler.continuousAnimations.forEach {
-                        it.value.sendAnimation(this@Connection)    // Send all current running continuous animations to newly connected GUI
-                    }
-                    disconnected = false
-                    Logger.info("Connection on port $port Established")
-                    var input: Any?
                     try {
+                        clientSocket = serverSocket.accept()
+                        Logger.trace("Accepted new connection on port $port")
+                        Logger.trace("Initializing input stream")
+                        val socIn = ObjectInputStream(BufferedInputStream(clientSocket!!.getInputStream()))
+                        Logger.trace("Initializing output stream")
+                        socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+                        Logger.debug("Sending currently running animations to GUI")
+                        AnimationHandler.continuousAnimations.forEach {
+                            it.value.sendAnimation(this@Connection)    // Send all current running continuous animations to newly connected GUI
+                        }
+                        disconnected = false
+                        Logger.info("Connection on port $port Established")
+                        var input: Any?
                         while (!disconnected) {
                             Logger.trace("Waiting for input")
                             input = socIn.readObject()
@@ -116,7 +116,7 @@ object SocketConnections {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
                             socOut!!.writeObject(mapOf("Animation" to animation, "ID" to id))
-                            Logger.trace("Sent animation to GUI:\n$animation : $id")
+                            Logger.debug("Sent animation to GUI:\n$animation : $id")
                         }
                     }
                 }

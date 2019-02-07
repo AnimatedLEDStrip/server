@@ -1,13 +1,15 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.*
+import animatedledstrip.leds.ColorContainer
 import javafx.event.EventHandler
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import tornadofx.*
 import java.lang.Math.pow
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 /**
@@ -95,6 +97,9 @@ class WS281xEmulator : View("WS281x Emulator") {
             }
         }
     }
+
+    fun ColorContainer.toColor(): Color =
+        Color.color((color shr 16 and 0xFF) / 255.0, (color shr 8 and 0xFF) / 255.0, (color and 0xFF) / 255.0)
 
     /**
      * Color of the pane background
