@@ -26,37 +26,24 @@ class SocketConnectionsTest {
         quit = false
         withTimeout(60000) {
             hostIP = "0.0.0.0"
-            println("ab")
             val c = SocketConnections.add(1201)
-            println("cd")
             GlobalScope.launch {
-                println("e")
                 c.openSocket()
-                println("f")
             }
-            println("g")
+
             val job = GlobalScope.launch {
                 withContext(Dispatchers.IO) {
-                    println("h")
                     val socket = Socket("0.0.0.0", 1201)
-                    println("i")
                     ObjectOutputStream(socket.getOutputStream())
-                    println("j")
                     ObjectInputStream(BufferedInputStream(socket.getInputStream()))
 
-                    println("k")
                     runBlocking { delay(5000) }
-                    println("l")
 
                     quit = true
-                    println("m")
                     socket.shutdownOutput()
-                    println("n")
                 }
             }
-            println("o")
             job.join()
-            println("p")
         }
     }
 

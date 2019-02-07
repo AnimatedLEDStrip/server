@@ -6,6 +6,7 @@ import animatedledstrip.leds.AnimationData
 import animatedledstrip.leds.Direction
 import animatedledstrip.leds.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimationHandler
+import animatedledstrip.server.SocketConnections
 import animatedledstrip.server.leds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -20,6 +21,7 @@ class AnimationHandlerTest {
 
     init {
         Configurator.defaultConfig().level(Level.OFF).activate()
+        SocketConnections.connections.clear()
         leds = EmulatedAnimatedLEDStrip(50)
     }
 
