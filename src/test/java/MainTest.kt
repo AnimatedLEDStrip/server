@@ -25,7 +25,7 @@ class MainTest {
             setSocketPorts(1105, 1106)
 
             GlobalScope.launch {
-                delay(2000)
+                delay(5000)
                 checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0)
                 quit = true
             }
