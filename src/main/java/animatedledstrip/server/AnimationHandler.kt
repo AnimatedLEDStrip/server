@@ -1,8 +1,8 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.Animation
-import animatedledstrip.leds.AnimationData
-import animatedledstrip.leds.NonRepetitive
+import animatedledstrip.animationutils.Animation
+import animatedledstrip.animationutils.AnimationData
+import animatedledstrip.animationutils.NonRepetitive
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext

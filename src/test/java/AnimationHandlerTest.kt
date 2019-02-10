@@ -1,10 +1,10 @@
 package animatedledstrip.test
 
-import animatedledstrip.ccpresets.CCBlue
-import animatedledstrip.leds.Animation
-import animatedledstrip.leds.AnimationData
-import animatedledstrip.leds.Direction
-import animatedledstrip.leds.EmulatedAnimatedLEDStrip
+import animatedledstrip.animationutils.Animation
+import animatedledstrip.animationutils.AnimationData
+import animatedledstrip.animationutils.Direction
+import animatedledstrip.colors.ccpresets.CCBlue
+import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimationHandler
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.server.leds

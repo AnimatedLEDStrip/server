@@ -1,6 +1,6 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.AnimationData
+import animatedledstrip.animationutils.AnimationData
 import org.pmw.tinylog.Logger
 
 /**

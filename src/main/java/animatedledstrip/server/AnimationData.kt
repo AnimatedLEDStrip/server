@@ -1,10 +1,12 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.*
+import animatedledstrip.animationutils.*
+import animatedledstrip.colors.ColorContainer
+import animatedledstrip.utils.parseHex
 import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
 
+// TODO: Modify to allow variable numbers of arguments for colors
 val options: Options = Options()
     .addOption("a", true, "Animation")
     .addOption("c1", true, "Color1")
@@ -12,9 +14,9 @@ val options: Options = Options()
     .addOption("c3", true, "Color3")
     .addOption("c4", true, "Color4")
     .addOption("c5", true, "Color5")
-    .addOption(Option("clist", true, "ColorList").apply {
-        args = Option.UNLIMITED_VALUES
-    })
+//    .addOption(Option("clist", true, "ColorList").apply {
+//        args = Option.UNLIMITED_VALUES
+//    })
     .addOption("d", true, "Direction")
     .addOption("delay", true, "Delay")
     .addOption("dmod", true, "DelayMod")
@@ -72,9 +74,9 @@ fun AnimationData.parseText(argString: String) {
     this.color4 = ColorContainer(parseHex(cmd.getOptionValue("c4") ?: "0"))
     this.color5 = ColorContainer(parseHex(cmd.getOptionValue("c5") ?: "0"))
 
-    (cmd.getOptionValues("clist") as Array<*>?)?.forEach {
-        c -> colorList.add(ColorContainer(parseHex(c as String? ?: "0")))
-    }
+//    (cmd.getOptionValues("clist") as Array<*>?)?.forEach {
+//        c -> colorList.add(ColorContainer(parseHex(c as String? ?: "0")))
+//    }
 
     this.delay = cmd.getOptionValue("delay")?.toLong() ?: when (animationInfoMap[animation]?.delay) {
         ReqLevel.REQUIRED -> throw Exception("Animation delay required for $animation")

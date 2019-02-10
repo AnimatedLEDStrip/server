@@ -1,6 +1,6 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.AnimationData
+import animatedledstrip.animationutils.AnimationData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext

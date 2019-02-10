@@ -1,6 +1,6 @@
 package animatedledstrip.test
 
-import animatedledstrip.leds.EmulatedAnimatedLEDStrip
+import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.*
 import kotlinx.coroutines.*
 import org.junit.Test

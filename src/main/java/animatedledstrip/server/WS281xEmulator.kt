@@ -1,6 +1,6 @@
 package animatedledstrip.server
 
-import animatedledstrip.leds.ColorContainer
+import animatedledstrip.colors.ColorContainer
 import javafx.event.EventHandler
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
