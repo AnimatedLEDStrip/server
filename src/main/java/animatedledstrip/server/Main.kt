@@ -3,6 +3,7 @@ package animatedledstrip.server
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.colors.ccpresets.CCBlack
+import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.AnimatedLEDStripKotlinPi
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
@@ -47,6 +48,7 @@ fun main(args: Array<String>) {
     options.addOption("e", "Emulate LED strip and launch emulator")
     options.addOption("E", "Emulate LED strip but do NOT launch emulator")
     options.addOption("i", "Enable image debugging")
+    options.addOption("T", "Run tests")
 
     val cmdline = DefaultParser().parse(options, args)
 
@@ -153,11 +155,13 @@ fun main(args: Array<String>) {
         }
     }
 
+    if (cmdline.hasOption("T")) AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlue))
+
     /*  If we told the LEDs to use EmulatedWS281x as their superclass, start the emulation GUI */
     if (leds is EmulatedAnimatedLEDStrip && !cmdline.hasOption("E")) {
         Logger.trace("Starting emulated LED strip GUI")
         GlobalScope.launch {
-            launch<EmulatedLEDStripViewer>(args)
+//            launch<EmulatedLEDStripViewer>(args)
         }
     }
 

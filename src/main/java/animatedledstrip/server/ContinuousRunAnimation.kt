@@ -46,7 +46,7 @@ class ContinuousRunAnimation(private val id: String, private val params: Animati
      */
     fun sendAnimation(connection: SocketConnections.Connection? = null) {
         Logger.trace("Sending animation to GUI")
-        SocketConnections.sendAnimation(params.toMap(), id, connection)
+        SocketConnections.sendAnimation(params, id, connection)
     }
 
 }

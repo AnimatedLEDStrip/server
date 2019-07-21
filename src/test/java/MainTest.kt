@@ -3,6 +3,7 @@ package animatedledstrip.test
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.*
 import kotlinx.coroutines.*
+import org.junit.Ignore
 import org.junit.Test
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
@@ -48,6 +49,7 @@ class MainTest {
     }
 
     @Test
+    @Ignore
     fun testConnection1() = runBlocking {
         quit = false
         withTimeout(60000) {
