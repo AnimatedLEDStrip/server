@@ -27,8 +27,6 @@ class EmulatedLEDStripViewer : App(WS281xEmulator::class)
 
 lateinit var leds: AnimatedLEDStrip       // Our LED strip instance - will be initialized in main
 
-val animationQueue = mutableListOf<String>("C 0")
-
 var quit = false    // Tracks if server should remain alive
 
 var socketPort1 = 5
@@ -142,18 +140,9 @@ fun main(args: Array<String>) {
     }
 
     /*  Start GUI Socket in separate thread */
-    Logger.trace("Launching GUISocket thread")
-    GlobalScope.launch(newSingleThreadContext("GUIConnection")) {
-        SocketConnections.add(socketPort1).apply {
-            openSocket()
-        }
-    }
-
-    GlobalScope.launch(newSingleThreadContext("AppConnection")) {
-        SocketConnections.add(socketPort2).apply {
-            openSocket()
-        }
-    }
+    Logger.trace("Launching socket threads")
+    SocketConnections.add(socketPort1).open()
+    SocketConnections.add(socketPort2).open()
 
     if (cmdline.hasOption("T")) AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlue))
 

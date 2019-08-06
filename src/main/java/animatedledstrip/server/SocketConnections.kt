@@ -1,10 +1,7 @@
 package animatedledstrip.server
 
 import animatedledstrip.animationutils.AnimationData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.io.EOFException
 import java.io.ObjectInputStream
@@ -37,6 +34,9 @@ object SocketConnections {
         return connection
     }
 
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private val connectionThreadPool = newFixedThreadPoolContext(250, "Connections")
+
     class Connection(val port: Int) {
         private val serverSocket = ServerSocket(
                 port,
@@ -50,6 +50,12 @@ object SocketConnections {
 
         fun isDisconnected() = disconnected
 
+        fun open() {
+            GlobalScope.launch(connectionThreadPool) {
+                openSocket()
+            }
+        }
+
         /**
          * Accept communication and start loop that listens for input
          *
@@ -59,7 +65,7 @@ object SocketConnections {
          *
          * (If there is a disconnection and the server is not shutting down, wait for a new connection)
          */
-        suspend fun openSocket() {
+        private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
                 Logger.debug("Socket at port $port started")
                 while (!quit) {
