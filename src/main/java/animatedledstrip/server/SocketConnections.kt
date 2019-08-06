@@ -48,8 +48,12 @@ object SocketConnections {
         private var socOut: ObjectOutputStream? = null
         var textBased = false
 
-        fun isDisconnected() = disconnected
+        val isDisconnected: Boolean
+            get() = disconnected
 
+        /**
+         * Open the connection
+         */
         fun open() {
             GlobalScope.launch(connectionThreadPool) {
                 openSocket()
@@ -62,8 +66,7 @@ object SocketConnections {
          * If the server is not shutting down (quit == false):
          *      Accept a new connection,
          *      While connected, get input and pass on to the animationQueue.
-         *
-         * (If there is a disconnection and the server is not shutting down, wait for a new connection)
+         *      If there is a disconnection and the server is not shutting down, wait for a new connection
          */
         private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
@@ -77,8 +80,9 @@ object SocketConnections {
                         Logger.trace("Initializing output stream")
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
                         Logger.debug("Sending currently running animations to GUI")
+                        // Send all current running continuous animations to newly connected client
                         AnimationHandler.continuousAnimations.forEach {
-                            it.value.sendAnimation(this@Connection)    // Send all current running continuous animations to newly connected GUI
+                            it.value.sendAnimation(this@Connection)
                         }
                         disconnected = false
                         Logger.info("Connection on port $port Established")
@@ -87,7 +91,10 @@ object SocketConnections {
                             Logger.trace("Waiting for input")
                             input = socIn.readObject() as AnimationData
                             Logger.trace("Input received")
-                            AnimationHandler.addAnimation(input)
+                            if (input.endAnimation)
+                                AnimationHandler.continuousAnimations[input.id]?.endAnimation()
+                            else
+                                AnimationHandler.addAnimation(input)
                         }
                     } catch (e: SocketException) {
                         // Catch disconnections
@@ -104,17 +111,18 @@ object SocketConnections {
         /**
          * Send animation data to the GUI along with an ID
          *
-         * @param animation A Map<String, Any?> containing data about the animation
+         * @param animation An AnimationData containing data about the animation
          * @param id The ID for the animation
          */
         fun sendAnimation(animation: AnimationData, id: String) {
-            if (!isDisconnected()) {
+            if (!isDisconnected) {
                 Logger.trace("Animation to send: $animation")
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut!!.writeObject(mapOf("Animation" to animation, "ID" to id))
-                            Logger.debug("Sent animation to GUI:\n$animation : $id")
+                            socOut?.writeObject(animation.id(id))
+                                    ?: Logger.debug("Could not send animation $id: Connection socket null")
+                            Logger.debug("Sent animation $id")
                         }
                     }
                 }

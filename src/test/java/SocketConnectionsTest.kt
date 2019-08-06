@@ -27,9 +27,7 @@ class SocketConnectionsTest {
         withTimeout(60000) {
             hostIP = "0.0.0.0"
             val c = SocketConnections.add(1201)
-            GlobalScope.launch {
-                c.openSocket()
-            }
+            c.open()
 
             val job = GlobalScope.launch {
                 withContext(Dispatchers.IO) {

@@ -35,7 +35,6 @@ var socketPort2 = 6
 
 var hostIP: String? = null
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 fun main(args: Array<String>) {
 
     val options = Options()
@@ -126,6 +125,7 @@ fun main(args: Array<String>) {
     AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlack))
     /*  Launch loop to read from local terminal, mainly for a 'q' from the user */
     Logger.trace("Launching local terminal tread")
+    @Suppress("EXPERIMENTAL_API_USAGE")
     GlobalScope.launch(newSingleThreadContext("Local Terminal")) {
         while (!quit) {
             Logger.trace("Local terminal waiting for input")
@@ -162,7 +162,7 @@ fun main(args: Array<String>) {
     Logger.debug("Quit has become true")
 
     /**
-     *  Turns off LEDs and sends a 'Q' to the GUI
+     *  Turns off LEDs
      */
     fun shutdownServer() {
         leds.setStripColor(0)
