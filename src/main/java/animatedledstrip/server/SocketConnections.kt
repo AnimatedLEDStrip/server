@@ -91,10 +91,7 @@ object SocketConnections {
                             Logger.trace("Waiting for input")
                             input = socIn.readObject() as AnimationData
                             Logger.trace("Input received")
-                            if (input.endAnimation)
-                                AnimationHandler.continuousAnimations[input.id]?.endAnimation()
-                            else
-                                AnimationHandler.addAnimation(input)
+                            AnimationHandler.addAnimation(input)
                         }
                     } catch (e: SocketException) {
                         // Catch disconnections

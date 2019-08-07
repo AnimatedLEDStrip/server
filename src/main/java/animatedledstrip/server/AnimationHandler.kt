@@ -54,7 +54,6 @@ object AnimationHandler {
 
         Logger.trace("Launching new thread for new animation")
         GlobalScope.launch(animationThreadPool) {
-            Logger.trace("Decomposing params map")
             Logger.debug(params)
 
             when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
