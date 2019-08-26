@@ -39,9 +39,9 @@ object SocketConnections {
 
     class Connection(val port: Int) {
         private val serverSocket = ServerSocket(
-                port,
-                0,
-                if (hostIP == null) null else InetAddress.getByName(hostIP)
+            port,
+            0,
+            if (hostIP == null) null else InetAddress.getByName(hostIP)
         )
         var clientSocket: Socket? = null
         private var disconnected = true
@@ -123,7 +123,7 @@ object SocketConnections {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
                             socOut?.writeObject(animation.id(if (animation.id == "") id else "${animation.id} $id"))
-                                    ?: Logger.debug("Could not send animation $id: Connection socket null")
+                                ?: Logger.debug("Could not send animation $id: Connection socket null")
                             Logger.debug("Sent animation $id")
                         }
                     }
