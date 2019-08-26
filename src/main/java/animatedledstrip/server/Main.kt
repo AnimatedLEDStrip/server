@@ -50,16 +50,16 @@ fun main(args: Array<String>) {
     val cmdline = DefaultParser().parse(options, args)
 
     val pattern =
-        if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
-        else "{{level}:|min-size=8} {message}"
+            if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
+            else "{{level}:|min-size=8} {message}"
 
     val level =
-        when {
-            cmdline.hasOption("t") -> Level.TRACE
-            cmdline.hasOption("d") -> Level.DEBUG
-            cmdline.hasOption("q") -> Level.OFF
-            else -> Level.INFO
-        }
+            when {
+                cmdline.hasOption("t") -> Level.TRACE
+                cmdline.hasOption("d") -> Level.DEBUG
+                cmdline.hasOption("q") -> Level.OFF
+                else -> Level.INFO
+            }
 
     Configurator.defaultConfig().formatPattern(pattern).level(level).activate()
 
@@ -73,33 +73,33 @@ fun main(args: Array<String>) {
     leds = when (cmdline.hasOption("e") || cmdline.hasOption("E")) {
         false -> {
             AnimatedLEDStripKotlinPi(
-                try {
-                    Logger.trace("Trying to load numLEDs from led.config")
-                    properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
-                } catch (e: Exception) {
-                    Logger.warn("No numLEDs in led.config or led.config does not exist")
-                    240                                                 // Else default
-                },
-                try {
-                    Logger.trace("Trying to load pin from led.config")
-                    properties.getProperty("pin").toInt()               // If config file has pin property
-                } catch (e: Exception) {
-                    Logger.warn("No pin in led.config or led.config does not exist")
-                    10                                                  // Else default
-                },
-                imageDebugging = cmdline.hasOption("i")
+                    try {
+                        Logger.trace("Trying to load numLEDs from led.config")
+                        properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
+                    } catch (e: Exception) {
+                        Logger.warn("No numLEDs in led.config or led.config does not exist")
+                        240                                                 // Else default
+                    },
+                    try {
+                        Logger.trace("Trying to load pin from led.config")
+                        properties.getProperty("pin").toInt()               // If config file has pin property
+                    } catch (e: Exception) {
+                        Logger.warn("No pin in led.config or led.config does not exist")
+                        10                                                  // Else default
+                    },
+                    imageDebugging = cmdline.hasOption("i")
             )
         }
         true -> {
             EmulatedAnimatedLEDStrip(
-                try {
-                    Logger.trace("Trying to load numLEDs from led.config")
-                    properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
-                } catch (e: Exception) {
-                    Logger.warn("No numLEDs in led.config or led.config does not exist")
-                    240                                                 // Else default
-                },
-                imageDebugging = cmdline.hasOption("i")
+                    try {
+                        Logger.trace("Trying to load numLEDs from led.config")
+                        properties.getProperty("numLEDs").toInt()           // If config file has numLEDs property
+                    } catch (e: Exception) {
+                        Logger.warn("No numLEDs in led.config or led.config does not exist")
+                        240                                                 // Else default
+                    },
+                    imageDebugging = cmdline.hasOption("i")
             )
         }
 
@@ -141,8 +141,16 @@ fun main(args: Array<String>) {
 
     /*  Start GUI Socket in separate thread */
     Logger.trace("Launching socket threads")
-    SocketConnections.add(socketPort1).open()
-    SocketConnections.add(socketPort2).open()
+    properties.getProperty("ports")?.split(' ')?.forEach {
+        try {
+            it.toInt()
+        } catch (e: NumberFormatException) {
+            Logger.error("Could not cast port $it to int")
+        }
+        SocketConnections.add(it.toInt()).open()
+    }
+//    SocketConnections.add(socketPort1).open()
+//    SocketConnections.add(socketPort2).open()
 
     if (cmdline.hasOption("T")) AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlue))
 
@@ -150,7 +158,7 @@ fun main(args: Array<String>) {
     if (leds is EmulatedAnimatedLEDStrip && !cmdline.hasOption("E")) {
         Logger.trace("Starting emulated LED strip GUI")
         GlobalScope.launch {
-//            launch<EmulatedLEDStripViewer>(args)
+            //            launch<EmulatedLEDStripViewer>(args)
         }
     }
 
@@ -174,7 +182,6 @@ fun main(args: Array<String>) {
 
     shutdownServer()
 }
-
 
 
 /**

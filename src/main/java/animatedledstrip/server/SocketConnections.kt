@@ -89,9 +89,14 @@ object SocketConnections {
                         var input: Any?
                         while (!disconnected) {
                             Logger.trace("Waiting for input")
-                            input = socIn.readObject() as AnimationData
-                            Logger.trace("Input received")
-                            AnimationHandler.addAnimation(input)
+                            try {
+                                input = socIn.readObject() as AnimationData
+                                Logger.trace("Input received")
+                                AnimationHandler.addAnimation(input)
+                            } catch (e: ClassCastException) {
+                                Logger.error("Could not cast input to AnimationData")
+                                continue
+                            }
                         }
                     } catch (e: SocketException) {
                         // Catch disconnections
@@ -117,7 +122,7 @@ object SocketConnections {
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut?.writeObject(animation.id(id))
+                            socOut?.writeObject(animation.id(if (animation.id == "") id else "${animation.id} $id"))
                                     ?: Logger.debug("Could not send animation $id: Connection socket null")
                             Logger.debug("Sent animation $id")
                         }
