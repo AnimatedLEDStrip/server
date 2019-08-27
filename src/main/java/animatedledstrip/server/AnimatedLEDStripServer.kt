@@ -33,7 +33,6 @@ class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
         addOption("t", "Enable trace debugging")
         addOption("v", "Enable verbose log statements")
         addOption("q", "Disable log outputs")
-        addOption("e", "Emulate LED strip and launch emulator")
         addOption("E", "Emulate LED strip but do NOT launch emulator")
         addOption("f", true, "Specify properties file")
         addOption("i", "Enable image debugging")
