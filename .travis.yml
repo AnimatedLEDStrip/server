@@ -1,6 +1,6 @@
 ---
 language: java
-jdk: openjdk8
+jdk: openjdk9
 
 branches:
   only:
@@ -10,20 +10,17 @@ branches:
 
 stages:
   - name: test
-  - name: deploy gh-pages
+  - name: deploy
     if: branch = master AND type != pull_request
 
 jobs:
   include:
     - stage: test
-      install:
-        -
+      install: ""
       after_success: bash <(curl -s https://codecov.io/bash)
-    - stage: deploy gh-pages
-      install:
-        -
-      test:
-        -
+    - stage: deploy
+      install: ""
+      test: ""
       deploy:
         - provider: script
           script: mvn --settings .maven.xml site -DskipTests=true -B && git add dokka
@@ -35,4 +32,11 @@ jobs:
           local_dir: ./dokka
           on:
             branch: master
-
+    - stage: deploy
+      install:
+        - ""
+      deploy:
+        - provider: script
+          script: mvn deploy --settings .maven.xml -DskipTests=true -B
+          on:
+            branch: master
