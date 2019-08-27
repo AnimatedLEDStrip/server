@@ -3,6 +3,7 @@ package animatedledstrip.server
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.NonRepetitive
+import animatedledstrip.leds.AnimatedLEDStrip
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -14,7 +15,7 @@ import java.lang.Math.random
  * An object that creates ContinuousRunAnimation instances for animations and
  * keeps track of currently running animations.
  */
-object AnimationHandler {
+internal class AnimationHandler(private val leds: AnimatedLEDStrip) {
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     val animationThreadPool = newFixedThreadPoolContext(100, "AnimationThreads")
@@ -69,7 +70,7 @@ object AnimationHandler {
                         Logger.trace("Calling Continuous Animation")
                         val id = random().toString().removePrefix("0.")
                         continuousAnimations[id] =
-                            ContinuousRunAnimation(id, params)
+                            ContinuousRunAnimation(id, params, leds)
                         Logger.trace(continuousAnimations)
                         continuousAnimations[id]!!.startAnimation()
                         Logger.debug("$id complete")

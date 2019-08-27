@@ -1,15 +1,11 @@
 package animatedledstrip.test
 
-import animatedledstrip.animationutils.Animation
-import animatedledstrip.animationutils.AnimationData
-import animatedledstrip.animationutils.Direction
+import animatedledstrip.animationutils.*
 import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimationHandler
 import animatedledstrip.server.SocketConnections
-import animatedledstrip.server.leds
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import animatedledstrip.utils.delayBlocking
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
@@ -22,54 +18,59 @@ class AnimationHandlerTest {
     init {
         Configurator.defaultConfig().level(Level.OFF).activate()
         SocketConnections.connections.clear()
-        leds = EmulatedAnimatedLEDStrip(50)
     }
+
+    private val leds = EmulatedAnimatedLEDStrip(50)
 
     @Test
     fun testHandlerInit() {
-        AnimationHandler
-        assertTrue { AnimationHandler.continuousAnimations.isEmpty() }
+        val handler = AnimationHandler(leds)
+        assertTrue { handler.continuousAnimations.isEmpty() }
     }
 
     @Test
     fun testNonRepetitiveAnimation() {
-        AnimationHandler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlue))
+        val handler = AnimationHandler(leds)
 
-        runBlocking { delay(1000) }
+        handler.addAnimation(AnimationData().animation(Animation.COLOR).color(CCBlue))
 
-        checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0xFF)
+        delayBlocking(1000)
+
+        checkAllPixels(leds, 0xFF)
     }
 
     @Test
     fun testNonContinuousAnimation() {
-        AnimationHandler.addAnimation(AnimationData().animation(Animation.MULTIPIXELRUN).continuous(false))
-
-        runBlocking { delay(1000) }
+        val handler = AnimationHandler(leds)
+        handler.addAnimation(AnimationData().animation(Animation.MULTIPIXELRUN).continuous(false))
+        delayBlocking(1000)
     }
 
     @Test
     fun testContinuousAnimation() {
-        AnimationHandler.addAnimation(
+        val handler = AnimationHandler(leds)
+        handler.addAnimation(
             AnimationData()
                 .animation(Animation.PIXELRUN)
                 .color(0xFF)
                 .direction(Direction.FORWARD)
         )
 
-        runBlocking { delay(2000) }
+        delayBlocking(2000)
 
-        for (key in AnimationHandler.continuousAnimations.keys) {
-            AnimationHandler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id(key))
+        for (key in handler.continuousAnimations.keys) {
+            handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id(key))
         }
 
-        runBlocking { delay(1000) }
-        checkAllPixels(leds as EmulatedAnimatedLEDStrip, 0x0)
+        delayBlocking(1000)
+        checkAllPixels(leds, 0x0)
     }
 
     @Test
     fun testRemoveNonExistentAnimation() {
+        val handler = AnimationHandler(leds)
         assertFails {
-            AnimationHandler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
+            handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
         }
     }
 

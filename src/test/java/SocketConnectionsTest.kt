@@ -1,10 +1,13 @@
 package animatedledstrip.test
 
+import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
+import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
-import animatedledstrip.server.hostIP
-import animatedledstrip.server.quit
+import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
 import org.junit.Test
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -13,20 +16,27 @@ import kotlin.test.assertTrue
 
 class SocketConnectionsTest {
 
+    init {
+        Configurator.defaultConfig().level(Level.OFF).activate()
+    }
+
     @Test
     fun testAdd() {
-        hostIP = "0.0.0.0"
-        SocketConnections.add(1200)
+        val server =
+            AnimatedLEDStripServer(arrayOf("-E"), EmulatedAnimatedLEDStrip::class)
+        SocketConnections.hostIP = "0.0.0.0"
+        SocketConnections.add(1200, server)
 
         assertTrue { SocketConnections.connections.containsKey(1200) }
     }
 
     @Test
     fun testOpenSocket() = runBlocking {
-        quit = false
         withTimeout(60000) {
-            hostIP = "0.0.0.0"
-            val c = SocketConnections.add(1201)
+            val server =
+                AnimatedLEDStripServer(arrayOf("-E"), EmulatedAnimatedLEDStrip::class).start()
+            SocketConnections.hostIP = "0.0.0.0"
+            val c = SocketConnections.add(1201, server)
             c.open()
 
             val job = GlobalScope.launch {
@@ -35,9 +45,9 @@ class SocketConnectionsTest {
                     ObjectOutputStream(socket.getOutputStream())
                     ObjectInputStream(BufferedInputStream(socket.getInputStream()))
 
-                    runBlocking { delay(5000) }
+                    delayBlocking(5000)
 
-                    quit = true
+                    server.stop()
                     socket.shutdownOutput()
                 }
             }

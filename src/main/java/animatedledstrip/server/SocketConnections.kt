@@ -1,6 +1,7 @@
 package animatedledstrip.server
 
 import animatedledstrip.animationutils.AnimationData
+import animatedledstrip.animationutils.id
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.io.EOFException
@@ -13,6 +14,8 @@ import java.net.SocketException
 
 
 object SocketConnections {
+
+    var hostIP: String? = null
 
     /**
      * A Map<Int, Connection> of all opened ports mapped to their respective
@@ -28,8 +31,8 @@ object SocketConnections {
      * @param port The port to use when creating the ServerSocket in the
      * connection
      */
-    fun add(port: Int): Connection {
-        val connection = Connection(port)
+    fun add(port: Int, server: AnimatedLEDStripServer<*>): Connection {
+        val connection = Connection(port, server)
         connections[port] = connection
         return connection
     }
@@ -37,7 +40,7 @@ object SocketConnections {
     @Suppress("EXPERIMENTAL_API_USAGE")
     private val connectionThreadPool = newFixedThreadPoolContext(250, "Connections")
 
-    class Connection(val port: Int) {
+    class Connection(val port: Int, private val server: AnimatedLEDStripServer<*>) {
         private val serverSocket = ServerSocket(
             port,
             0,
@@ -56,6 +59,7 @@ object SocketConnections {
          */
         fun open() {
             GlobalScope.launch(connectionThreadPool) {
+                Logger.debug("Starting port $port")
                 openSocket()
             }
         }
@@ -71,7 +75,7 @@ object SocketConnections {
         private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
                 Logger.debug("Socket at port $port started")
-                while (!quit) {
+                while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
                         Logger.trace("Accepted new connection on port $port")
@@ -81,7 +85,7 @@ object SocketConnections {
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
                         Logger.debug("Sending currently running animations to GUI")
                         // Send all current running continuous animations to newly connected client
-                        AnimationHandler.continuousAnimations.forEach {
+                        server.animationHandler.continuousAnimations.forEach {
                             it.value.sendAnimation(this@Connection)
                         }
                         disconnected = false
@@ -92,7 +96,7 @@ object SocketConnections {
                             try {
                                 input = socIn.readObject() as AnimationData
                                 Logger.trace("Input received")
-                                AnimationHandler.addAnimation(input)
+                                server.animationHandler.addAnimation(input)
                             } catch (e: ClassCastException) {
                                 Logger.error("Could not cast input to AnimationData")
                                 continue
