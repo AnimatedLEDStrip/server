@@ -17,7 +17,7 @@
 <p><a href="-init-.html">&lt;init&gt;</a></p>
 </td>
 <td>
-<code><span class="identifier">Connection</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$<init>(kotlin.Int)/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span></code></td>
+<code><span class="identifier">Connection</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$<init>(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$<init>(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/server">server</span><span class="symbol">:</span>&nbsp;<a href="../../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">)</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -29,7 +29,7 @@
 <p><a href="client-socket.html">clientSocket</a></p>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">clientSocket</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code></td>
+<code><span class="keyword">var </span><span class="identifier">clientSocket</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/Socket.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code></td>
 </tr>
 <tr>
 <td>
@@ -40,6 +40,13 @@
 </tr>
 <tr>
 <td>
+<p><a href="is-disconnected.html">isDisconnected</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">isDisconnected</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
+<tr>
+<td>
 <p><a href="port.html">port</a></p>
 </td>
 <td>
@@ -47,17 +54,24 @@
 </tr>
 <tr>
 <td>
+<p><a href="server.html">server</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">server</span><span class="symbol">: </span><a href="../../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
 <p><a href="server-socket.html">serverSocket</a></p>
 </td>
 <td>
-<code><span class="keyword">val </span><span class="identifier">serverSocket</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/6/docs/api/java/net/ServerSocket.html"><span class="identifier">ServerSocket</span></a></code></td>
+<code><span class="keyword">val </span><span class="identifier">serverSocket</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/ServerSocket.html"><span class="identifier">ServerSocket</span></a></code></td>
 </tr>
 <tr>
 <td>
 <p><a href="soc-out.html">socOut</a></p>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">socOut</span><span class="symbol">: </span><a href="http://docs.oracle.com/javase/6/docs/api/java/io/ObjectOutputStream.html"><span class="identifier">ObjectOutputStream</span></a><span class="symbol">?</span></code></td>
+<code><span class="keyword">var </span><span class="identifier">socOut</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/io/ObjectOutputStream.html"><span class="identifier">ObjectOutputStream</span></a><span class="symbol">?</span></code></td>
 </tr>
 <tr>
 <td>
@@ -73,10 +87,12 @@
 <tbody>
 <tr>
 <td>
-<p><a href="is-disconnected.html">isDisconnected</a></p>
+<p><a href="open.html">open</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">isDisconnected</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+<code><span class="keyword">fun </span><span class="identifier">open</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Open the connection</p>
+</td>
 </tr>
 <tr>
 <td>
@@ -92,7 +108,7 @@
 <p><a href="send-animation.html">sendAnimation</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(kotlin.collections.Map((kotlin.Any, )), kotlin.String)/animation">animation</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">,</span>&nbsp;<span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(kotlin.collections.Map((kotlin.Any, )), kotlin.String)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/animation">animation</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Send animation data to the GUI along with an ID</p>
 </td>
 </tr>

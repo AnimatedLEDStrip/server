@@ -29,10 +29,24 @@
 <p><a href="connections.html">connections</a></p>
 </td>
 <td>
-<code><span class="keyword">val </span><span class="identifier">connections</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html"><span class="identifier">MutableMap</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">,</span>&nbsp;<a href="-connection/index.html"><span class="identifier">Connection</span></a><span class="symbol">&gt;</span></code>
+<code><span class="keyword">val </span><span class="identifier">connections</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html"><span class="identifier">MutableMap</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">,</span>&nbsp;<a href="-connection/index.html"><span class="identifier">SocketConnections.Connection</span></a><span class="symbol">&gt;</span></code>
 <p>A Map&lt;Int, Connection&gt; of all opened ports mapped to their respective
 Connection instances.</p>
 </td>
+</tr>
+<tr>
+<td>
+<p><a href="connection-thread-pool.html">connectionThreadPool</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">connectionThreadPool</span><span class="symbol">: </span><span class="identifier">ExecutorCoroutineDispatcher</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="host-i-p.html">hostIP</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">hostIP</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -44,7 +58,7 @@ Connection instances.</p>
 <p><a href="add.html">add</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">add</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int)/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="-connection/index.html"><span class="identifier">Connection</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">add</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/server">server</span><span class="symbol">:</span>&nbsp;<a href="../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="-connection/index.html"><span class="identifier">SocketConnections.Connection</span></a></code>
 <p>Initialize a new connection. Creates a Connection instance with the
 specified port, then adds the port and Connection instance to
 <a href="connections.html">connections</a> before returning the Connection instance.</p>
@@ -55,7 +69,7 @@ specified port, then adds the port and Connection instance to
 <p><a href="send-animation.html">sendAnimation</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections$sendAnimation(kotlin.collections.Map((kotlin.Any, )), kotlin.String, animatedledstrip.server.SocketConnections.Connection)/animation">animation</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">,</span>&nbsp;<span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$sendAnimation(kotlin.collections.Map((kotlin.Any, )), kotlin.String, animatedledstrip.server.SocketConnections.Connection)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$sendAnimation(kotlin.collections.Map((kotlin.Any, )), kotlin.String, animatedledstrip.server.SocketConnections.Connection)/client">client</span><span class="symbol">:</span>&nbsp;<a href="-connection/index.html"><span class="identifier">Connection</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String, animatedledstrip.server.SocketConnections.Connection)/animation">animation</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String, animatedledstrip.server.SocketConnections.Connection)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String, animatedledstrip.server.SocketConnections.Connection)/client">client</span><span class="symbol">:</span>&nbsp;<a href="-connection/index.html"><span class="identifier">SocketConnections.Connection</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Send animation data to one or all client(s).</p>
 </td>
 </tr>

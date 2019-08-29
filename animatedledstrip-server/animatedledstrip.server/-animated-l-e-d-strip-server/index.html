@@ -1,0 +1,140 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>AnimatedLEDStripServer - animatedledstrip-server</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">animatedledstrip-server</a>&nbsp;/&nbsp;<a href="../index.html">animatedledstrip.server</a>&nbsp;/&nbsp;<a href="./index.html">AnimatedLEDStripServer</a><br/>
+<br/>
+<h1>AnimatedLEDStripServer</h1>
+<code><span class="keyword">class </span><span class="identifier">AnimatedLEDStripServer</span><span class="symbol">&lt;</span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">&gt;</span></code>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">AnimatedLEDStripServer</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimatedLEDStripServer$<init>(kotlin.Array((kotlin.String)), kotlin.reflect.KClass((animatedledstrip.server.AnimatedLEDStripServer.T)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html"><span class="identifier">Array</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.AnimatedLEDStripServer$<init>(kotlin.Array((kotlin.String)), kotlin.reflect.KClass((animatedledstrip.server.AnimatedLEDStripServer.T)))/ledClass">ledClass</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html"><span class="identifier">KClass</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="animation-handler.html">animationHandler</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">animationHandler</span><span class="symbol">: </span><a href="../-animation-handler/index.html"><span class="identifier">AnimationHandler</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="cmdline.html">cmdline</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">cmdline</span><span class="symbol">: </span><span class="identifier">CommandLine</span><span class="symbol">!</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="default-output-file-name.html">defaultOutputFileName</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">defaultOutputFileName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="default-property-file-name.html">defaultPropertyFileName</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">defaultPropertyFileName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="leds.html">leds</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">leds</span><span class="symbol">: </span><span class="identifier">AnimatedLEDStrip</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="local-thread.html">localThread</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">localThread</span><span class="symbol">: </span><span class="identifier">ExecutorCoroutineDispatcher</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="options.html">options</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">options</span><span class="symbol">: </span><span class="identifier">Options</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="ports.html">ports</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">ports</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/index.html"><span class="identifier">MutableList</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="properties.html">properties</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">properties</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/util/Properties.html"><span class="identifier">Properties</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="running.html">running</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">running</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="test-animation.html">testAnimation</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">testAnimation</span><span class="symbol">: </span><span class="identifier">AnimationData</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="start.html">start</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">start</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="start-local-terminal-reader.html">startLocalTerminalReader</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">startLocalTerminalReader</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="stop.html">stop</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">stop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="wait-until-stop.html">waitUntilStop</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">waitUntilStop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

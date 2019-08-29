@@ -24,7 +24,7 @@ to be run</p>
 <p><a href="-init-.html">&lt;init&gt;</a></p>
 </td>
 <td>
-<code><span class="identifier">ContinuousRunAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.animationutils.AnimationData)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.animationutils.AnimationData)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">)</span></code>
+<code><span class="identifier">ContinuousRunAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.animationutils.AnimationData, animatedledstrip.leds.AnimatedLEDStrip)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.animationutils.AnimationData, animatedledstrip.leds.AnimatedLEDStrip)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$<init>(kotlin.String, animatedledstrip.animationutils.AnimationData, animatedledstrip.leds.AnimatedLEDStrip)/leds">leds</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">)</span></code>
 <p>Class for running an animation that repeats until stopped.</p>
 </td>
 </tr>
@@ -50,6 +50,13 @@ to be run</p>
 <code><span class="keyword">val </span><span class="identifier">id</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code>
 <p>A string to identify the animation, usually a random number</p>
 </td>
+</tr>
+<tr>
+<td>
+<p><a href="leds.html">leds</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">leds</span><span class="symbol">: </span><span class="identifier">AnimatedLEDStrip</span></code></td>
 </tr>
 <tr>
 <td>
@@ -80,7 +87,7 @@ to be run</p>
 <p><a href="send-animation.html">sendAnimation</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$sendAnimation(animatedledstrip.server.SocketConnections.Connection)/connection">connection</span><span class="symbol">:</span>&nbsp;<a href="../-socket-connections/-connection/index.html"><span class="identifier">Connection</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.ContinuousRunAnimation$sendAnimation(animatedledstrip.server.SocketConnections.Connection)/connection">connection</span><span class="symbol">:</span>&nbsp;<a href="../-socket-connections/-connection/index.html"><span class="identifier">SocketConnections.Connection</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Send animation data to GUI.</p>
 </td>
 </tr>
