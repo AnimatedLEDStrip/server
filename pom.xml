@@ -7,6 +7,11 @@
     <groupId>io.github.animatedledstrip</groupId>
     <artifactId>animatedledstrip-server</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Library for creating an AnimatedLEDStripServer</description>
+    <url>https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer</url>
 
     <developers>
         <developer>
@@ -19,14 +24,15 @@
 
     <scm>
         <connection>scm:git:https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer.git</connection>
-        <developerConnection>scm:git:https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer.git
+        </developerConnection>
         <url>https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer</url>
     </scm>
 
     <properties>
         <jdk.version>9</jdk.version>
         <kotlin.version>1.3.50</kotlin.version>
-        <dokka.version>0.9.17</dokka.version>
+        <dokka.version>0.9.18</dokka.version>
         <github.global.server>github</github.global.server>
         <main.class>MainKt</main.class>
         <!--suppress CheckTagEmptyBody -->
@@ -55,8 +61,8 @@
     <dependencies>
         <dependency>
             <groupId>io.github.animatedledstrip</groupId>
-            <artifactId>animatedledstrip-kotlin-pi</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <artifactId>animatedledstrip-pi</artifactId>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -112,7 +118,7 @@
                         <goals>
                             <goal>compile</goal>
                         </goals>
-                        </execution>
+                    </execution>
                     <execution>
                         <id>test-compile</id>
                         <phase>test-compile</phase>
