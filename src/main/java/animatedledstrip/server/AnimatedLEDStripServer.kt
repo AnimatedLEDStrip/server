@@ -45,11 +45,16 @@ import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
+class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     args: Array<String>,
     ledClass: KClass<T>
 ) {
+    /**
+     * Is the server running
+     */
     internal var running = false
+
+    /* Command line and properties file */
 
     private val options = Options().apply {
         addOption("d", "Enable debugging")
@@ -58,44 +63,59 @@ class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
         addOption("q", "Disable log outputs")
         addOption("E", "Emulate LED strip but do NOT launch emulator")
         addOption("f", true, "Specify properties file")
+        addOption("o", true, "Specify output file name for image debugging")
+        addOption("r", true, "Specify number of renders between saves")
         addOption("i", "Enable image debugging")
         addOption("T", "Run test")
     }
 
     private val cmdline = DefaultParser().parse(options, args)
 
-    var defaultPropertyFileName = "led.config"
+    private var propertyFileName = cmdline.getOptionValue("f") ?: "led.config"
 
-    var defaultOutputFileName: String? = null
+    private var outputFileName: String? = cmdline.getOptionValue("o")
 
     private val properties = Properties().apply {
         try {
-            load(FileInputStream(cmdline.getOptionValue("f") ?: defaultPropertyFileName))
+            load(FileInputStream(propertyFileName))
         } catch (e: FileNotFoundException) {
-            Logger.warn("File ${cmdline.getOptionValue("f") ?: defaultPropertyFileName} not found")
+            Logger.warn("File $propertyFileName not found")
         }
     }
 
-    val ports = mutableListOf<Int>().apply {
-        Logger.debug(properties.getProperty("ports"))
+
+    /* Arguments for creating the AnimatedLEDStrip instance */
+
+    private val emulated: Boolean = cmdline.hasOption("e") || cmdline.hasOption("E")
+
+    private val numLEDs: Int = properties.getProperty("numLEDs", "240").toInt()
+
+    private val pin: Int = properties.getProperty("pin", "12").toInt()
+
+    private val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
+
+    private val ports = mutableListOf<Int>().apply {
         properties.getProperty("ports")?.split(' ')?.forEach {
-            Logger.debug(it)
             requireNotNull(it.toIntOrNull())
             this.add(it.toInt())
         }
     }
 
-    private val leds = when (cmdline.hasOption("e") || cmdline.hasOption("E")) {
+    private val rendersBeforeSave =
+        properties.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
+
+    private val leds = when (emulated) {
         false -> ledClass.primaryConstructor!!.call(
-            properties.getProperty("numLEDs", "240").toInt(),
-            properties.getProperty("pin", "12").toInt(),
-            cmdline.hasOption("i"),
-            cmdline.getOptionValue("o") ?: defaultOutputFileName
+            numLEDs,
+            pin,
+            imageDebuggingEnabled,
+            outputFileName,
+            rendersBeforeSave
         )
         true -> EmulatedAnimatedLEDStrip(
-            properties.getProperty("numLEDs", "240").toInt(),
-            imageDebugging = cmdline.hasOption("i"),
-            fileName = cmdline.getOptionValue("o") ?: defaultOutputFileName
+            numLEDs,
+            imageDebugging = imageDebuggingEnabled,
+            fileName = outputFileName
         )
     }
 
@@ -105,11 +125,11 @@ class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
         AnimationData().animation(Animation.COLOR).color(CCBlue)
 
     init {
-        val pattern =
+        val loggingPattern =
             if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
             else "{{level}:|min-size=8} {message}"
 
-        val level =
+        val loggingLevel =
             when {
                 cmdline.hasOption("t") -> Level.TRACE
                 cmdline.hasOption("d") -> Level.DEBUG
@@ -117,14 +137,14 @@ class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
                 else -> Level.INFO
             }
 
-        Configurator.defaultConfig().formatPattern(pattern).level(level).activate()
+        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).activate()
     }
 
 
     fun start(): AnimatedLEDStripServer<T> {
         running = true
         startLocalTerminalReader()
-        Logger.debug("Ports = $ports")
+        Logger.debug("Ports: $ports")
         ports.forEach {
             SocketConnections.add(it, server = this).open()
         }
