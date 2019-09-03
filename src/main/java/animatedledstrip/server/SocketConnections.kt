@@ -23,6 +23,7 @@ package animatedledstrip.server
  */
 
 
+import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.id
 import kotlinx.coroutines.*
@@ -109,7 +110,7 @@ object SocketConnections {
                         Logger.debug("Sending currently running animations to GUI")
                         // Send all current running continuous animations to newly connected client
                         server.animationHandler.continuousAnimations.forEach {
-                            it.value.sendAnimation(this@Connection)
+                            it.value.sendStartAnimation(this@Connection)
                         }
                         disconnected = false
                         Logger.info("Connection on port $port Established")
@@ -149,7 +150,17 @@ object SocketConnections {
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut?.writeObject(animation.id(if (animation.id == "") id else "${animation.id} $id"))
+                            socOut?.writeObject(
+                                animation
+                                    .id(
+                                        if ((animation.animation == Animation.CUSTOMANIMATION ||
+                                                    animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
+                                            animation.id.length == 1
+                                        )
+                                            "${animation.id} $id"
+                                        else id
+                                    )
+                            )
                                 ?: Logger.debug("Could not send animation $id: Connection socket null")
                             Logger.debug("Sent animation $id")
                         }

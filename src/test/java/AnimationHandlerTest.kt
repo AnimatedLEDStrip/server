@@ -32,7 +32,6 @@ import animatedledstrip.utils.delayBlocking
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
-import kotlin.test.assertFails
 import kotlin.test.assertTrue
 
 class AnimationHandlerTest {
@@ -92,9 +91,7 @@ class AnimationHandlerTest {
     @Test
     fun testRemoveNonExistentAnimation() {
         val handler = AnimationHandler(leds)
-        assertFails {
-            handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
-        }
+        handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
     }
 
 }

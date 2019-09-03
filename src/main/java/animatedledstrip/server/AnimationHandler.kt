@@ -38,10 +38,10 @@ import java.lang.Math.random
  * An object that creates ContinuousRunAnimation instances for animations and
  * keeps track of currently running animations.
  */
-internal class AnimationHandler(private val leds: AnimatedLEDStrip) {
+internal class AnimationHandler(private val leds: AnimatedLEDStrip, threadCount: Int = 100) {
 
     @Suppress("EXPERIMENTAL_API_USAGE")
-    val animationThreadPool = newFixedThreadPoolContext(100, "AnimationThreads")
+    val animationThreadPool = newFixedThreadPoolContext(threadCount, "AnimationThreads")
 
     /**
      * Map tracking what continuous animations are currently running
@@ -67,43 +67,42 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip) {
      */
     fun addAnimation(params: AnimationData) {
 
-        /*  Special "Animation" type that the GUI sends to end an animation */
+        /*  Special "Animation" type that the client sends to end an animation */
         if (params.animation == Animation.ENDANIMATION) {
             Logger.debug("Ending an animation")
             continuousAnimations[params.id]?.endAnimation()       // End animation
-                ?: throw Exception("Animation ${params.id} not running")
+                ?: Logger.error("Animation ${params.id} not running")
             continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
+
             return
         }
 
-        Logger.trace("Launching new thread for new animation")
-        GlobalScope.launch(animationThreadPool) {
-            Logger.debug(params)
-
-            when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
-                /*  Animations that are only run once because they change the color of the strip */
-                true -> {
-                    Logger.trace("Calling Single Run Animation")
-                    leds.run(params)
-                    Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
-                }
-                /*  Animations that can be run repeatedly */
-                false -> {
-                    if (params.continuous) {
-                        Logger.trace("Calling Continuous Animation")
-                        val id = random().toString().removePrefix("0.")
-                        continuousAnimations[id] =
-                            ContinuousRunAnimation(id, params, leds)
-                        Logger.trace(continuousAnimations)
-                        continuousAnimations[id]!!.startAnimation()
-                        Logger.debug("$id complete")
-                    } else {
-                        Logger.trace("Calling Single Run Animation")
-                        leds.run(params)
-                        Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
-                    }
+        when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
+            /* Animations that are only run once because they change the color of the strip */
+            true -> {
+                singleRunAnimation(params)
+            }
+            /* Animations that can be run repeatedly */
+            false -> {
+                if (params.continuous) {
+                    Logger.trace("Calling Continuous Animation")
+                    val id = random().toString().removePrefix("0.")
+                    continuousAnimations[id] =
+                        ContinuousRunAnimation(id, params, leds, this)
+                    Logger.trace(continuousAnimations)
+                    continuousAnimations[id]!!.runAnimation()
+                } else {
+                    singleRunAnimation(params)
                 }
             }
+        }
+    }
+
+    private fun singleRunAnimation(params: AnimationData) {
+        GlobalScope.launch(animationThreadPool) {
+            Logger.trace("Calling Single Run Animation")
+            leds.run(params)
+            Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
         }
     }
 }

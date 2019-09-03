@@ -23,8 +23,12 @@ package animatedledstrip.server
  */
 
 
+import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.leds.AnimatedLEDStrip
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.pmw.tinylog.Logger
 
 /**
@@ -34,43 +38,64 @@ import org.pmw.tinylog.Logger
  * @param params An AnimationData instance containing data about the animation
  * to be run
  */
-class ContinuousRunAnimation(private val id: String, private val params: AnimationData, private val leds: AnimatedLEDStrip) {
+internal class ContinuousRunAnimation(
+    private val id: String,
+    private val params: AnimationData,
+    private val leds: AnimatedLEDStrip,
+    private val handler: AnimationHandler
+) {
 
     /**
-     * Variable controlling while loops in animation functions.
+     * Variable controlling if the animation will repeat
      */
     private var continueAnimation = true
 
+    private var job: Job? = null
+
 
     init {
-        sendAnimation()                 // Send animation to GUI
+        sendStartAnimation()                 // Send animation to GUI
     }
 
 
     /**
-     * Determine which animation is being called and call the corresponding function.
+     * Run the animation in a new thread
      */
-    fun startAnimation() {
-        Logger.trace("params: $params")
-        while (continueAnimation) leds.run(params)
+    fun runAnimation() {
+        job = GlobalScope.launch(handler.animationThreadPool) {
+            Logger.trace("params: $params")
+            while (continueAnimation) leds.run(params)
+            sendEndAnimation()
+        }
     }
 
 
     /**
-     * Stop animation by setting the loop guard to false.
+     * Stop animation by setting the loop guard to false
      */
     fun endAnimation() {
         Logger.debug("Animation $id ending")
-        continueAnimation = false
+        if (continueAnimation) continueAnimation = false
+        else job?.cancel()
     }
 
 
     /**
-     *  Send animation data to GUI.
+     *  Send message to client(s) that animation has started
      */
-    fun sendAnimation(connection: SocketConnections.Connection? = null) {
-        Logger.trace("Sending animation to GUI")
+    fun sendStartAnimation(connection: SocketConnections.Connection? = null) {
+        Logger.trace("Sending animation start to client(s)")
         SocketConnections.sendAnimation(params, id, connection)
+    }
+
+    /**
+     * Send message to client(s) that animation has ended
+     *
+     * @param connection
+     */
+    fun sendEndAnimation(connection: SocketConnections.Connection? = null) {
+        Logger.trace("Sending animation end to client(s)")
+        SocketConnections.sendAnimation(params.copy(animation = Animation.ENDANIMATION), id, connection)
     }
 
 }
