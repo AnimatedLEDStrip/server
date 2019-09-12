@@ -68,34 +68,28 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip, threadCount:
     fun addAnimation(params: AnimationData) {
 
         /*  Special "Animation" type that the client sends to end an animation */
-        if (params.animation == Animation.ENDANIMATION) {
-            Logger.debug("Ending an animation")
-            continuousAnimations[params.id]?.endAnimation()       // End animation
-                ?: Logger.error("Animation ${params.id} not running")
-            continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
-
-            return
-        }
-
-        when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
-            /* Animations that are only run once because they change the color of the strip */
-            true -> {
-                singleRunAnimation(params)
-            }
-            /* Animations that can be run repeatedly */
-            false -> {
-                if (params.continuous) {
-                    Logger.trace("Calling Continuous Animation")
-                    val id = random().toString().removePrefix("0.")
-                    continuousAnimations[id] =
-                        ContinuousRunAnimation(id, params, leds, this)
-                    Logger.trace(continuousAnimations)
-                    continuousAnimations[id]!!.runAnimation()
-                } else {
+        if (params.animation == Animation.ENDANIMATION)
+            endAnimation(params)
+        else
+            when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
+                /* Animations that are only run once because they change the color of the strip */
+                true -> {
                     singleRunAnimation(params)
                 }
+                /* Animations that can be run repeatedly */
+                false -> {
+                    if (params.continuous) {
+                        Logger.trace("Calling Continuous Animation")
+                        val id = (random() * 100000000).toInt().toString()
+                        continuousAnimations[id] =
+                            ContinuousRunAnimation(id, params, leds, this)
+                        Logger.trace(continuousAnimations)
+                        continuousAnimations[id]!!.runAnimation()
+                    } else {
+                        singleRunAnimation(params)
+                    }
+                }
             }
-        }
     }
 
     private fun singleRunAnimation(params: AnimationData) {
@@ -104,6 +98,18 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip, threadCount:
             leds.run(params)
             Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
         }
+    }
+
+    fun endAnimation(params: AnimationData?) {
+        Logger.debug("Ending an animation")
+        continuousAnimations[params?.id ?: "NONE"]?.endAnimation()       // End animation
+            ?: run { Logger.warn("Animation ${params?.id} not running"); return }
+//        continuousAnimations.remove(params?.id)                 // Remove it from the continuousAnimations map
+    }
+
+    fun endAnimation(animation: ContinuousRunAnimation?) {
+        if (animation == null) return
+        else endAnimation(animation.params)
     }
 }
 
