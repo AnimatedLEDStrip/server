@@ -46,7 +46,7 @@ class SocketConnectionsTest {
     @Test
     fun testAdd() {
         val server =
-            AnimatedLEDStripServer(arrayOf("-E"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-Eq"), EmulatedAnimatedLEDStrip::class)
         SocketConnections.hostIP = "0.0.0.0"
         SocketConnections.add(1200, server)
 
@@ -57,7 +57,7 @@ class SocketConnectionsTest {
     fun testOpenSocket() = runBlocking {
         withTimeout(60000) {
             val server =
-                AnimatedLEDStripServer(arrayOf("-E"), EmulatedAnimatedLEDStrip::class).start()
+                AnimatedLEDStripServer(arrayOf("-Eq"), EmulatedAnimatedLEDStrip::class).start()
             SocketConnections.hostIP = "0.0.0.0"
             val c = SocketConnections.add(1201, server)
             c.open()
