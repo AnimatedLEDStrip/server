@@ -162,7 +162,8 @@ object SocketConnections {
                                     )
                             )
                                 ?: Logger.debug("Could not send animation $id: Connection socket null")
-                            Logger.debug("Sent animation $id")
+                            if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
+                            else Logger.debug("Sent animation $id")
                         }
                     }
                 }
