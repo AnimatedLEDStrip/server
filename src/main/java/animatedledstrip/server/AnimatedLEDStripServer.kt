@@ -54,7 +54,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
      */
     internal var running = false
 
-    /* Command line and properties file */
+    /* Command line options and properties file */
 
     private val options = Options().apply {
         addOption("d", "Enable debugging")
@@ -83,6 +83,22 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         }
     }
 
+    /* Set logging levels based on command line */
+    init {
+        val loggingPattern =
+            if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
+            else "{{level}:|min-size=8} {message}"
+
+        val loggingLevel =
+            when {
+                cmdline.hasOption("t") -> Level.TRACE
+                cmdline.hasOption("d") -> Level.DEBUG
+                cmdline.hasOption("q") -> Level.OFF
+                else -> Level.INFO
+            }
+
+        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).activate()
+    }
 
     /* Arguments for creating the AnimatedLEDStrip instance */
 
@@ -124,22 +140,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     var testAnimation: AnimationData =
         AnimationData().animation(Animation.COLOR).color(CCBlue)
 
-    init {
-        val loggingPattern =
-            if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
-            else "{{level}:|min-size=8} {message}"
 
-        val loggingLevel =
-            when {
-                cmdline.hasOption("t") -> Level.TRACE
-                cmdline.hasOption("d") -> Level.DEBUG
-                cmdline.hasOption("q") -> Level.OFF
-                else -> Level.INFO
-            }
-
-        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).activate()
-    }
-
+    /* Start and stop methods */
 
     fun start(): AnimatedLEDStripServer<T> {
         running = true
@@ -152,12 +154,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         return this
     }
 
-    fun waitUntilStop() {
-        while (running) {
-            delayBlocking(1)
-        }
-    }
-
     fun stop() {
         leds.setStripColor(0)
         delayBlocking(500)
@@ -166,6 +162,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         running = false
     }
 
+    /* Local terminal thread */
+
     @Suppress("EXPERIMENTAL_API_USAGE")
     val localThread = newSingleThreadContext("Local Terminal")
 
@@ -173,13 +171,57 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         GlobalScope.launch(localThread) {
             while (this@AnimatedLEDStripServer.running) {
                 Logger.trace("Local terminal waiting for input")
-                val strIn = readLine()
+                val strIn = readLine() ?: continue
                 Logger.trace("Read line")
-                if (strIn?.toUpperCase() == "Q") {
-                    Logger.trace("'Q' received, shutting down server")
-                    stop()
+                val line = strIn.toUpperCase().split(" ")
+                when (line[0]) {
+                    "QUIT", "Q", "EXIT" -> {
+                        Logger.info("Shutting down server")
+                        stop()
+                    }
+                    "DEBUG" -> {
+                        setLoggingLevel(Level.DEBUG)
+                        Logger.debug("Set logging level to debug")
+                    }
+                    "TRACE" -> {
+                        setLoggingLevel(Level.TRACE)
+                        Logger.trace("Set logging level to trace")
+                    }
+                    "INFO" -> {
+                        setLoggingLevel(Level.INFO)
+                        Logger.info("Set logging level to info")
+                    }
+                    "CLEAR" -> {
+                        animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
+                    }
+                    "SHOW" -> {
+                        if (line.size > 1) Logger.info(
+                            "${line[1]}: ${animationHandler.continuousAnimations[line[1]]?.params ?: "NOT FOUND"}"
+                        )
+                        else Logger.info("Running Animations: ${animationHandler.continuousAnimations.keys}")
+                    }
+                    "END" -> {
+                        if (line.size > 1) {
+                            if (line[1].toUpperCase() == "ALL") {
+                                val animations = animationHandler.continuousAnimations
+                                animations.forEach {
+                                    animationHandler.endAnimation(it.value)
+                                }
+                            } else for (i in 1 until line.size)
+                                animationHandler.endAnimation(animationHandler.continuousAnimations[line[i]])
+                        } else Logger.warn("Animation ID must be specified")
+                    }
+                    else -> Logger.warn("Not a valid command")
                 }
             }
         }
     }
+
+    /* Helper methods */
+
+    fun setLoggingLevel(level: Level) {
+        Configurator.currentConfig().level(level).activate()
+    }
+
+
 }
