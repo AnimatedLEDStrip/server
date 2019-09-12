@@ -40,7 +40,7 @@ import org.pmw.tinylog.Logger
  */
 internal class ContinuousRunAnimation(
     private val id: String,
-    private val params: AnimationData,
+    val params: AnimationData,
     private val leds: AnimatedLEDStrip,
     private val handler: AnimationHandler
 ) {
@@ -66,6 +66,7 @@ internal class ContinuousRunAnimation(
             Logger.trace("params: $params")
             while (continueAnimation) leds.run(params)
             sendEndAnimation()
+            handler.continuousAnimations.remove(id)
         }
     }
 
