@@ -98,6 +98,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             requireNotNull(it.toIntOrNull())
             this.add(it.toInt())
         }
+        this += 1118            // local port
     }
 
     private val rendersBeforeSave =
@@ -143,58 +144,47 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         running = false
     }
 
-    /* Local terminal thread */
-
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    val localThread = newSingleThreadContext("Local Terminal")
-
-    private fun startLocalTerminalReader() {
-        GlobalScope.launch(localThread) {
-            while (this@AnimatedLEDStripServer.running) {
-                Logger.trace("Local terminal waiting for input")
-                val strIn = readLine() ?: continue
-                Logger.trace("Read line")
-                val line = strIn.toUpperCase().split(" ")
-                when (line[0]) {
-                    "QUIT", "Q", "EXIT" -> {
-                        Logger.info("Shutting down server")
-                        stop()
-                    }
-                    "DEBUG" -> {
-                        setLoggingLevel(Level.DEBUG)
-                        Logger.debug("Set logging level to debug")
-                    }
-                    "TRACE" -> {
-                        setLoggingLevel(Level.TRACE)
-                        Logger.trace("Set logging level to trace")
-                    }
-                    "INFO" -> {
-                        setLoggingLevel(Level.INFO)
-                        Logger.info("Set logging level to info")
-                    }
-                    "CLEAR" -> {
-                        animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
-                    }
-                    "SHOW" -> {
-                        if (line.size > 1) Logger.info(
-                            "${line[1]}: ${animationHandler.continuousAnimations[line[1]]?.params ?: "NOT FOUND"}"
-                        )
-                        else Logger.info("Running Animations: ${animationHandler.continuousAnimations.keys}")
-                    }
-                    "END" -> {
-                        if (line.size > 1) {
-                            if (line[1].toUpperCase() == "ALL") {
-                                val animations = animationHandler.continuousAnimations
-                                animations.forEach {
-                                    animationHandler.endAnimation(it.value)
-                                }
-                            } else for (i in 1 until line.size)
-                                animationHandler.endAnimation(animationHandler.continuousAnimations[line[i]])
-                        } else Logger.warn("Animation ID must be specified")
-                    }
-                    else -> Logger.warn("Not a valid command")
-                }
+    internal fun parseTextCommand(command: String) {
+        Logger.info { command }
+        val line = command.toUpperCase().split(" ")
+        return when (line[0]) {
+            "QUIT", "Q", "EXIT" -> {
+                Logger.info { "Shutting down server" }
+                stop()
             }
+            "DEBUG" -> {
+                setLoggingLevel("debug")
+                Logger.debug { "Set logging level to debug" }
+            }
+            "TRACE" -> {
+                setLoggingLevel("trace")
+                Logger.trace { "Set logging level to trace" }
+            }
+            "INFO" -> {
+                setLoggingLevel("info")
+                Logger.info { "Set logging level to info" }
+            }
+            "CLEAR" -> {
+                animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
+            }
+            "SHOW" -> {
+                if (line.size > 1) Logger.info {
+                    "${line[1]}: ${animationHandler.continuousAnimations[line[1]]?.params ?: "NOT FOUND"}"
+                }
+                else Logger.info { "Running Animations: ${animationHandler.continuousAnimations.keys}" }
+            }
+            "END" -> {
+                if (line.size > 1) {
+                    if (line[1].toUpperCase() == "ALL") {
+                        val animations = animationHandler.continuousAnimations
+                        animations.forEach {
+                            animationHandler.endAnimation(it.value)
+                        }
+                    } else for (i in 1 until line.size)
+                        animationHandler.endAnimation(animationHandler.continuousAnimations[line[i]])
+                } else Logger.warn { "Animation ID must be specified" }
+            }
+            else -> Logger.warn { "Not a valid command" }
         }
     }
 

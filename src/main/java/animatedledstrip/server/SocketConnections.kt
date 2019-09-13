@@ -47,6 +47,8 @@ object SocketConnections {
      */
     val connections = mutableMapOf<Int, Connection>()
 
+    var localConnection: Connection? = null
+
     /**
      * Initialize a new connection. Creates a Connection instance with the
      * specified port, then adds the port and Connection instance to
@@ -57,7 +59,8 @@ object SocketConnections {
      */
     fun add(port: Int, server: AnimatedLEDStripServer<*>): Connection {
         val connection = Connection(port, server)
-        connections[port] = connection
+        if (port == 1118) localConnection = connection
+        else connections[port] = connection
         return connection
     }
 
@@ -118,9 +121,15 @@ object SocketConnections {
                         while (!disconnected) {
                             Logger.trace { "Waiting for input" }
                             try {
-                                input = socIn.readObject() as AnimationData
-                                Logger.trace("Input received")
-                                server.animationHandler.addAnimation(input)
+                                input = when (port) {
+                                    1118 -> socIn.readObject() as String
+                                    else -> socIn.readObject() as AnimationData
+                                }
+                                Logger.trace { "Input received" }
+                                when (input) {
+                                    is AnimationData -> server.animationHandler.addAnimation(input)
+                                    is String -> server.parseTextCommand(input)
+                                }
                             } catch (e: ClassCastException) {
                                 Logger.error { "Could not cast input to ${if (port == 1118) "String" else "AnimationData"}" }
                                 continue
@@ -139,12 +148,14 @@ object SocketConnections {
         }
 
         /**
-         * Send animation data to the GUI along with an ID
+         * Send animation data to the client along with an ID.
+         * Does not work for port 1118 (local connection).
          *
          * @param animation An AnimationData containing data about the animation
          * @param id The ID for the animation
          */
         fun sendAnimation(animation: AnimationData, id: String) {
+            check(port != 1118) { "Cannot send animation to local port" }
             if (!isDisconnected) {
                 Logger.trace { "Animation to send: $animation" }
                 runBlocking {
@@ -164,6 +175,25 @@ object SocketConnections {
                                 ?: Logger.debug { "Could not send animation $id: Connection socket null" }
                             if (animation.animation == Animation.ENDANIMATION) Logger.debug { "Sent end of animation $id" }
                             else Logger.debug { "Sent animation $id" }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Send a string to the local port.
+         * Only works for a connection with port 1118 (local connection)
+         */
+        fun sendString(str: String) {
+            check(port == 1118) { "Cannot send string to non-local port" }
+            if (!isDisconnected) {
+                Logger.trace { "String to send: $str" }
+                runBlocking {
+                    withTimeout(5000) {
+                        withContext(Dispatchers.IO) {
+                            socOut?.writeObject(str)
+                                ?: Logger.debug { "Could not send string $str: Connection socket null" }
                         }
                     }
                 }
