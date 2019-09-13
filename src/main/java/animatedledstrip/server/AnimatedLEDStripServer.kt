@@ -97,7 +97,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             requireNotNull(it.toIntOrNull())
             this.add(it.toInt())
         }
-        this += 1118            // local port
+        if (!emulated) this += 1118            // local port
     }
 
     private val rendersBeforeSave =

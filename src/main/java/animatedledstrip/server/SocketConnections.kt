@@ -186,9 +186,10 @@ object SocketConnections {
          * Only works for a connection with port 1118 (local connection)
          */
         fun sendString(str: String) {
+            println("Send")
             check(port == 1118) { "Cannot send string to non-local port" }
             if (!isDisconnected) {
-                Logger.trace { "String to send: $str" }
+                Logger.info { "String to send: $str" }
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {

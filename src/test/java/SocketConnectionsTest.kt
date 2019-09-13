@@ -28,7 +28,6 @@ import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
-import org.junit.Ignore
 import org.junit.Test
 import org.tinylog.configuration.Configuration
 import java.io.BufferedInputStream
@@ -54,7 +53,6 @@ class SocketConnectionsTest {
     }
 
     @Test
-    @Ignore
     fun testOpenSocket() = runBlocking {
         withTimeout(60000) {
             val server =
