@@ -15,7 +15,7 @@ branches:
 stages:
   - name: test
   - name: deploy
-    if: branch = master AND type != pull_request
+    if: (branch = master OR branch =~ /^v.*/) AND type != pull_request
 
 jobs:
   include:
@@ -34,13 +34,9 @@ jobs:
           keep-history: true
           verbose: true
           local_dir: ./dokka
-          on:
-            branch: master
     - stage: deploy
       install:
         - ""
       deploy:
         - provider: script
           script: mvn deploy --settings .maven.xml -DskipTests=true -B
-          on:
-            branch: master
