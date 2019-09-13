@@ -27,16 +27,16 @@ import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import kotlinx.coroutines.*
+import org.junit.Ignore
 import org.junit.Test
-import org.pmw.tinylog.Configurator
-import org.pmw.tinylog.Level
+import org.tinylog.configuration.Configuration
 import java.io.ByteArrayInputStream
 
 class AnimatedLEDStripServerTest {
 
     init {
         SocketConnections.hostIP = "0.0.0.0"
-        Configurator.defaultConfig().level(Level.OFF).activate()
+        Configuration.set("level", "off")
     }
 
     val leds = EmulatedAnimatedLEDStrip(50)
@@ -59,6 +59,7 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
+    @Ignore
     fun testLocalTerminalThread() = runBlocking {
         withTimeout(60000) {
             val stream = ByteArrayInputStream("q".toByteArray())

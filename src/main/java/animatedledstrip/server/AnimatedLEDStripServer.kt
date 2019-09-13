@@ -31,14 +31,9 @@ import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.Options
-import org.pmw.tinylog.Configurator
-import org.pmw.tinylog.Level
-import org.pmw.tinylog.Logger
+import org.tinylog.Logger
+import org.tinylog.configuration.Configuration
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.*
@@ -56,19 +51,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     /* Command line options and properties file */
 
-    private val options = Options().apply {
-        addOption("d", "Enable debugging")
-        addOption("t", "Enable trace debugging")
-        addOption("v", "Enable verbose log statements")
-        addOption("q", "Disable log outputs")
-        addOption("E", "Emulate LED strip but do NOT launch emulator")
-        addOption("f", true, "Specify properties file")
-        addOption("o", true, "Specify output file name for image debugging")
-        addOption("r", true, "Specify number of renders between saves")
-        addOption("i", "Enable image debugging")
-        addOption("T", "Run test")
-    }
-
     private val cmdline = DefaultParser().parse(options, args)
 
     private var propertyFileName = cmdline.getOptionValue("f") ?: "led.config"
@@ -79,7 +61,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         try {
             load(FileInputStream(propertyFileName))
         } catch (e: FileNotFoundException) {
-            Logger.warn("File $propertyFileName not found")
+            Logger.warn { "File $propertyFileName not found" }
         }
     }
 
@@ -91,13 +73,14 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         val loggingLevel =
             when {
-                cmdline.hasOption("t") -> Level.TRACE
-                cmdline.hasOption("d") -> Level.DEBUG
-                cmdline.hasOption("q") -> Level.OFF
-                else -> Level.INFO
+                cmdline.hasOption("t") -> "trace"
+                cmdline.hasOption("d") -> "debug"
+                cmdline.hasOption("q") -> "off"
+                else -> "info"
             }
 
-        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).activate()
+        Configuration.set("level", loggingLevel)
+        Configuration.set("format", loggingPattern)
     }
 
     /* Arguments for creating the AnimatedLEDStrip instance */
@@ -140,13 +123,11 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     var testAnimation: AnimationData =
         AnimationData().animation(Animation.COLOR).color(CCBlue)
 
-
     /* Start and stop methods */
 
     fun start(): AnimatedLEDStripServer<T> {
         running = true
-        startLocalTerminalReader()
-        Logger.debug("Ports: $ports")
+        Logger.debug { "Ports: $ports" }
         ports.forEach {
             SocketConnections.add(it, server = this).open()
         }
@@ -219,8 +200,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     /* Helper methods */
 
-    fun setLoggingLevel(level: Level) {
-        Configurator.currentConfig().level(level).activate()
+    fun setLoggingLevel(level: String) {
+        Configuration.set("level", level)
     }
 
 

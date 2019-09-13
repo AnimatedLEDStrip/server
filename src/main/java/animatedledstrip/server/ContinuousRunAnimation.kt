@@ -29,7 +29,7 @@ import animatedledstrip.leds.AnimatedLEDStrip
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.pmw.tinylog.Logger
+import org.tinylog.Logger
 
 /**
  * Class for running an animation that repeats until stopped.
@@ -63,7 +63,7 @@ internal class ContinuousRunAnimation(
      */
     fun runAnimation() {
         job = GlobalScope.launch(handler.animationThreadPool) {
-            Logger.trace("params: $params")
+            Logger.trace { "params: $params" }
             while (continueAnimation) leds.run(params)
             sendEndAnimation()
             handler.continuousAnimations.remove(id)
@@ -75,7 +75,7 @@ internal class ContinuousRunAnimation(
      * Stop animation by setting the loop guard to false
      */
     fun endAnimation() {
-        Logger.debug("Animation $id ending")
+        Logger.debug { "Animation $id ending" }
         if (continueAnimation) continueAnimation = false
         else job?.cancel()
     }
@@ -85,7 +85,7 @@ internal class ContinuousRunAnimation(
      *  Send message to client(s) that animation has started
      */
     fun sendStartAnimation(connection: SocketConnections.Connection? = null) {
-        Logger.trace("Sending animation start to client(s)")
+        Logger.trace { "Sending animation start to client(s)" }
         SocketConnections.sendAnimation(params, id, connection)
     }
 
@@ -95,7 +95,7 @@ internal class ContinuousRunAnimation(
      * @param connection
      */
     fun sendEndAnimation(connection: SocketConnections.Connection? = null) {
-        Logger.trace("Sending animation end to client(s)")
+        Logger.trace { "Sending animation end to client(s)" }
         SocketConnections.sendAnimation(params.copy(animation = Animation.ENDANIMATION), id, connection)
     }
 

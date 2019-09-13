@@ -27,7 +27,7 @@ import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.id
 import kotlinx.coroutines.*
-import org.pmw.tinylog.Logger
+import org.tinylog.Logger
 import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -83,7 +83,7 @@ object SocketConnections {
          */
         fun open() {
             GlobalScope.launch(connectionThreadPool) {
-                Logger.debug("Starting port $port")
+                Logger.debug { "Starting port $port" }
                 openSocket()
             }
         }
@@ -98,40 +98,40 @@ object SocketConnections {
          */
         private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
-                Logger.debug("Socket at port $port started")
+                Logger.debug { "Socket at port $port started" }
                 while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
-                        Logger.trace("Accepted new connection on port $port")
-                        Logger.trace("Initializing input stream")
+                        Logger.trace { "Accepted new connection on port $port" }
+                        Logger.trace { "Initializing input stream" }
                         val socIn = ObjectInputStream(clientSocket!!.getInputStream())
-                        Logger.trace("Initializing output stream")
+                        Logger.trace { "Initializing output stream" }
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
-                        Logger.debug("Sending currently running animations to GUI")
+                        Logger.debug { "Sending currently running animations to GUI" }
                         // Send all current running continuous animations to newly connected client
                         server.animationHandler.continuousAnimations.forEach {
                             it.value.sendStartAnimation(this@Connection)
                         }
                         disconnected = false
-                        Logger.info("Connection on port $port Established")
+                        Logger.info { "Connection on port $port Established" }
                         var input: Any?
                         while (!disconnected) {
-                            Logger.trace("Waiting for input")
+                            Logger.trace { "Waiting for input" }
                             try {
                                 input = socIn.readObject() as AnimationData
                                 Logger.trace("Input received")
                                 server.animationHandler.addAnimation(input)
                             } catch (e: ClassCastException) {
-                                Logger.error("Could not cast input to AnimationData")
+                                Logger.error { "Could not cast input to ${if (port == 1118) "String" else "AnimationData"}" }
                                 continue
                             }
                         }
                     } catch (e: SocketException) {
                         // Catch disconnections
-                        Logger.warn("Connection on port $port Lost: $e")
+                        Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
                         disconnected = true
                     } catch (e: EOFException) {
-                        Logger.warn("Connection on port $port Lost: $e")
+                        Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
                         disconnected = true
                     }
                 }
@@ -146,7 +146,7 @@ object SocketConnections {
          */
         fun sendAnimation(animation: AnimationData, id: String) {
             if (!isDisconnected) {
-                Logger.trace("Animation to send: $animation")
+                Logger.trace { "Animation to send: $animation" }
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
@@ -161,9 +161,9 @@ object SocketConnections {
                                         else id
                                     )
                             )
-                                ?: Logger.debug("Could not send animation $id: Connection socket null")
-                            if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
-                            else Logger.debug("Sent animation $id")
+                                ?: Logger.debug { "Could not send animation $id: Connection socket null" }
+                            if (animation.animation == Animation.ENDANIMATION) Logger.debug { "Sent end of animation $id" }
+                            else Logger.debug { "Sent animation $id" }
                         }
                     }
                 }
@@ -189,7 +189,7 @@ object SocketConnections {
         if (client != null) client.sendAnimation(animation, id)
         else connections.forEach {
             it.value.sendAnimation(animation, id)
-            Logger.trace("Sent animation to client on port ${it.key}")
+            Logger.trace { "Sent animation to client on port ${it.key}" }
         }
     }
 

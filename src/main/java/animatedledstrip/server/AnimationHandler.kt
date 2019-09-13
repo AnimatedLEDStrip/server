@@ -30,7 +30,7 @@ import animatedledstrip.leds.AnimatedLEDStrip
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
-import org.pmw.tinylog.Logger
+import org.tinylog.Logger
 import java.lang.Math.random
 
 
@@ -79,7 +79,7 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip, threadCount:
                 /* Animations that can be run repeatedly */
                 false -> {
                     if (params.continuous) {
-                        Logger.trace("Calling Continuous Animation")
+                        Logger.trace { "Calling Continuous Animation" }
                         val id = (random() * 100000000).toInt().toString()
                         continuousAnimations[id] =
                             ContinuousRunAnimation(id, params, leds, this)
@@ -94,16 +94,16 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip, threadCount:
 
     private fun singleRunAnimation(params: AnimationData) {
         GlobalScope.launch(animationThreadPool) {
-            Logger.trace("Calling Single Run Animation")
+            Logger.trace { "Calling Single Run Animation" }
             leds.run(params)
-            Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
+            Logger.trace { "Single Run Animation on ${Thread.currentThread().name} complete" }
         }
     }
 
     fun endAnimation(params: AnimationData?) {
-        Logger.debug("Ending an animation")
+        Logger.debug { "Ending an animation" }
         continuousAnimations[params?.id ?: "NONE"]?.endAnimation()       // End animation
-            ?: run { Logger.warn("Animation ${params?.id} not running"); return }
+            ?: run { Logger.warn { "Animation ${params?.id} not running" }; return }
 //        continuousAnimations.remove(params?.id)                 // Remove it from the continuousAnimations map
     }
 
