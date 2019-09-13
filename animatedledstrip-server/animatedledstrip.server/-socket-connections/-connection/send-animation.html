@@ -10,7 +10,8 @@
 <h1>sendAnimation</h1>
 <a name="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)"></a>
 <code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/animation">animation</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Send animation data to the GUI along with an ID</p>
+<p>Send animation data to the client along with an ID.
+Does not work for port 1118 (local connection).</p>
 <h3>Parameters</h3>
 <p><a name="animation"></a>
 <code>animation</code> - An AnimationData containing data about the animation</p>

@@ -1,4 +1,5 @@
 $dokka.format:html
 $dokka.linkExtension:html
 
+animatedledstrip.cmdline
 animatedledstrip.server

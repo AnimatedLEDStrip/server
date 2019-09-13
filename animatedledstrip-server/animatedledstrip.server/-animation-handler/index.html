@@ -19,7 +19,7 @@ keeps track of currently running animations.</p>
 <p><a href="-init-.html">&lt;init&gt;</a></p>
 </td>
 <td>
-<code><span class="identifier">AnimationHandler</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip)/leds">leds</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">)</span></code>
+<code><span class="identifier">AnimationHandler</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int)/leds">leds</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int)/threadCount">threadCount</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;100<span class="symbol">)</span></code>
 <p>An object that creates ContinuousRunAnimation instances for animations and
 keeps track of currently running animations.</p>
 </td>
@@ -65,6 +65,21 @@ keeps track of currently running animations.</p>
 <code><span class="keyword">fun </span><span class="identifier">addAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$addAnimation(animatedledstrip.animationutils.AnimationData)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Adds a new animation.</p>
 </td>
+</tr>
+<tr>
+<td>
+<p><a href="end-animation.html">endAnimation</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">endAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$endAnimation(animatedledstrip.animationutils.AnimationData)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code><br/>
+<code><span class="keyword">fun </span><span class="identifier">endAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$endAnimation(animatedledstrip.server.ContinuousRunAnimation)/animation">animation</span><span class="symbol">:</span>&nbsp;<a href="../-continuous-run-animation/index.html"><span class="identifier">ContinuousRunAnimation</span></a><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="single-run-animation.html">singleRunAnimation</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">singleRunAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$singleRunAnimation(animatedledstrip.animationutils.AnimationData)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 </tbody>
 </table>

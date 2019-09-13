@@ -40,17 +40,17 @@
 </tr>
 <tr>
 <td>
-<p><a href="default-output-file-name.html">defaultOutputFileName</a></p>
+<p><a href="emulated.html">emulated</a></p>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">defaultOutputFileName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+<code><span class="keyword">val </span><span class="identifier">emulated</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="default-property-file-name.html">defaultPropertyFileName</a></p>
+<p><a href="image-debugging-enabled.html">imageDebuggingEnabled</a></p>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">defaultPropertyFileName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+<code><span class="keyword">val </span><span class="identifier">imageDebuggingEnabled</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
 </tr>
 <tr>
 <td>
@@ -61,17 +61,24 @@
 </tr>
 <tr>
 <td>
-<p><a href="local-thread.html">localThread</a></p>
+<p><a href="num-l-e-ds.html">numLEDs</a></p>
 </td>
 <td>
-<code><span class="keyword">val </span><span class="identifier">localThread</span><span class="symbol">: </span><span class="identifier">ExecutorCoroutineDispatcher</span></code></td>
+<code><span class="keyword">val </span><span class="identifier">numLEDs</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="options.html">options</a></p>
+<p><a href="output-file-name.html">outputFileName</a></p>
 </td>
 <td>
-<code><span class="keyword">val </span><span class="identifier">options</span><span class="symbol">: </span><span class="identifier">Options</span></code></td>
+<code><span class="keyword">var </span><span class="identifier">outputFileName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="pin.html">pin</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">pin</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
 </tr>
 <tr>
 <td>
@@ -89,10 +96,26 @@
 </tr>
 <tr>
 <td>
+<p><a href="property-file-name.html">propertyFileName</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">propertyFileName</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="renders-before-save.html">rendersBeforeSave</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">rendersBeforeSave</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
+</tr>
+<tr>
+<td>
 <p><a href="running.html">running</a></p>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">running</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+<code><span class="keyword">var </span><span class="identifier">running</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Is the server running</p>
+</td>
 </tr>
 <tr>
 <td>
@@ -108,17 +131,17 @@
 <tbody>
 <tr>
 <td>
+<p><a href="parse-text-command.html">parseTextCommand</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">parseTextCommand</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimatedLEDStripServer$parseTextCommand(kotlin.String)/command">command</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
 <p><a href="start.html">start</a></p>
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">start</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="start-local-terminal-reader.html">startLocalTerminalReader</a></p>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="identifier">startLocalTerminalReader</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 <tr>
 <td>
@@ -127,12 +150,17 @@
 <td>
 <code><span class="keyword">fun </span><span class="identifier">stop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
+</tbody>
+</table>
+<h3>Extension Functions</h3>
+<table>
+<tbody>
 <tr>
 <td>
-<p><a href="wait-until-stop.html">waitUntilStop</a></p>
+<p><a href="../wait-until-stop.html">waitUntilStop</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">waitUntilStop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+<code><span class="keyword">fun </span><a href="./index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">.</span><span class="identifier">waitUntilStop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 </tbody>
 </table>
