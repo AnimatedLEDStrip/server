@@ -3,9 +3,9 @@ package animatedledstrip.server
 import org.tinylog.Logger
 import org.tinylog.core.LogEntry
 import org.tinylog.core.LogEntryValue
-import org.tinylog.writers.AbstractFormatPatternWriter
+import org.tinylog.writers.Writer
 
-class SocketLogWriter(properties: Map<String, String>) : AbstractFormatPatternWriter(properties) {
+class SocketWriter(properties: Map<String, String>) : Writer {
 
     val delimiter = properties.getOrDefault("delimiter", ":")
 

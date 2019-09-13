@@ -57,14 +57,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     private var outputFileName: String? = cmdline.getOptionValue("o")
 
-    private val properties = Properties().apply {
-        try {
-            load(FileInputStream(propertyFileName))
-        } catch (e: FileNotFoundException) {
-            Logger.warn { "File $propertyFileName not found" }
-        }
-    }
-
     /* Set logging levels based on command line */
     init {
         val loggingPattern =
@@ -81,6 +73,13 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         Configuration.set("level", loggingLevel)
         Configuration.set("format", loggingPattern)
+    }
+    private val properties = Properties().apply {
+        try {
+            load(FileInputStream(propertyFileName))
+        } catch (e: FileNotFoundException) {
+            Logger.warn { "File $propertyFileName not found" }
+        }
     }
 
     /* Arguments for creating the AnimatedLEDStrip instance */
@@ -152,18 +151,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 Logger.info { "Shutting down server" }
                 stop()
             }
-            "DEBUG" -> {
-                setLoggingLevel("debug")
-                Logger.debug { "Set logging level to debug" }
-            }
-            "TRACE" -> {
-                setLoggingLevel("trace")
-                Logger.trace { "Set logging level to trace" }
-            }
-            "INFO" -> {
-                setLoggingLevel("info")
-                Logger.info { "Set logging level to info" }
-            }
             "CLEAR" -> {
                 animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
             }
@@ -190,9 +177,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     /* Helper methods */
 
-    fun setLoggingLevel(level: String) {
-        Configuration.set("level", level)
-    }
+
 
 
 }
