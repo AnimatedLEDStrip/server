@@ -110,13 +110,14 @@ object SocketConnections {
                         val socIn = ObjectInputStream(clientSocket!!.getInputStream())
                         Logger.trace { "Initializing output stream" }
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+                        Logger.info { "Connection on port $port Established" }
+                        disconnected = false
                         Logger.debug { "Sending currently running animations to GUI" }
                         // Send all current running continuous animations to newly connected client
                         server.animationHandler.continuousAnimations.forEach {
+                            Logger.info { "Sending ${it.value}"}
                             it.value.sendStartAnimation(this@Connection)
                         }
-                        disconnected = false
-                        Logger.info { "Connection on port $port Established" }
                         var input: Any?
                         while (!disconnected) {
                             Logger.trace { "Waiting for input" }
@@ -186,15 +187,13 @@ object SocketConnections {
          * Only works for a connection with port 1118 (local connection)
          */
         fun sendString(str: String) {
-            println("Send")
             check(port == 1118) { "Cannot send string to non-local port" }
             if (!isDisconnected) {
-                Logger.info { "String to send: $str" }
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
                             socOut?.writeObject(str)
-                                ?: Logger.debug { "Could not send string $str: Connection socket null" }
+//                                ?: Logger.debug { "Could not send string $str: Connection socket null" }
                         }
                     }
                 }

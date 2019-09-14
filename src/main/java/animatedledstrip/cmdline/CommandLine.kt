@@ -29,7 +29,7 @@ class CommandLine {
                 readerJob = GlobalScope.launch {
                     withContext(Dispatchers.IO) {
                         while (!endCmdLine) {
-                            println(socIn.readObject() as String? ?: continue)
+                            println(socIn.readObject() as String? ?: "ERROR")
                         }
                     }
                 }

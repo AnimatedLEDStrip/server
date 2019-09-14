@@ -14,7 +14,6 @@ class SocketWriter(properties: java.util.Map<String, String>) : Writer {
     }
 
     override fun write(log: LogEntry?) {
-        println(log?.message)
         SocketConnections.localConnection?.sendString(
                 "${log?.level.toString()}$delimiter".padEnd(8, ' ') +
                         "${log?.message}"
