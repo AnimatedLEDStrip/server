@@ -1,10 +1,12 @@
 package animatedledstrip.cmdline
 
 import kotlinx.coroutines.*
+import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketException
 import kotlin.system.exitProcess
 
 class CommandLine {
@@ -29,8 +31,14 @@ class CommandLine {
                 val socIn = ObjectInputStream(socket.getInputStream())
                 readerJob = GlobalScope.launch {
                     withContext(Dispatchers.IO) {
-                        while (!endCmdLine) {
-                            println(socIn.readObject() as String? ?: "ERROR")
+                        try {
+                            while (!endCmdLine) {
+                                println(socIn.readObject() as String? ?: "ERROR")
+                            }
+                        } catch (e: SocketException) {
+                            println("Connection lost: $e")
+                        } catch (e: EOFException) {
+                            println("Connection lost: $e")
                         }
                     }
                 }
@@ -49,7 +57,11 @@ class CommandLine {
                     }
                 }
 
-            } catch (e: Exception) {
+            } catch (e: SocketException) {
+                println("Connection lost: $e")
+                readerJob?.cancel()
+            } catch (e: EOFException) {
+                println("Connection lost: $e")
                 readerJob?.cancel()
             }
         }
