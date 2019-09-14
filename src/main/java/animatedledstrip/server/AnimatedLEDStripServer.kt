@@ -144,10 +144,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     }
 
     internal fun parseTextCommand(command: String) {
-        Logger.info { command }
         val line = command.toUpperCase().split(" ")
         return when (line[0]) {
-            "QUIT", "Q", "EXIT" -> {
+            "QUIT", "Q" -> {
                 Logger.info { "Shutting down server" }
                 stop()
             }
@@ -171,13 +170,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         animationHandler.endAnimation(animationHandler.continuousAnimations[line[i]])
                 } else Logger.warn { "Animation ID must be specified" }
             }
-            else -> Logger.warn { "Not a valid command" }
+            else -> Logger.warn { "$command is not a valid command" }
         }
     }
-
-    /* Helper methods */
-
-
-
 
 }

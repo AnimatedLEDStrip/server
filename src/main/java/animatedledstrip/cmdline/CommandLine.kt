@@ -5,6 +5,7 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
+import kotlin.system.exitProcess
 
 class CommandLine {
 
@@ -34,12 +35,17 @@ class CommandLine {
                     }
                 }
 
-                while (!endCmdLine) {
+                input@ while (!endCmdLine) {
                     print("> ")
                     val str = readLine() ?: continue
-                    socOut.writeObject(str)
                     when (str.toUpperCase()) {
-                        "Q", "QUIT" -> endCmdLine = true
+                        "" -> continue@input
+                        "EXIT" -> exitProcess(0)
+                        "Q", "QUIT" -> {
+                            socOut.writeObject(str)
+                            exitProcess(0)
+                        }
+                        else -> socOut.writeObject(str)
                     }
                 }
 
