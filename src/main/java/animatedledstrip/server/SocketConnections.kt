@@ -74,12 +74,10 @@ object SocketConnections {
             if (hostIP == null) null else InetAddress.getByName(hostIP)
         )
         var clientSocket: Socket? = null
-        private var disconnected = true
+        var connected = false
+            private set
         private var socOut: ObjectOutputStream? = null
         var textBased = false
-
-        val isDisconnected: Boolean
-            get() = disconnected
 
         /**
          * Open the connection
@@ -111,7 +109,7 @@ object SocketConnections {
                         Logger.trace { "Initializing output stream" }
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
                         Logger.info { "Connection on port $port Established" }
-                        disconnected = false
+                        connected = true
                         Logger.debug { "Sending currently running animations to GUI" }
                         // Send all current running continuous animations to newly connected client
                         server.animationHandler.continuousAnimations.forEach {
@@ -119,7 +117,7 @@ object SocketConnections {
                             it.value.sendStartAnimation(this@Connection)
                         }
                         var input: Any?
-                        while (!disconnected) {
+                        while (connected) {
                             Logger.trace { "Waiting for input" }
                             try {
                                 input = when (port) {
@@ -139,10 +137,10 @@ object SocketConnections {
                     } catch (e: SocketException) {
                         // Catch disconnections
                         Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
-                        disconnected = true
+                        connected = false
                     } catch (e: EOFException) {
                         Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
-                        disconnected = true
+                        connected = false
                     }
                 }
             }
@@ -157,7 +155,7 @@ object SocketConnections {
          */
         fun sendAnimation(animation: AnimationData, id: String) {
             check(port != 1118) { "Cannot send animation to local port" }
-            if (!isDisconnected) {
+            if (connected) {
                 Logger.trace { "Animation to send: $animation" }
                 runBlocking {
                     withTimeout(5000) {
@@ -188,7 +186,7 @@ object SocketConnections {
          */
         fun sendString(str: String) {
             check(port == 1118) { "Cannot send string to non-local port" }
-            if (!isDisconnected) {
+            if (connected) {
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
