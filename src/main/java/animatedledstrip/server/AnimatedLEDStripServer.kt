@@ -34,6 +34,7 @@ import animatedledstrip.utils.delayBlocking
 import org.apache.commons.cli.DefaultParser
 import org.tinylog.Logger
 import org.tinylog.configuration.Configuration
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.*
@@ -126,6 +127,10 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     /* Start and stop methods */
 
     fun start(): AnimatedLEDStripServer<T> {
+        val dir = File(".animations")
+        if (!dir.isDirectory)
+            dir.mkdirs()
+
         running = true
         Logger.debug { "Ports: $ports" }
         ports.forEach {

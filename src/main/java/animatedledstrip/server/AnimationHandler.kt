@@ -31,6 +31,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
 import org.tinylog.Logger
+import java.io.File
+import java.io.FileInputStream
+import java.io.ObjectInputStream
 import java.lang.Math.random
 
 
@@ -51,6 +54,21 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip, threadCount:
      */
     val continuousAnimations = mutableMapOf<String, ContinuousRunAnimation>()
 
+
+    init {
+        GlobalScope.launch {
+            File(".animations/").walk().forEach {
+                if (!it.isDirectory && it.name.endsWith(".anim")) try {
+                    ObjectInputStream(FileInputStream(it)).apply {
+                        val obj = readObject() as AnimationData
+                        addAnimation(obj)
+                        close()
+                    }
+                } catch (e: ClassCastException) {
+                }
+            }
+        }
+    }
 
     /**
      * Adds a new animation.

@@ -77,7 +77,6 @@ object SocketConnections {
         var connected = false
             private set
         private var socOut: ObjectOutputStream? = null
-        var textBased = false
 
         /**
          * Open the connection

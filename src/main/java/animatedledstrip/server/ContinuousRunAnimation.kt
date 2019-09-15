@@ -26,10 +26,13 @@ package animatedledstrip.server
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.leds.AnimatedLEDStrip
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.tinylog.Logger
+import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * Class for running an animation that repeats until stopped.
@@ -52,6 +55,8 @@ internal class ContinuousRunAnimation(
 
     private var job: Job? = null
 
+    private val fileName = "$id.anim"
+
 
     init {
         sendStartAnimation()                 // Send animation to GUI
@@ -63,6 +68,14 @@ internal class ContinuousRunAnimation(
      */
     fun runAnimation() {
         job = GlobalScope.launch(handler.animationThreadPool) {
+            launch {
+                withContext(Dispatchers.IO) {
+                    ObjectOutputStream(FileOutputStream(".animations/$fileName")).apply {
+                        writeObject(params)
+                        close()
+                    }
+                }
+            }
             Logger.trace { "params: $params" }
             while (continueAnimation) leds.run(params)
             sendEndAnimation()
@@ -78,6 +91,8 @@ internal class ContinuousRunAnimation(
         Logger.debug { "Animation $id ending" }
         if (continueAnimation) continueAnimation = false
         else job?.cancel()
+        if (File(".animations/$id").exists())
+            Files.delete(Paths.get(".animations/$fileName"))
     }
 
 
