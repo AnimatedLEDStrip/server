@@ -27,7 +27,7 @@ import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.id
 import kotlinx.coroutines.*
-import org.tinylog.Logger
+import org.pmw.tinylog.Logger
 import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream

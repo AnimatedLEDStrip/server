@@ -14,6 +14,7 @@ val options = Options().apply {
     addOption("o", true, "Specify output file name for image debugging")
     addOption("r", true, "Specify number of renders between saves")
     addOption("i", "Enable image debugging")
+    addOption("P", "Persist animations across restarts")
     addOption("T", "Run test")
     addOption("C", "Connect to a running server with a command line")
 }

@@ -29,14 +29,12 @@ import animatedledstrip.server.SocketConnections
 import kotlinx.coroutines.*
 import org.junit.Ignore
 import org.junit.Test
-import org.tinylog.configuration.Configuration
 import java.io.ByteArrayInputStream
 
 class AnimatedLEDStripServerTest {
 
     init {
         SocketConnections.hostIP = "0.0.0.0"
-        Configuration.set("level", "off")
     }
 
     val leds = EmulatedAnimatedLEDStrip(50)

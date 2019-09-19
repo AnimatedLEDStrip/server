@@ -1,13 +1,19 @@
 package animatedledstrip.server
 
-import org.tinylog.core.LogEntry
-import org.tinylog.core.LogEntryValue
-import org.tinylog.writers.Writer
+import org.pmw.tinylog.Configuration
+import org.pmw.tinylog.LogEntry
+import org.pmw.tinylog.writers.LogEntryValue
+import org.pmw.tinylog.writers.PropertiesSupport
+import org.pmw.tinylog.writers.Writer
 
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-class SocketWriter(properties: java.util.Map<String, String>) : Writer {
+@PropertiesSupport(name = "socket", properties = [])
+class SocketWriter : Writer {
 
-    val delimiter = properties.getOrDefault("delimiter", ":")
+    val delimiter = ":"
+
+    override fun init(p0: Configuration?) {
+    }
 
     override fun getRequiredLogEntryValues(): MutableSet<LogEntryValue> {
         return mutableSetOf(LogEntryValue.LEVEL, LogEntryValue.MESSAGE)
@@ -15,9 +21,9 @@ class SocketWriter(properties: java.util.Map<String, String>) : Writer {
 
     override fun write(log: LogEntry?) {
         SocketConnections.localConnection?.sendString(
-                "${log?.level.toString()}$delimiter".padEnd(8, ' ') +
-                        "${log?.message}"
-            )
+            "${log?.level.toString()}$delimiter".padEnd(8, ' ') +
+                    "${log?.message}"
+        )
     }
 
     override fun flush() {

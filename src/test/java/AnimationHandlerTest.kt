@@ -30,14 +30,12 @@ import animatedledstrip.server.AnimationHandler
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import org.junit.Test
-import org.tinylog.configuration.Configuration
 import kotlin.test.assertTrue
 
 class AnimationHandlerTest {
 
 
     init {
-        Configuration.set("level", "off")
         SocketConnections.connections.clear()
     }
 

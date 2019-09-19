@@ -32,8 +32,9 @@ import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
 import org.apache.commons.cli.DefaultParser
-import org.tinylog.Logger
-import org.tinylog.configuration.Configuration
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
+import org.pmw.tinylog.Logger
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -66,16 +67,19 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         val loggingLevel =
             when {
-                cmdline.hasOption("t") -> "trace"
-                cmdline.hasOption("d") -> "debug"
-                cmdline.hasOption("q") -> "off"
-                else -> "info"
+                cmdline.hasOption("t") -> Level.TRACE
+                cmdline.hasOption("d") -> Level.DEBUG
+                cmdline.hasOption("q") -> Level.OFF
+                else -> Level.INFO
             }
 
-        Configuration.set("level", loggingLevel)
-        Configuration.set("format", loggingPattern)
+        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).addWriter(SocketWriter())
+            .activate()
+
+
     }
-    private val properties = Properties().apply {
+
+    private val properties: Properties? = Properties().apply {
         try {
             load(FileInputStream(propertyFileName))
         } catch (e: FileNotFoundException) {
@@ -87,14 +91,14 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     private val emulated: Boolean = cmdline.hasOption("e") || cmdline.hasOption("E")
 
-    private val numLEDs: Int = properties.getProperty("numLEDs", "240").toInt()
+    private val numLEDs: Int = properties?.getProperty("numLEDs", "240")?.toInt() ?: 240
 
-    private val pin: Int = properties.getProperty("pin", "12").toInt()
+    private val pin: Int = properties?.getProperty("pin", "12")?.toInt() ?: 12
 
     private val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
 
     private val ports = mutableListOf<Int>().apply {
-        properties.getProperty("ports")?.split(' ')?.forEach {
+        properties?.getProperty("ports")?.split(' ')?.forEach {
             requireNotNull(it.toIntOrNull())
             this.add(it.toInt())
         }
@@ -102,7 +106,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     }
 
     private val rendersBeforeSave =
-        properties.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
+        properties?.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
 
     private val leds = when (emulated) {
         false -> ledClass.primaryConstructor!!.call(
@@ -119,7 +123,10 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         )
     }
 
-    internal val animationHandler = AnimationHandler(leds)
+    private val persistAnimations =
+        properties?.getProperty("persist", "false")?.toBoolean() ?: cmdline.hasOption("P")
+
+    internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
 
     var testAnimation: AnimationData =
         AnimationData().animation(Animation.COLOR).color(CCBlue)
@@ -155,6 +162,18 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 Logger.info { "Shutting down server" }
                 stop()
             }
+            "DEBUG" -> {
+                setLoggingLevel(Level.DEBUG)
+                Logger.debug("Set logging level to debug")
+            }
+            "TRACE" -> {
+                setLoggingLevel(Level.TRACE)
+                Logger.trace("Set logging level to trace")
+            }
+            "INFO" -> {
+                setLoggingLevel(Level.INFO)
+                Logger.info("Set logging level to info")
+            }
             "CLEAR" -> {
                 animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
             }
@@ -177,6 +196,10 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             }
             else -> Logger.warn { "$command is not a valid command" }
         }
+    }
+
+    private fun setLoggingLevel(level: Level) {
+        Configurator.currentConfig().level(level).activate()
     }
 
 }

@@ -44,7 +44,6 @@ class CommandLine {
                 }
 
                 input@ while (!endCmdLine) {
-                    print("> ")
                     val str = readLine() ?: continue
                     when (str.toUpperCase()) {
                         "" -> continue@input

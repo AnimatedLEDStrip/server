@@ -27,7 +27,7 @@ import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.leds.AnimatedLEDStrip
 import kotlinx.coroutines.*
-import org.tinylog.Logger
+import org.pmw.tinylog.Logger
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
@@ -58,25 +58,13 @@ internal class ContinuousRunAnimation(
     private val fileName = "$id.anim"
 
 
-    init {
-        sendStartAnimation()                 // Send animation to GUI
-    }
-
-
     /**
      * Run the animation in a new thread
      */
     fun runAnimation() {
         job = GlobalScope.launch(handler.animationThreadPool) {
-            launch {
-                withContext(Dispatchers.IO) {
-                    ObjectOutputStream(FileOutputStream(".animations/$fileName")).apply {
-                        writeObject(params)
-                        close()
-                    }
-                }
-            }
-            Logger.trace { "params: $params" }
+            if (handler.persistAnimations) launch { saveAnimationToDisk() }
+            sendStartAnimation()
             while (continueAnimation) leds.run(params)
             sendEndAnimation()
             handler.continuousAnimations.remove(id)
@@ -91,7 +79,7 @@ internal class ContinuousRunAnimation(
         Logger.debug { "Animation $id ending" }
         if (continueAnimation) continueAnimation = false
         else job?.cancel()
-        if (File(".animations/$id").exists())
+        if (File(".animations/$fileName").exists())
             Files.delete(Paths.get(".animations/$fileName"))
     }
 
@@ -100,7 +88,6 @@ internal class ContinuousRunAnimation(
      *  Send message to client(s) that animation has started
      */
     fun sendStartAnimation(connection: SocketConnections.Connection? = null) {
-        Logger.trace { "Sending animation start to client(s)" }
         SocketConnections.sendAnimation(params, id, connection)
     }
 
@@ -110,8 +97,16 @@ internal class ContinuousRunAnimation(
      * @param connection
      */
     fun sendEndAnimation(connection: SocketConnections.Connection? = null) {
-        Logger.trace { "Sending animation end to client(s)" }
         SocketConnections.sendAnimation(params.copy(animation = Animation.ENDANIMATION), id, connection)
+    }
+
+    private suspend fun saveAnimationToDisk() {
+        withContext(Dispatchers.IO) {
+            ObjectOutputStream(FileOutputStream(".animations/$fileName")).apply {
+                writeObject(params)
+                close()
+            }
+        }
     }
 
 }

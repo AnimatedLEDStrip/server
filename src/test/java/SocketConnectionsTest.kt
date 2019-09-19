@@ -29,7 +29,6 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
 import org.junit.Test
-import org.tinylog.configuration.Configuration
 import java.io.BufferedInputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -37,10 +36,6 @@ import java.net.Socket
 import kotlin.test.assertTrue
 
 class SocketConnectionsTest {
-
-    init {
-        Configuration.set("level", "off")
-    }
 
     @Test
     fun testAdd() {
