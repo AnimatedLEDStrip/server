@@ -23,6 +23,7 @@ package animatedledstrip.server
  */
 
 
+import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.id
 import kotlinx.coroutines.*
@@ -46,6 +47,8 @@ object SocketConnections {
      */
     val connections = mutableMapOf<Int, Connection>()
 
+    var localConnection: Connection? = null
+
     /**
      * Initialize a new connection. Creates a Connection instance with the
      * specified port, then adds the port and Connection instance to
@@ -56,7 +59,8 @@ object SocketConnections {
      */
     fun add(port: Int, server: AnimatedLEDStripServer<*>): Connection {
         val connection = Connection(port, server)
-        connections[port] = connection
+        if (port == 1118) localConnection = connection
+        else connections[port] = connection
         return connection
     }
 
@@ -70,19 +74,16 @@ object SocketConnections {
             if (hostIP == null) null else InetAddress.getByName(hostIP)
         )
         var clientSocket: Socket? = null
-        private var disconnected = true
+        var connected = false
+            private set
         private var socOut: ObjectOutputStream? = null
-        var textBased = false
-
-        val isDisconnected: Boolean
-            get() = disconnected
 
         /**
          * Open the connection
          */
         fun open() {
             GlobalScope.launch(connectionThreadPool) {
-                Logger.debug("Starting port $port")
+                Logger.debug { "Starting port $port" }
                 openSocket()
             }
         }
@@ -97,61 +98,94 @@ object SocketConnections {
          */
         private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
-                Logger.debug("Socket at port $port started")
+                Logger.debug { "Socket at port $port started" }
                 while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
-                        Logger.trace("Accepted new connection on port $port")
-                        Logger.trace("Initializing input stream")
                         val socIn = ObjectInputStream(clientSocket!!.getInputStream())
-                        Logger.trace("Initializing output stream")
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
-                        Logger.debug("Sending currently running animations to GUI")
+                        Logger.info { "Connection on port $port Established" }
+                        connected = true
                         // Send all current running continuous animations to newly connected client
-                        server.animationHandler.continuousAnimations.forEach {
-                            it.value.sendAnimation(this@Connection)
-                        }
-                        disconnected = false
-                        Logger.info("Connection on port $port Established")
+                        if (port != 1118)
+                            server.animationHandler.continuousAnimations.forEach {
+                                it.value.sendStartAnimation(this@Connection)
+                            }
                         var input: Any?
-                        while (!disconnected) {
-                            Logger.trace("Waiting for input")
+                        while (connected) {
+                            Logger.trace { "Waiting for input" }
                             try {
-                                input = socIn.readObject() as AnimationData
-                                Logger.trace("Input received")
-                                server.animationHandler.addAnimation(input)
+                                input = when (port) {
+                                    1118 -> socIn.readObject() as String
+                                    else -> socIn.readObject() as AnimationData
+                                }
+                                Logger.trace { "Input received" }
+                                when (input) {
+                                    is AnimationData -> server.animationHandler.addAnimation(input)
+                                    is String -> server.parseTextCommand(input)
+                                }
                             } catch (e: ClassCastException) {
-                                Logger.error("Could not cast input to AnimationData")
+                                Logger.error { "Could not cast input to ${if (port == 1118) "String" else "AnimationData"}" }
                                 continue
                             }
                         }
                     } catch (e: SocketException) {
                         // Catch disconnections
-                        Logger.warn("Connection on port $port Lost: $e")
-                        disconnected = true
+                        Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
+                        connected = false
                     } catch (e: EOFException) {
-                        Logger.warn("Connection on port $port Lost: $e")
-                        disconnected = true
+                        Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
+                        connected = false
                     }
                 }
             }
         }
 
         /**
-         * Send animation data to the GUI along with an ID
+         * Send animation data to the client along with an ID.
+         * Does not work for port 1118 (local connection).
          *
          * @param animation An AnimationData containing data about the animation
          * @param id The ID for the animation
          */
         fun sendAnimation(animation: AnimationData, id: String) {
-            if (!isDisconnected) {
-                Logger.trace("Animation to send: $animation")
+            check(port != 1118) { "Cannot send animation to local port" }
+            if (connected) {
+                Logger.trace { "Animation to send: $animation" }
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut?.writeObject(animation.id(if (animation.id == "") id else "${animation.id} $id"))
-                                ?: Logger.debug("Could not send animation $id: Connection socket null")
-                            Logger.debug("Sent animation $id")
+                            socOut?.writeObject(
+                                animation
+                                    .id(
+                                        if ((animation.animation == Animation.CUSTOMANIMATION ||
+                                                    animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
+                                            animation.id.length == 1
+                                        )
+                                            "${animation.id} $id"
+                                        else id
+                                    )
+                            )
+                                ?: Logger.debug { "Could not send animation $id: Connection socket null" }
+                            if (animation.animation == Animation.ENDANIMATION) Logger.debug { "Sent end of animation $id" }
+                            else Logger.debug { "Sent animation $id" }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Send a string to the local port.
+         * Only works for a connection with port 1118 (local connection)
+         */
+        fun sendString(str: String) {
+            check(port == 1118) { "Cannot send string to non-local port" }
+            if (connected) {
+                runBlocking {
+                    withTimeout(5000) {
+                        withContext(Dispatchers.IO) {
+                            socOut?.writeObject(str)
                         }
                     }
                 }
@@ -177,7 +211,7 @@ object SocketConnections {
         if (client != null) client.sendAnimation(animation, id)
         else connections.forEach {
             it.value.sendAnimation(animation, id)
-            Logger.trace("Sent animation to client on port ${it.key}")
+            Logger.trace { "Sent animation to client on port ${it.key}" }
         }
     }
 

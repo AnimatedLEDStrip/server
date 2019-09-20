@@ -31,6 +31,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
 import org.pmw.tinylog.Logger
+import java.io.File
+import java.io.FileInputStream
+import java.io.InvalidClassException
+import java.io.ObjectInputStream
 import java.lang.Math.random
 
 
@@ -38,10 +42,14 @@ import java.lang.Math.random
  * An object that creates ContinuousRunAnimation instances for animations and
  * keeps track of currently running animations.
  */
-internal class AnimationHandler(private val leds: AnimatedLEDStrip) {
+internal class AnimationHandler(
+    private val leds: AnimatedLEDStrip,
+    threadCount: Int = 100,
+    internal val persistAnimations: Boolean = false
+) {
 
     @Suppress("EXPERIMENTAL_API_USAGE")
-    val animationThreadPool = newFixedThreadPoolContext(100, "AnimationThreads")
+    val animationThreadPool = newFixedThreadPoolContext(threadCount, "AnimationThreads")
 
     /**
      * Map tracking what continuous animations are currently running
@@ -51,6 +59,24 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip) {
      */
     val continuousAnimations = mutableMapOf<String, ContinuousRunAnimation>()
 
+
+    init {
+        GlobalScope.launch {
+            File(".animations/").walk().forEach {
+                if (!it.isDirectory && it.name.endsWith(".anim")) try {
+                    ObjectInputStream(FileInputStream(it)).apply {
+                        val obj = readObject() as AnimationData
+                        addAnimation(obj, obj.id)
+                        close()
+                    }
+                } catch (e: ClassCastException) {
+                    it.delete()
+                } catch (e: InvalidClassException) {
+                    it.delete()
+                }
+            }
+        }
+    }
 
     /**
      * Adds a new animation.
@@ -65,46 +91,46 @@ internal class AnimationHandler(private val leds: AnimatedLEDStrip) {
      *
      * @param params An AnimationData instance containing data about the animation to be run
      */
-    fun addAnimation(params: AnimationData) {
+    fun addAnimation(params: AnimationData, animId: String? = null) {
 
-        /*  Special "Animation" type that the GUI sends to end an animation */
-        if (params.animation == Animation.ENDANIMATION) {
-            Logger.debug("Ending an animation")
-            continuousAnimations[params.id]?.endAnimation()       // End animation
-                ?: throw Exception("Animation ${params.id} not running")
-            continuousAnimations.remove(params.id)                 // Remove it from the continuousAnimations map
-            return
-        }
-
-        Logger.trace("Launching new thread for new animation")
-        GlobalScope.launch(animationThreadPool) {
-            Logger.debug(params)
-
+        /*  Special "Animation" type that the client sends to end an animation */
+        if (params.animation == Animation.ENDANIMATION)
+            endAnimation(params)
+        else
             when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
-                /*  Animations that are only run once because they change the color of the strip */
+                /* Animations that are only run once because they change the color of the strip */
                 true -> {
-                    Logger.trace("Calling Single Run Animation")
-                    leds.run(params)
-                    Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
+                    singleRunAnimation(params)
                 }
-                /*  Animations that can be run repeatedly */
+                /* Animations that can be run repeatedly */
                 false -> {
                     if (params.continuous) {
-                        Logger.trace("Calling Continuous Animation")
-                        val id = random().toString().removePrefix("0.")
+                        val id = animId ?: (random() * 100000000).toInt().toString()
                         continuousAnimations[id] =
-                            ContinuousRunAnimation(id, params, leds)
+                            ContinuousRunAnimation(id, params, leds, this)
                         Logger.trace(continuousAnimations)
-                        continuousAnimations[id]!!.startAnimation()
-                        Logger.debug("$id complete")
+                        continuousAnimations[id]!!.runAnimation()
                     } else {
-                        Logger.trace("Calling Single Run Animation")
-                        leds.run(params)
-                        Logger.trace("Single Run Animation on ${Thread.currentThread().name} complete")
+                        singleRunAnimation(params)
                     }
                 }
             }
+    }
+
+    private fun singleRunAnimation(params: AnimationData) {
+        GlobalScope.launch(animationThreadPool) {
+            leds.run(params)
         }
+    }
+
+    fun endAnimation(params: AnimationData?) {
+        continuousAnimations[params?.id ?: "NONE"]?.endAnimation()       // End animation
+            ?: run { Logger.warn { "Animation ${params?.id} not running" }; return }
+    }
+
+    fun endAnimation(animation: ContinuousRunAnimation?) {
+        if (animation == null) return
+        else endAnimation(animation.params)
     }
 }
 

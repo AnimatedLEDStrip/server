@@ -23,9 +23,16 @@ package animatedledstrip.server
  */
 
 
+import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.leds.AnimatedLEDStrip
+import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
+import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * Class for running an animation that repeats until stopped.
@@ -34,43 +41,72 @@ import org.pmw.tinylog.Logger
  * @param params An AnimationData instance containing data about the animation
  * to be run
  */
-class ContinuousRunAnimation(private val id: String, private val params: AnimationData, private val leds: AnimatedLEDStrip) {
+internal class ContinuousRunAnimation(
+    private val id: String,
+    val params: AnimationData,
+    private val leds: AnimatedLEDStrip,
+    private val handler: AnimationHandler
+) {
 
     /**
-     * Variable controlling while loops in animation functions.
+     * Variable controlling if the animation will repeat
      */
     private var continueAnimation = true
 
+    private var job: Job? = null
 
-    init {
-        sendAnimation()                 // Send animation to GUI
-    }
+    private val fileName = "$id.anim"
 
 
     /**
-     * Determine which animation is being called and call the corresponding function.
+     * Run the animation in a new thread
      */
-    fun startAnimation() {
-        Logger.trace("params: $params")
-        while (continueAnimation) leds.run(params)
+    fun runAnimation() {
+        job = GlobalScope.launch(handler.animationThreadPool) {
+            if (handler.persistAnimations) launch { saveAnimationToDisk() }
+            sendStartAnimation()
+            while (continueAnimation) leds.run(params)
+            sendEndAnimation()
+            handler.continuousAnimations.remove(id)
+        }
     }
 
 
     /**
-     * Stop animation by setting the loop guard to false.
+     * Stop animation by setting the loop guard to false
      */
     fun endAnimation() {
-        Logger.debug("Animation $id ending")
-        continueAnimation = false
+        Logger.debug { "Animation $id ending" }
+        if (continueAnimation) continueAnimation = false
+        else job?.cancel()
+        if (File(".animations/$fileName").exists())
+            Files.delete(Paths.get(".animations/$fileName"))
     }
 
 
     /**
-     *  Send animation data to GUI.
+     *  Send message to client(s) that animation has started
      */
-    fun sendAnimation(connection: SocketConnections.Connection? = null) {
-        Logger.trace("Sending animation to GUI")
+    fun sendStartAnimation(connection: SocketConnections.Connection? = null) {
         SocketConnections.sendAnimation(params, id, connection)
+    }
+
+    /**
+     * Send message to client(s) that animation has ended
+     *
+     * @param connection
+     */
+    fun sendEndAnimation(connection: SocketConnections.Connection? = null) {
+        SocketConnections.sendAnimation(params.copy(animation = Animation.ENDANIMATION), id, connection)
+    }
+
+    private suspend fun saveAnimationToDisk() {
+        withContext(Dispatchers.IO) {
+            ObjectOutputStream(FileOutputStream(".animations/$fileName")).apply {
+                writeObject(params)
+                close()
+            }
+        }
     }
 
 }

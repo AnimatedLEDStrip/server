@@ -31,85 +31,41 @@ import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.Options
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
+class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     args: Array<String>,
     ledClass: KClass<T>
 ) {
+    /**
+     * Is the server running
+     */
     internal var running = false
 
-    private val options = Options().apply {
-        addOption("d", "Enable debugging")
-        addOption("t", "Enable trace debugging")
-        addOption("v", "Enable verbose log statements")
-        addOption("q", "Disable log outputs")
-        addOption("E", "Emulate LED strip but do NOT launch emulator")
-        addOption("f", true, "Specify properties file")
-        addOption("i", "Enable image debugging")
-        addOption("T", "Run test")
-    }
+    /* Command line options and properties file */
 
     private val cmdline = DefaultParser().parse(options, args)
 
-    var defaultPropertyFileName = "led.config"
+    private var propertyFileName = cmdline.getOptionValue("f") ?: "led.config"
 
-    var defaultOutputFileName: String? = null
+    private var outputFileName: String? = cmdline.getOptionValue("o")
 
-    private val properties = Properties().apply {
-        try {
-            load(FileInputStream(cmdline.getOptionValue("f") ?: defaultPropertyFileName))
-        } catch (e: FileNotFoundException) {
-            Logger.warn("File ${cmdline.getOptionValue("f") ?: defaultPropertyFileName} not found")
-        }
-    }
-
-    val ports = mutableListOf<Int>().apply {
-        Logger.debug(properties.getProperty("ports"))
-        properties.getProperty("ports")?.split(' ')?.forEach {
-            Logger.debug(it)
-            requireNotNull(it.toIntOrNull())
-            this.add(it.toInt())
-        }
-    }
-
-    private val leds = when (cmdline.hasOption("e") || cmdline.hasOption("E")) {
-        false -> ledClass.primaryConstructor!!.call(
-            properties.getProperty("numLEDs", "240").toInt(),
-            properties.getProperty("pin", "12").toInt(),
-            cmdline.hasOption("i"),
-            cmdline.getOptionValue("o") ?: defaultOutputFileName
-        )
-        true -> EmulatedAnimatedLEDStrip(
-            properties.getProperty("numLEDs", "240").toInt(),
-            imageDebugging = cmdline.hasOption("i"),
-            fileName = cmdline.getOptionValue("o") ?: defaultOutputFileName
-        )
-    }
-
-    internal val animationHandler = AnimationHandler(leds)
-
-    var testAnimation: AnimationData =
-        AnimationData().animation(Animation.COLOR).color(CCBlue)
-
+    /* Set logging levels based on command line */
     init {
-        val pattern =
+        val loggingPattern =
             if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
             else "{{level}:|min-size=8} {message}"
 
-        val level =
+        val loggingLevel =
             when {
                 cmdline.hasOption("t") -> Level.TRACE
                 cmdline.hasOption("d") -> Level.DEBUG
@@ -117,25 +73,78 @@ class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
                 else -> Level.INFO
             }
 
-        Configurator.defaultConfig().formatPattern(pattern).level(level).activate()
+        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).addWriter(SocketWriter())
+            .activate()
+
+
     }
 
+    private val properties: Properties? = Properties().apply {
+        try {
+            load(FileInputStream(propertyFileName))
+        } catch (e: FileNotFoundException) {
+            Logger.warn { "File $propertyFileName not found" }
+        }
+    }
+
+    /* Arguments for creating the AnimatedLEDStrip instance */
+
+    private val emulated: Boolean = cmdline.hasOption("e") || cmdline.hasOption("E")
+
+    private val numLEDs: Int = properties?.getProperty("numLEDs", "240")?.toInt() ?: 240
+
+    private val pin: Int = properties?.getProperty("pin", "12")?.toInt() ?: 12
+
+    private val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
+
+    private val ports = mutableListOf<Int>().apply {
+        properties?.getProperty("ports")?.split(' ')?.forEach {
+            requireNotNull(it.toIntOrNull())
+            this.add(it.toInt())
+        }
+        if (!emulated) this += 1118            // local port
+    }
+
+    private val rendersBeforeSave =
+        properties?.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
+
+    private val leds = when (emulated) {
+        false -> ledClass.primaryConstructor!!.call(
+            numLEDs,
+            pin,
+            imageDebuggingEnabled,
+            outputFileName,
+            rendersBeforeSave
+        )
+        true -> EmulatedAnimatedLEDStrip(
+            numLEDs,
+            imageDebugging = imageDebuggingEnabled,
+            fileName = outputFileName
+        )
+    }
+
+    private val persistAnimations =
+        properties?.getProperty("persist", "false")?.toBoolean() ?: cmdline.hasOption("P")
+
+    internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
+
+    var testAnimation: AnimationData =
+        AnimationData().animation(Animation.COLOR).color(CCBlue)
+
+    /* Start and stop methods */
 
     fun start(): AnimatedLEDStripServer<T> {
+        val dir = File(".animations")
+        if (!dir.isDirectory)
+            dir.mkdirs()
+
         running = true
-        startLocalTerminalReader()
-        Logger.debug("Ports = $ports")
+        Logger.debug { "Ports: $ports" }
         ports.forEach {
             SocketConnections.add(it, server = this).open()
         }
         if (cmdline.hasOption("T")) animationHandler.addAnimation(testAnimation)
         return this
-    }
-
-    fun waitUntilStop() {
-        while (running) {
-            delayBlocking(1)
-        }
     }
 
     fun stop() {
@@ -146,20 +155,51 @@ class AnimatedLEDStripServer <T: AnimatedLEDStrip> (
         running = false
     }
 
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    val localThread = newSingleThreadContext("Local Terminal")
-
-    private fun startLocalTerminalReader() {
-        GlobalScope.launch(localThread) {
-            while (this@AnimatedLEDStripServer.running) {
-                Logger.trace("Local terminal waiting for input")
-                val strIn = readLine()
-                Logger.trace("Read line")
-                if (strIn?.toUpperCase() == "Q") {
-                    Logger.trace("'Q' received, shutting down server")
-                    stop()
-                }
+    internal fun parseTextCommand(command: String) {
+        val line = command.toUpperCase().split(" ")
+        return when (line[0]) {
+            "QUIT", "Q" -> {
+                Logger.info { "Shutting down server" }
+                stop()
             }
+            "DEBUG" -> {
+                setLoggingLevel(Level.DEBUG)
+                Logger.debug("Set logging level to debug")
+            }
+            "TRACE" -> {
+                setLoggingLevel(Level.TRACE)
+                Logger.trace("Set logging level to trace")
+            }
+            "INFO" -> {
+                setLoggingLevel(Level.INFO)
+                Logger.info("Set logging level to info")
+            }
+            "CLEAR" -> {
+                animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
+            }
+            "SHOW" -> {
+                if (line.size > 1) Logger.info {
+                    "${line[1]}: ${animationHandler.continuousAnimations[line[1]]?.params ?: "NOT FOUND"}"
+                }
+                else Logger.info { "Running Animations: ${animationHandler.continuousAnimations.keys}" }
+            }
+            "END" -> {
+                if (line.size > 1) {
+                    if (line[1].toUpperCase() == "ALL") {
+                        val animations = animationHandler.continuousAnimations
+                        animations.forEach {
+                            animationHandler.endAnimation(it.value)
+                        }
+                    } else for (i in 1 until line.size)
+                        animationHandler.endAnimation(animationHandler.continuousAnimations[line[i]])
+                } else Logger.warn { "Animation ID must be specified" }
+            }
+            else -> Logger.warn { "$command is not a valid command" }
         }
     }
+
+    private fun setLoggingLevel(level: Level) {
+        Configurator.currentConfig().level(level).activate()
+    }
+
 }
