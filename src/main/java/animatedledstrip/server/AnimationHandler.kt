@@ -66,7 +66,7 @@ internal class AnimationHandler(
                 if (!it.isDirectory && it.name.endsWith(".anim")) try {
                     ObjectInputStream(FileInputStream(it)).apply {
                         val obj = readObject() as AnimationData
-                        addAnimation(obj)
+                        addAnimation(obj, obj.id)
                         close()
                     }
                 } catch (e: ClassCastException) {
@@ -91,7 +91,7 @@ internal class AnimationHandler(
      *
      * @param params An AnimationData instance containing data about the animation to be run
      */
-    fun addAnimation(params: AnimationData) {
+    fun addAnimation(params: AnimationData, animId: String? = null) {
 
         /*  Special "Animation" type that the client sends to end an animation */
         if (params.animation == Animation.ENDANIMATION)
@@ -105,7 +105,7 @@ internal class AnimationHandler(
                 /* Animations that can be run repeatedly */
                 false -> {
                     if (params.continuous) {
-                        val id = (random() * 100000000).toInt().toString()
+                        val id = animId ?: (random() * 100000000).toInt().toString()
                         continuousAnimations[id] =
                             ContinuousRunAnimation(id, params, leds, this)
                         Logger.trace(continuousAnimations)

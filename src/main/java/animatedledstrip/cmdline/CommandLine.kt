@@ -1,6 +1,8 @@
 package animatedledstrip.cmdline
 
 import kotlinx.coroutines.*
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
 import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -16,6 +18,10 @@ class CommandLine {
     private var endCmdLine = false
 
     private var readerJob: Job? = null
+
+    init {
+        Configurator.defaultConfig().level(Level.OFF).activate()
+    }
 
     fun loop() {
         println("Welcome to the AnimatedLEDStrip Server console")

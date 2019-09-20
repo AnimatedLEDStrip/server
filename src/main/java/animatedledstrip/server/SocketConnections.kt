@@ -102,19 +102,15 @@ object SocketConnections {
                 while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
-                        Logger.trace { "Accepted new connection on port $port" }
-                        Logger.trace { "Initializing input stream" }
                         val socIn = ObjectInputStream(clientSocket!!.getInputStream())
-                        Logger.trace { "Initializing output stream" }
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
                         Logger.info { "Connection on port $port Established" }
                         connected = true
-                        Logger.debug { "Sending currently running animations to GUI" }
                         // Send all current running continuous animations to newly connected client
-                        server.animationHandler.continuousAnimations.forEach {
-                            Logger.info { "Sending ${it.value}"}
-                            it.value.sendStartAnimation(this@Connection)
-                        }
+                        if (port != 1118)
+                            server.animationHandler.continuousAnimations.forEach {
+                                it.value.sendStartAnimation(this@Connection)
+                            }
                         var input: Any?
                         while (connected) {
                             Logger.trace { "Waiting for input" }
@@ -190,7 +186,6 @@ object SocketConnections {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
                             socOut?.writeObject(str)
-//                                ?: Logger.debug { "Could not send string $str: Connection socket null" }
                         }
                     }
                 }
