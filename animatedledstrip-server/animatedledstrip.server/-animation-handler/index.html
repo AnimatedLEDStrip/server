@@ -19,7 +19,7 @@ keeps track of currently running animations.</p>
 <p><a href="-init-.html">&lt;init&gt;</a></p>
 </td>
 <td>
-<code><span class="identifier">AnimationHandler</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int)/leds">leds</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int)/threadCount">threadCount</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;100<span class="symbol">)</span></code>
+<code><span class="identifier">AnimationHandler</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int, kotlin.Boolean)/leds">leds</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int, kotlin.Boolean)/threadCount">threadCount</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;100<span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.AnimationHandler$<init>(animatedledstrip.leds.AnimatedLEDStrip, kotlin.Int, kotlin.Boolean)/persistAnimations">persistAnimations</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a>&nbsp;<span class="symbol">=</span>&nbsp;false<span class="symbol">)</span></code>
 <p>An object that creates ContinuousRunAnimation instances for animations and
 keeps track of currently running animations.</p>
 </td>
@@ -52,6 +52,13 @@ keeps track of currently running animations.</p>
 <td>
 <code><span class="keyword">val </span><span class="identifier">leds</span><span class="symbol">: </span><span class="identifier">AnimatedLEDStrip</span></code></td>
 </tr>
+<tr>
+<td>
+<p><a href="persist-animations.html">persistAnimations</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">persistAnimations</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
 </tbody>
 </table>
 <h3>Functions</h3>
@@ -62,7 +69,7 @@ keeps track of currently running animations.</p>
 <p><a href="add-animation.html">addAnimation</a></p>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">addAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$addAnimation(animatedledstrip.animationutils.AnimationData)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">addAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.AnimationHandler$addAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/params">params</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.AnimationHandler$addAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/animId">animId</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Adds a new animation.</p>
 </td>
 </tr>
