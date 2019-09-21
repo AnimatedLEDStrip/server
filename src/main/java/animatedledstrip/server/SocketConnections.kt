@@ -113,13 +113,11 @@ object SocketConnections {
                             }
                         var input: Any?
                         while (connected) {
-                            Logger.trace { "Waiting for input" }
                             try {
                                 input = when (port) {
                                     1118 -> socIn.readObject() as String
                                     else -> socIn.readObject() as AnimationData
                                 }
-                                Logger.trace { "Input received" }
                                 when (input) {
                                     is AnimationData -> server.animationHandler.addAnimation(input)
                                     is String -> server.parseTextCommand(input)
@@ -151,7 +149,6 @@ object SocketConnections {
         fun sendAnimation(animation: AnimationData, id: String) {
             check(port != 1118) { "Cannot send animation to local port" }
             if (connected) {
-                Logger.trace { "Animation to send: $animation" }
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
@@ -211,7 +208,6 @@ object SocketConnections {
         if (client != null) client.sendAnimation(animation, id)
         else connections.forEach {
             it.value.sendAnimation(animation, id)
-            Logger.trace { "Sent animation to client on port ${it.key}" }
         }
     }
 

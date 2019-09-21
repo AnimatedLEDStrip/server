@@ -6,6 +6,7 @@ import org.pmw.tinylog.Level
 import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.OptionalDataException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketException
@@ -39,7 +40,11 @@ class CommandLine {
                     withContext(Dispatchers.IO) {
                         try {
                             while (!endCmdLine) {
-                                println(socIn.readObject() as String? ?: "ERROR")
+                                try {
+                                    println(socIn.readObject() as String? ?: "ERROR")
+                                } catch (e: OptionalDataException) {
+                                    println("Exception: $e")
+                                }
                             }
                         } catch (e: SocketException) {
                             println("Connection lost: $e")
