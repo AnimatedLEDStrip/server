@@ -3,8 +3,9 @@
 [![codecov](https://codecov.io/gh/AnimatedLEDStrip/AnimatedLEDStripServer/branch/master/graph/badge.svg)](https://codecov.io/gh/AnimatedLEDStrip/AnimatedLEDStripServer)
 
 # AnimatedLEDStripServer
+A library that runs a server for controlling LEDs. See the [wiki](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki)
+for usage instructions.
 
-A server that is built around the AnimatedLEDStrip library.
 
 ## Uses Java 9
 Because we use the dokka plugin to generate our documentation, we must use Java <=9
