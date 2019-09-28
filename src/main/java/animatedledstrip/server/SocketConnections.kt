@@ -36,7 +36,6 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
 
-
 object SocketConnections {
 
     var hostIP: String? = null
@@ -83,7 +82,7 @@ object SocketConnections {
          */
         fun open() {
             GlobalScope.launch(connectionThreadPool) {
-                Logger.debug { "Starting port $port" }
+                Logger.debug("Starting port $port")
                 openSocket()
             }
         }
@@ -98,13 +97,13 @@ object SocketConnections {
          */
         private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
-                Logger.debug { "Socket at port $port started" }
+                Logger.debug("Socket at port $port started")
                 while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
                         val socIn = ObjectInputStream(clientSocket!!.getInputStream())
                         socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
-                        Logger.info { "Connection on port $port Established" }
+                        Logger.info("Connection on port $port Established")
                         connected = true
                         // Send all current running continuous animations to newly connected client
                         if (port != 1118)
@@ -123,16 +122,16 @@ object SocketConnections {
                                     is String -> server.parseTextCommand(input)
                                 }
                             } catch (e: ClassCastException) {
-                                Logger.error { "Could not cast input to ${if (port == 1118) "String" else "AnimationData"}" }
+                                Logger.error("Could not cast input to ${if (port == 1118) "String" else "AnimationData"}")
                                 continue
                             }
                         }
                     } catch (e: SocketException) {
                         // Catch disconnections
-                        Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
+                        Logger.warn("Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e")
                         connected = false
                     } catch (e: EOFException) {
-                        Logger.warn { "Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e" }
+                        Logger.warn("Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e")
                         connected = false
                     }
                 }
@@ -163,9 +162,9 @@ object SocketConnections {
                                         else id
                                     )
                             )
-                                ?: Logger.debug { "Could not send animation $id: Connection socket null" }
-                            if (animation.animation == Animation.ENDANIMATION) Logger.debug { "Sent end of animation $id" }
-                            else Logger.debug { "Sent animation $id" }
+                                ?: Logger.debug("Could not send animation $id: Connection socket null")
+                            if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
+                            else Logger.debug("Sent animation $id")
                         }
                     }
                 }

@@ -37,7 +37,6 @@ import java.io.InvalidClassException
 import java.io.ObjectInputStream
 import java.lang.Math.random
 
-
 /**
  * An object that creates ContinuousRunAnimation instances for animations and
  * keeps track of currently running animations.

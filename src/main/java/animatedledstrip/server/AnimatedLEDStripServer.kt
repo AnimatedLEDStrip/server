@@ -46,6 +46,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     args: Array<String>,
     ledClass: KClass<T>
 ) {
+
     /**
      * Is the server running
      */
@@ -75,15 +76,13 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).addWriter(SocketWriter())
             .activate()
-
-
     }
 
     private val properties: Properties? = Properties().apply {
         try {
             load(FileInputStream(propertyFileName))
         } catch (e: FileNotFoundException) {
-            Logger.warn { "File $propertyFileName not found" }
+            Logger.warn("File $propertyFileName not found")
         }
     }
 
@@ -128,11 +127,19 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
 
+    /**
+     * The test animation
+     */
     var testAnimation: AnimationData =
         AnimationData().animation(Animation.COLOR).color(CCBlue)
 
     /* Start and stop methods */
 
+    /**
+     * Start the server
+     *
+     * @return This server
+     */
     fun start(): AnimatedLEDStripServer<T> {
         val dir = File(".animations")
         if (!dir.isDirectory)
@@ -147,6 +154,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         return this
     }
 
+    /**
+     * Stop the server
+     */
     fun stop() {
         leds.setStripColor(0)
         delayBlocking(500)
@@ -159,7 +169,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         val line = command.toUpperCase().split(" ")
         return when (line[0]) {
             "QUIT", "Q" -> {
-                Logger.info { "Shutting down server" }
+                Logger.info("Shutting down server")
                 stop()
             }
             "DEBUG" -> {
@@ -178,10 +188,10 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 animationHandler.addAnimation(AnimationData().animation(Animation.COLOR))
             }
             "SHOW" -> {
-                if (line.size > 1) Logger.info {
+                if (line.size > 1) Logger.info(
                     "${line[1]}: ${animationHandler.continuousAnimations[line[1]]?.params ?: "NOT FOUND"}"
-                }
-                else Logger.info { "Running Animations: ${animationHandler.continuousAnimations.keys}" }
+                )
+                else Logger.info("Running Animations: ${animationHandler.continuousAnimations.keys}")
             }
             "END" -> {
                 if (line.size > 1) {
@@ -192,9 +202,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         }
                     } else for (i in 1 until line.size)
                         animationHandler.endAnimation(animationHandler.continuousAnimations[line[i]])
-                } else Logger.warn { "Animation ID must be specified" }
+                } else Logger.warn("Animation ID must be specified")
             }
-            else -> Logger.warn { "$command is not a valid command" }
+            else -> Logger.warn("$command is not a valid command")
         }
     }
 
