@@ -23,7 +23,11 @@ package animatedledstrip.server
  */
 
 
+import animatedledstrip.cmdline.CommandLine
+import animatedledstrip.leds.AnimatedLEDStrip
+import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
+import kotlin.reflect.KClass
 
 var server: AnimatedLEDStripServer<*>? = null
 
@@ -40,4 +44,11 @@ val options = Options().apply {
     addOption("P", "Persist animations across restarts")
     addOption("T", "Run test")
     addOption("C", "Connect to a running server with a command line")
+}
+
+fun <T: AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {
+    when (DefaultParser().parse(options, args).hasOption("C")) {
+        false -> AnimatedLEDStripServer(args, ledClass).start().waitUntilStop()
+        true -> CommandLine().start()
+    }
 }

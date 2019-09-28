@@ -47,7 +47,7 @@ class CommandLine {
         Configurator.defaultConfig().level(Level.OFF).activate()
     }
 
-    fun loop() {
+    fun start() {
         println("Welcome to the AnimatedLEDStrip Server console")
         try {
             socket.connect(InetSocketAddress("localhost", 1118), 5000)
