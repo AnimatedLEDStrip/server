@@ -12,8 +12,7 @@ See the [wiki](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/C
 for instructions.
 
 ### Device Libraries
-Currently the only device supported is the Raspberry Pi. This can be [expanded in the future]
-(https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Device-Libraries) to more devices.
+Currently the only device supported is the Raspberry Pi. This can be [expanded in the future](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Device-Libraries) to more devices.
 See the [wiki](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Device-Libraries)
 for details.
 
