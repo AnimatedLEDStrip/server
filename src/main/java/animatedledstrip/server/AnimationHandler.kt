@@ -60,21 +60,22 @@ internal class AnimationHandler(
 
 
     init {
-        GlobalScope.launch {
-            File(".animations/").walk().forEach {
-                if (!it.isDirectory && it.name.endsWith(".anim")) try {
-                    ObjectInputStream(FileInputStream(it)).apply {
-                        val obj = readObject() as AnimationData
-                        addAnimation(obj, obj.id)
-                        close()
+        if (persistAnimations)
+            GlobalScope.launch {
+                File(".animations/").walk().forEach {
+                    if (!it.isDirectory && it.name.endsWith(".anim")) try {
+                        ObjectInputStream(FileInputStream(it)).apply {
+                            val obj = readObject() as AnimationData
+                            addAnimation(obj, obj.id)
+                            close()
+                        }
+                    } catch (e: ClassCastException) {
+                        it.delete()
+                    } catch (e: InvalidClassException) {
+                        it.delete()
                     }
-                } catch (e: ClassCastException) {
-                    it.delete()
-                } catch (e: InvalidClassException) {
-                    it.delete()
                 }
             }
-        }
     }
 
     /**
@@ -92,26 +93,24 @@ internal class AnimationHandler(
      */
     fun addAnimation(params: AnimationData, animId: String? = null) {
 
-        /*  Special "Animation" type that the client sends to end an animation */
+        // Special "Animation" type that the client sends to end an animation
         if (params.animation == Animation.ENDANIMATION)
             endAnimation(params)
         else
-            when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
-                /* Animations that are only run once because they change the color of the strip */
-                true -> {
-                    singleRunAnimation(params)
-                }
-                /* Animations that can be run repeatedly */
-                false -> {
-                    if (params.continuous) {
-                        val id = animId ?: (random() * 100000000).toInt().toString()
-                        params.id = id
-                        continuousAnimations[id] =
-                            ContinuousRunAnimation(id, params, leds, this)
-                        Logger.trace(continuousAnimations)
-                        continuousAnimations[id]!!.runAnimation()
-                    } else {
-                        singleRunAnimation(params)
+            when (params.continuous) {
+                true -> continuousRunAnimation(params, animId)
+                false -> singleRunAnimation(params)
+                // If continuous has not been set, check what type of animation is being run and use that
+                null -> {
+                    when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
+                        // Animations that are only run once because they change the color of the strip
+                        true -> {
+                            singleRunAnimation(params)
+                        }
+                        // Animations that can be run repeatedly
+                        false -> {
+                            continuousRunAnimation(params, animId)
+                        }
                     }
                 }
             }
@@ -121,6 +120,15 @@ internal class AnimationHandler(
         GlobalScope.launch(animationThreadPool) {
             leds.run(params)
         }
+    }
+
+    private fun continuousRunAnimation(params: AnimationData, animId: String?) {
+        val id = animId ?: (random() * 100000000).toInt().toString()
+        params.id = id
+        continuousAnimations[id] =
+            ContinuousRunAnimation(id, params, leds, this)
+        Logger.trace(continuousAnimations)
+        continuousAnimations[id]?.runAnimation() ?: Logger.warn("Animation $id cannot be run")
     }
 
     fun endAnimation(params: AnimationData?) {
