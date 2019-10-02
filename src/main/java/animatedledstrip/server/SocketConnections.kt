@@ -106,10 +106,12 @@ object SocketConnections {
                         Logger.info("Connection on port $port Established")
                         connected = true
                         // Send all current running continuous animations to newly connected client
-                        if (port != 1118)
+                        if (port != 1118) {
+                            sendInfo()
                             server.animationHandler.continuousAnimations.forEach {
                                 it.value.sendStartAnimation(this@Connection)
                             }
+                        }
                         var input: Any?
                         while (connected) {
                             try {
@@ -165,6 +167,23 @@ object SocketConnections {
                                 ?: Logger.debug("Could not send animation $id: Connection socket null")
                             if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
                             else Logger.debug("Sent animation $id")
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Send strip info to the client.
+         * Does not work for port 1118 (local connection).
+         */
+        fun sendInfo() {
+            check(port != 1118) { "Cannot send strip info to local port" }
+            if (connected) {
+                runBlocking {
+                    withTimeout(5000) {
+                        withContext(Dispatchers.IO) {
+                            socOut?.writeObject(server.stripInfo)
                         }
                     }
                 }

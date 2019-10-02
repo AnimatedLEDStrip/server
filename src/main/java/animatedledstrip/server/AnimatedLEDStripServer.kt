@@ -127,6 +127,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
 
+    internal val stripInfo = leds.stripInfo
+
     /**
      * The test animation
      */
