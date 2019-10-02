@@ -36,6 +36,9 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
 
+/**
+ * An object for creating, tracking and using connections that clients can connect to
+ */
 object SocketConnections {
 
     var hostIP: String? = null
@@ -46,6 +49,9 @@ object SocketConnections {
      */
     val connections = mutableMapOf<Int, Connection>()
 
+    /**
+     * The connection on port 1118 from the local machine's terminal
+     */
     var localConnection: Connection? = null
 
     /**
@@ -66,6 +72,12 @@ object SocketConnections {
     @Suppress("EXPERIMENTAL_API_USAGE")
     private val connectionThreadPool = newFixedThreadPoolContext(250, "Connections")
 
+    /**
+     * Represents a single port that a client can connect to.
+     *
+     * @property port The port to use
+     * @property server The server creating the connection
+     */
     class Connection(val port: Int, private val server: AnimatedLEDStripServer<*>) {
         private val serverSocket = ServerSocket(
             port,
@@ -101,11 +113,12 @@ object SocketConnections {
                 while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
-                        val socIn = ObjectInputStream(clientSocket!!.getInputStream())
-                        socOut = ObjectOutputStream(clientSocket!!.getOutputStream())
+                        val socIn = ObjectInputStream(clientSocket?.getInputStream())
+                        socOut = ObjectOutputStream(clientSocket?.getOutputStream())
                         Logger.info("Connection on port $port Established")
                         connected = true
-                        // Send all current running continuous animations to newly connected client
+                        // Send info about this strip and all current running continuous animations
+                        // to newly connected client
                         if (port != 1118) {
                             sendInfo()
                             server.animationHandler.continuousAnimations.forEach {
@@ -128,8 +141,7 @@ object SocketConnections {
                                 continue
                             }
                         }
-                    } catch (e: SocketException) {
-                        // Catch disconnections
+                    } catch (e: SocketException) {  // Catch disconnections
                         Logger.warn("Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e")
                         connected = false
                     } catch (e: EOFException) {

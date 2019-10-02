@@ -103,7 +103,7 @@ internal class AnimationHandler(
                 // If continuous has not been set, check what type of animation is being run and use that
                 null -> {
                     when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
-                        // Animations that are only run once because they change the color of the strip
+                        // Animations that are only run once because they change the prolonged color of the strip
                         true -> {
                             singleRunAnimation(params)
                         }
@@ -116,13 +116,24 @@ internal class AnimationHandler(
             }
     }
 
+    /**
+     * Run an animation once without repeating
+     *
+     * @param params An AnimationData instance containing data about the animation to be run
+     */
     private fun singleRunAnimation(params: AnimationData) {
         GlobalScope.launch(animationThreadPool) {
             leds.run(params)
         }
     }
 
-    private fun continuousRunAnimation(params: AnimationData, animId: String?) {
+    /**
+     * Start an animation that will be run continuously until stopped
+     *
+     * @param params An AnimationData instance containing data about the animation to be run
+     * @param animId The ID of the animation (if applicable)
+     */
+    private fun continuousRunAnimation(params: AnimationData, animId: String? = null) {
         val id = animId ?: (random() * 100000000).toInt().toString()
         params.id = id
         continuousAnimations[id] =
@@ -131,11 +142,17 @@ internal class AnimationHandler(
         continuousAnimations[id]?.runAnimation() ?: Logger.warn("Animation $id cannot be run")
     }
 
+    /**
+     * End an animation
+     */
     fun endAnimation(params: AnimationData?) {
         continuousAnimations[params?.id ?: "NONE"]?.endAnimation()       // End animation
             ?: run { Logger.warn { "Animation ${params?.id} not running" }; continuousAnimations.remove(params?.id); return }
     }
 
+    /**
+     * End an animation
+     */
     fun endAnimation(animation: ContinuousRunAnimation?) {
         if (animation == null) return
         else endAnimation(animation.params)
