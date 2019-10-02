@@ -105,6 +105,7 @@ internal class AnimationHandler(
                 false -> {
                     if (params.continuous) {
                         val id = animId ?: (random() * 100000000).toInt().toString()
+                        params.id = id
                         continuousAnimations[id] =
                             ContinuousRunAnimation(id, params, leds, this)
                         Logger.trace(continuousAnimations)
@@ -124,7 +125,7 @@ internal class AnimationHandler(
 
     fun endAnimation(params: AnimationData?) {
         continuousAnimations[params?.id ?: "NONE"]?.endAnimation()       // End animation
-            ?: run { Logger.warn { "Animation ${params?.id} not running" }; return }
+            ?: run { Logger.warn { "Animation ${params?.id} not running" }; continuousAnimations.remove(params?.id); return }
     }
 
     fun endAnimation(animation: ContinuousRunAnimation?) {
