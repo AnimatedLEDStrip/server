@@ -25,7 +25,7 @@ package animatedledstrip.server
 
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
-import animatedledstrip.animationutils.NonRepetitive
+import animatedledstrip.animationutils.isNonRepetitive
 import animatedledstrip.leds.AnimatedLEDStrip
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -89,6 +89,10 @@ internal class AnimationHandler(
      *      Adds pair with the animation ID and ContinuousRunAnimation instance
      *      to continuousAnimations.
      *
+     * If animation.continuous is null:
+     *      Determine if the animation is continuous based on the presence of a
+     *      NonRepetitive annotation
+     *
      * @param params An AnimationData instance containing data about the animation to be run
      */
     fun addAnimation(params: AnimationData, animId: String? = null) {
@@ -102,7 +106,7 @@ internal class AnimationHandler(
                 false -> singleRunAnimation(params)
                 // If continuous has not been set, check what type of animation is being run and use that
                 null -> {
-                    when (params.animation::class.java.fields[params.animation.ordinal].annotations.find { it is NonRepetitive } is NonRepetitive) {
+                    when (params.animation.isNonRepetitive()) {
                         // Animations that are only run once because they change the prolonged color of the strip
                         true -> {
                             singleRunAnimation(params)
