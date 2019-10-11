@@ -12,10 +12,13 @@ See the [wiki](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/C
 for instructions.
 
 ### Device Libraries
-Currently the only device supported is the Raspberry Pi. This can be [expanded in the future]
-(https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Device-Libraries) to more devices.
+Currently the only device supported is the Raspberry Pi. This can be [expanded in the future](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Device-Libraries) to more devices.
 See the [wiki](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Device-Libraries)
 for details.
+
+## Local Command Line Connection
+A connection to the server can be created from a local command line by running the executable with the `-C` flag.
+See the [wiki](https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer/wiki/Command-Line-Interface) for more details.
 
 ## Note About Building
 Because we use the dokka plugin to generate our documentation, we must build using Java <=9
