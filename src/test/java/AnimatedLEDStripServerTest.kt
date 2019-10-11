@@ -57,6 +57,19 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
+    fun testLoggingLevels() {
+        AnimatedLEDStripServer(arrayOf("-Etf", "./test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        AnimatedLEDStripServer(arrayOf("-Edf", "./test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        AnimatedLEDStripServer(arrayOf("-Eq"), EmulatedAnimatedLEDStrip::class)
+        AnimatedLEDStripServer(arrayOf("-Ef", "./test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+    }
+
+    @Test
+    fun testLoadProperties() {
+        AnimatedLEDStripServer(arrayOf("-Eqf", "./test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+    }
+
+    @Test
     @Ignore
     fun testLocalTerminalThread() = runBlocking {
         withTimeout(60000) {
