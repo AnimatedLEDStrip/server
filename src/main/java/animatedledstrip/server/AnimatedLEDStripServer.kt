@@ -56,15 +56,20 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     private val cmdline = DefaultParser().parse(options, args)
 
-    private var propertyFileName = cmdline.getOptionValue("f") ?: "led.config"
+    internal var propertyFileName = cmdline.getOptionValue("f") ?: "led.config"
 
-    private var outputFileName: String? = cmdline.getOptionValue("o")
+    internal var outputFileName: String? = cmdline.getOptionValue("o")
 
     /* Set logging levels based on command line */
     init {
         val loggingPattern =
             if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
             else "{{level}:|min-size=8} {message}"
+
+        assert(
+            if (cmdline.hasOption("v")) loggingPattern == "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
+            else loggingPattern == "{{level}:|min-size=8} {message}"
+        )
 
         val loggingLevel =
             when {
@@ -78,7 +83,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             .activate()
     }
 
-    private val properties: Properties? = Properties().apply {
+    internal val properties = Properties().apply {
         try {
             load(FileInputStream(propertyFileName))
         } catch (e: FileNotFoundException) {
@@ -88,42 +93,38 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     /* Arguments for creating the AnimatedLEDStrip instance */
 
-    private val emulated: Boolean = cmdline.hasOption("e") || cmdline.hasOption("E")
+    internal val emulated: Boolean =
+        cmdline.hasOption("E") || ledClass == EmulatedAnimatedLEDStrip::class
 
-    private val numLEDs: Int = properties?.getProperty("numLEDs", "240")?.toInt() ?: 240
+    internal val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
 
-    private val pin: Int = properties?.getProperty("pin", "12")?.toInt() ?: 12
+    internal val numLEDs: Int = properties.getProperty("numLEDs", "240")?.toInt() ?: 240
 
-    private val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
+    internal val pin: Int = properties.getProperty("pin", "12")?.toInt() ?: 12
 
-    private val ports = mutableListOf<Int>().apply {
-        properties?.getProperty("ports")?.split(' ')?.forEach {
+    internal val ports = mutableListOf<Int>().apply {
+        properties.getProperty("ports")?.split(' ')?.forEach {
             requireNotNull(it.toIntOrNull())
             this.add(it.toInt())
         }
         if (!emulated) this += 1118            // local port
     }
 
-    private val rendersBeforeSave =
-        properties?.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
+    internal val rendersBeforeSave =
+        properties.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
 
-    private val leds = when (emulated) {
-        false -> ledClass.primaryConstructor!!.call(
+    private val leds =
+        ledClass.primaryConstructor!!.call(
             numLEDs,
             pin,
             imageDebuggingEnabled,
             outputFileName,
             rendersBeforeSave
-        )
-        true -> EmulatedAnimatedLEDStrip(
-            numLEDs,
-            imageDebugging = imageDebuggingEnabled,
-            fileName = outputFileName
-        )
-    }
+        ) as AnimatedLEDStrip
 
-    private val persistAnimations =
-        properties?.getProperty("persist", "false")?.toBoolean() ?: cmdline.hasOption("P")
+
+    internal val persistAnimations =
+        properties.getProperty("persist", null)?.toBoolean() ?: cmdline.hasOption("P")
 
     internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
 
@@ -132,8 +133,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     /**
      * The test animation
      */
-    var testAnimation: AnimationData =
-        AnimationData().animation(Animation.COLOR).color(CCBlue)
+    var testAnimation = AnimationData().animation(Animation.COLOR).color(CCBlue)
 
     /* Start and stop methods */
 
