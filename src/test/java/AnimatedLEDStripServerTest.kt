@@ -26,8 +26,8 @@ package animatedledstrip.test
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
+import animatedledstrip.server.startServer
 import kotlinx.coroutines.*
-import org.junit.Ignore
 import org.junit.Test
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
@@ -44,21 +44,28 @@ class AnimatedLEDStripServerTest {
         SocketConnections.hostIP = "0.0.0.0"
     }
 
-    val leds = EmulatedAnimatedLEDStrip(50)
-
     @Test
-    fun testStart() = runBlocking {
+    fun testStartStop() = runBlocking {
         withTimeout(60000) {
             val server =
-                AnimatedLEDStripServer(arrayOf("-Eq"), EmulatedAnimatedLEDStrip::class)
+                AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+            server.start()
+            delay(5000)
+            server.stop()
+            Unit
+        }
+    }
 
+    @Test
+    fun testStartExtensionMethod() = runBlocking {
+        withTimeout(60000) {
             GlobalScope.launch {
                 delay(5000)
-                checkAllPixels(leds, 0)
-                server.stop()
+                val stream = ByteArrayInputStream("quit".toByteArray())
+                System.setIn(stream)
+                startServer(arrayOf("-qCL", "3100"), EmulatedAnimatedLEDStrip::class)
             }
-
-            server.start()
+            startServer(arrayOf("-qL", "3100"), EmulatedAnimatedLEDStrip::class)
             Unit
         }
     }
@@ -165,6 +172,17 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
+    fun testLocalPort() {
+        val testServer1 =
+            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer1.localPort == 1118 }
+
+        val testServer2 =
+            AnimatedLEDStripServer(arrayOf("-qL", "1000"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer2.localPort == 1000 }
+    }
+
+    @Test
     fun testPorts() {
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
@@ -218,11 +236,10 @@ class AnimatedLEDStripServerTest {
         AnimatedLEDStripServer(arrayOf(), EmulatedAnimatedLEDStrip::class)
     }
 
-
     @Test
     fun testSetLoggingLevel() {
         val testServer =
-            AnimatedLEDStripServer(arrayOf("-Eq"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.OFF }
         testServer.parseTextCommand("trace")
         assertTrue { Logger.getLevel() == Level.TRACE }
@@ -230,17 +247,5 @@ class AnimatedLEDStripServerTest {
         assertTrue { Logger.getLevel() == Level.DEBUG }
         testServer.parseTextCommand("info")
         assertTrue { Logger.getLevel() == Level.INFO }
-    }
-
-    @Test
-    @Ignore
-    fun testLocalTerminalThread() = runBlocking {
-        withTimeout(60000) {
-            val stream = ByteArrayInputStream("q".toByteArray())
-            System.setIn(stream)
-
-            AnimatedLEDStripServer(arrayOf("-Eq"), EmulatedAnimatedLEDStrip::class).start()
-            Unit
-        }
     }
 }

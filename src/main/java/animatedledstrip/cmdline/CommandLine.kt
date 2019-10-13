@@ -33,9 +33,8 @@ import java.io.OptionalDataException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketException
-import kotlin.system.exitProcess
 
-class CommandLine {
+class CommandLine(private val port: Int, private val quiet: Boolean = false) {
 
     private val socket = Socket()
 
@@ -47,13 +46,17 @@ class CommandLine {
         Configurator.defaultConfig().level(Level.OFF).activate()
     }
 
+    fun println(message: String) {
+        if (!quiet) kotlin.io.println(message)
+    }
+
     fun start() {
         println("Welcome to the AnimatedLEDStrip Server console")
         try {
-            socket.connect(InetSocketAddress("localhost", 1118), 5000)
+            socket.connect(InetSocketAddress("localhost", port), 5000)
         } catch (e: Exception) {
             println("Could not connect to server")
-            exitProcess(1)
+            return
         }
         println("Connected")
         try {
@@ -81,10 +84,10 @@ class CommandLine {
                 val str = readLine() ?: continue
                 when (str.toUpperCase()) {
                     "" -> continue@input
-                    "EXIT" -> exitProcess(0)
+                    "EXIT" -> return
                     "Q", "QUIT" -> {
                         socOut.writeObject(str)
-                        exitProcess(0)
+                        return
                     }
                     else -> socOut.writeObject(str)
                 }
@@ -93,11 +96,11 @@ class CommandLine {
         } catch (e: SocketException) {
             println("Connection lost: $e")
             readerJob?.cancel()
-            exitProcess(1)
+            return
         } catch (e: EOFException) {
             println("Connection lost: $e")
             readerJob?.cancel()
-            exitProcess(1)
+            return
         }
     }
 }

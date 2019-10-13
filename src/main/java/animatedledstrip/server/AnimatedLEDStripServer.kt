@@ -94,20 +94,22 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     /* Arguments for creating the AnimatedLEDStrip instance */
 
     internal val emulated: Boolean =
-        cmdline.hasOption("E") || ledClass == EmulatedAnimatedLEDStrip::class
+        cmdline.hasOption("E") || (ledClass == EmulatedAnimatedLEDStrip::class && !cmdline.hasOption("L"))
 
     internal val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
 
-    internal val numLEDs: Int = properties.getProperty("numLEDs", "240")?.toInt() ?: 240
+    internal val numLEDs: Int = properties.getProperty("numLEDs")?.toInt() ?: 240
 
-    internal val pin: Int = properties.getProperty("pin", "12")?.toInt() ?: 12
+    internal val pin: Int = properties.getProperty("pin")?.toInt() ?: 12
+
+    internal val localPort: Int = cmdline.getOptionValue("L")?.toInt() ?: 1118
 
     internal val ports = mutableListOf<Int>().apply {
         properties.getProperty("ports")?.split(' ')?.forEach {
             requireNotNull(it.toIntOrNull())
             this.add(it.toInt())
         }
-        if (!emulated) this += 1118            // local port
+        if (!emulated) this += localPort            // local port
     }
 
     internal val rendersBeforeSave =
@@ -124,7 +126,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
 
     internal val persistAnimations =
-        properties.getProperty("persist", null)?.toBoolean() ?: cmdline.hasOption("P")
+        properties.getProperty("persist")?.toBoolean() ?: cmdline.hasOption("P")
 
     internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
 
@@ -143,14 +145,16 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
      * @return This server
      */
     fun start(): AnimatedLEDStripServer<T> {
-        val dir = File(".animations")
-        if (!dir.isDirectory)
-            dir.mkdirs()
+        if (persistAnimations) {
+            val dir = File(".animations")
+            if (!dir.isDirectory)
+                dir.mkdirs()
+        }
 
         running = true
         Logger.debug { "Ports: $ports" }
         ports.forEach {
-            SocketConnections.add(it, server = this).open()
+            SocketConnections.add(it, server = this, local = it == localPort).open()
         }
         if (cmdline.hasOption("T")) animationHandler.addAnimation(testAnimation)
         return this

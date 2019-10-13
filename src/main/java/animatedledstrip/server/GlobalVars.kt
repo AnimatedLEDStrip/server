@@ -29,8 +29,6 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import kotlin.reflect.KClass
 
-var server: AnimatedLEDStripServer<*>? = null
-
 val options = Options().apply {
     addOption("d", "Enable debug level logging")
     addOption("t", "Enable trace level logging")
@@ -43,12 +41,17 @@ val options = Options().apply {
     addOption("i", "Enable image debugging")
     addOption("P", "Persist animations across restarts")
     addOption("T", "Run test")
+    addOption("L", true, "Set local connection port number")
     addOption("C", "Connect to a running server with a command line")
 }
 
-fun <T: AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {
-    when (DefaultParser().parse(options, args).hasOption("C")) {
+fun <T : AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {
+    val cmdline = DefaultParser().parse(options, args)
+    when (cmdline.hasOption("C")) {
         false -> AnimatedLEDStripServer(args, ledClass).start().waitUntilStop()
-        true -> CommandLine().start()
+        true -> CommandLine(
+            port = cmdline.getOptionValue("L")?.toInt() ?: 1118,
+            quiet = cmdline.hasOption("q")
+        ).start()
     }
 }

@@ -62,9 +62,9 @@ object SocketConnections {
      * @param port The port to use when creating the ServerSocket in the
      * connection
      */
-    fun add(port: Int, server: AnimatedLEDStripServer<*>): Connection {
-        val connection = Connection(port, server)
-        if (port == 1118) localConnection = connection
+    fun add(port: Int, server: AnimatedLEDStripServer<*>, local: Boolean = false): Connection {
+        val connection = Connection(port, server, local)
+        if (local) localConnection = connection
         else connections[port] = connection
         return connection
     }
@@ -78,7 +78,8 @@ object SocketConnections {
      * @property port The port to use
      * @property server The server creating the connection
      */
-    class Connection(val port: Int, private val server: AnimatedLEDStripServer<*>) {
+    class Connection(val port: Int, private val server: AnimatedLEDStripServer<*>, private val local: Boolean = false) {
+
         private val serverSocket = ServerSocket(
             port,
             0,
@@ -119,7 +120,7 @@ object SocketConnections {
                         connected = true
                         // Send info about this strip and all current running continuous animations
                         // to newly connected client
-                        if (port != 1118) {
+                        if (!local) {
                             sendInfo()
                             server.animationHandler.continuousAnimations.forEach {
                                 it.value.sendStartAnimation(this@Connection)
@@ -128,24 +129,24 @@ object SocketConnections {
                         var input: Any?
                         while (connected) {
                             try {
-                                input = when (port) {
-                                    1118 -> socIn.readObject() as String
-                                    else -> socIn.readObject() as AnimationData
+                                input = when (local) {
+                                    true -> socIn.readObject() as String
+                                    false -> socIn.readObject() as AnimationData
                                 }
                                 when (input) {
                                     is AnimationData -> server.animationHandler.addAnimation(input)
                                     is String -> server.parseTextCommand(input)
                                 }
                             } catch (e: ClassCastException) {
-                                Logger.error("Could not cast input to ${if (port == 1118) "String" else "AnimationData"}")
+                                Logger.error("Could not cast input to ${if (local) "String" else "AnimationData"}")
                                 continue
                             }
                         }
                     } catch (e: SocketException) {  // Catch disconnections
-                        Logger.warn("Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e")
+                        Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}Lost: $e")
                         connected = false
                     } catch (e: EOFException) {
-                        Logger.warn("Connection on port $port ${if (port == 1118) "(Local) " else ""}Lost: $e")
+                        Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}Lost: $e")
                         connected = false
                     }
                 }
@@ -160,7 +161,7 @@ object SocketConnections {
          * @param id The ID for the animation
          */
         fun sendAnimation(animation: AnimationData, id: String) {
-            check(port != 1118) { "Cannot send animation to local port" }
+            check(!local) { "Cannot send animation to local port" }
             if (connected) {
                 runBlocking {
                     withTimeout(5000) {
@@ -190,7 +191,7 @@ object SocketConnections {
          * Does not work for port 1118 (local connection).
          */
         fun sendInfo() {
-            check(port != 1118) { "Cannot send strip info to local port" }
+            check(!local) { "Cannot send strip info to local port" }
             if (connected) {
                 runBlocking {
                     withTimeout(5000) {
@@ -207,7 +208,7 @@ object SocketConnections {
          * Only works for a connection with port 1118 (local connection)
          */
         fun sendString(str: String) {
-            check(port == 1118) { "Cannot send string to non-local port" }
+            check(local) { "Cannot send string to non-local port" }
             if (connected) {
                 runBlocking {
                     withTimeout(5000) {
