@@ -46,7 +46,7 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
         Configurator.defaultConfig().level(Level.OFF).activate()
     }
 
-    fun println(message: String) {
+    private fun println(message: String) {
         if (!quiet) kotlin.io.println(message)
     }
 

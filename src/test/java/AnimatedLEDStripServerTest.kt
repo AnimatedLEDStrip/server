@@ -61,7 +61,7 @@ class AnimatedLEDStripServerTest {
         withTimeout(60000) {
             GlobalScope.launch {
                 delay(5000)
-                val stream = ByteArrayInputStream("quit".toByteArray())
+                val stream = ByteArrayInputStream("show\nquit".toByteArray())
                 System.setIn(stream)
                 startServer(arrayOf("-qCL", "3100"), EmulatedAnimatedLEDStrip::class)
             }
@@ -106,10 +106,21 @@ class AnimatedLEDStripServerTest {
     fun testLoggingLevels() {
         AnimatedLEDStripServer(arrayOf("-tf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.TRACE }
+        AnimatedLEDStripServer(arrayOf("-tqf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { Logger.getLevel() == Level.TRACE }
+        AnimatedLEDStripServer(arrayOf("-dtf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { Logger.getLevel() == Level.TRACE }
+        AnimatedLEDStripServer(arrayOf("-qdtf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { Logger.getLevel() == Level.TRACE }
+
         AnimatedLEDStripServer(arrayOf("-df", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.DEBUG }
+        AnimatedLEDStripServer(arrayOf("-qdf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { Logger.getLevel() == Level.DEBUG }
+
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.OFF }
+
         AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.INFO }
     }
@@ -155,8 +166,19 @@ class AnimatedLEDStripServerTest {
         assertTrue { testServer1.numLEDs == 240 }
 
         val testServer2 =
+            AnimatedLEDStripServer(arrayOf("-qn", "50"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer2.numLEDs == 50 }
+
+        val testServer3 =
             AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.numLEDs == 120 }
+        assertTrue { testServer3.numLEDs == 120 }
+
+        val testServer4 =
+            AnimatedLEDStripServer(
+                arrayOf("-qn", "100", "-f", "src/test/resources/led.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
+        assertTrue { testServer4.numLEDs == 100 }
     }
 
 
@@ -167,8 +189,20 @@ class AnimatedLEDStripServerTest {
         assertTrue { testServer1.pin == 12 }
 
         val testServer2 =
+            AnimatedLEDStripServer(arrayOf("-qp", "20"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer2.pin == 20 }
+
+        val testServer3 =
             AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.pin == 15 }
+        assertTrue { testServer3.pin == 15 }
+
+        val testServer4 =
+            AnimatedLEDStripServer(
+                arrayOf("-qp", "10", "-f", "src/test/resources/led.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
+        assertTrue { testServer4.pin == 10 }
+
     }
 
     @Test
@@ -180,6 +214,17 @@ class AnimatedLEDStripServerTest {
         val testServer2 =
             AnimatedLEDStripServer(arrayOf("-qL", "1000"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer2.localPort == 1000 }
+
+        val testServer3 =
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer3.localPort == 2132 }
+
+        val testServer4 =
+            AnimatedLEDStripServer(
+                arrayOf("-qL", "1500", "-f", "src/test/resources/led.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
+        assertTrue { testServer4.localPort == 1500 }
     }
 
     @Test
@@ -196,11 +241,12 @@ class AnimatedLEDStripServerTest {
 
         assertFailsWith<IllegalArgumentException> {
             AnimatedLEDStripServer(
-                arrayOf("-qf", "src/test/resources/led.badconfig"),
+                arrayOf("-qf", "src/test/resources/ports.badconfig"),
                 EmulatedAnimatedLEDStrip::class
             )
         }
     }
+
     @Test
     fun testRendersBeforeSave() {
         val testServer1 =
@@ -208,12 +254,19 @@ class AnimatedLEDStripServerTest {
         assertTrue { testServer1.rendersBeforeSave == 1000 }
 
         val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.rendersBeforeSave == 2000 }
+            AnimatedLEDStripServer(arrayOf("-qr", "500"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer2.rendersBeforeSave == 500 }
 
         val testServer3 =
-            AnimatedLEDStripServer(arrayOf("-qr", "500"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer3.rendersBeforeSave == 500 }
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer3.rendersBeforeSave == 2000 }
+
+        val testServer4 =
+            AnimatedLEDStripServer(
+                arrayOf("-qr", "750", "-f", "src/test/resources/led.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
+        assertTrue { testServer4.rendersBeforeSave == 750 }
     }
 
     @Test
@@ -223,17 +276,41 @@ class AnimatedLEDStripServerTest {
         assertFalse { testServer1.persistAnimations }
 
         val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-qP"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer2.persistAnimations }
 
         val testServer3 =
-            AnimatedLEDStripServer(arrayOf("-qP"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer3.persistAnimations }
+            AnimatedLEDStripServer(arrayOf("-qP", "--no-persist"), EmulatedAnimatedLEDStrip::class)
+        assertFalse { testServer3.persistAnimations }
+
+        val testServer4 =
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer4.persistAnimations }
+
+        val testServer5 =
+            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer5.persistAnimations }
+
+        val testServer6 =
+            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/led.config", "--no-persist"), EmulatedAnimatedLEDStrip::class)
+        assertFalse { testServer6.persistAnimations }
+
+        val testServer7 =
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/no-persist.config"), EmulatedAnimatedLEDStrip::class)
+        assertFalse { testServer7.persistAnimations }
+
+        val testServer8 =
+            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/no-persist.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer8.persistAnimations }
+
+        val testServer9 =
+            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/no-persist.config", "--no-persist"), EmulatedAnimatedLEDStrip::class)
+        assertFalse { testServer9.persistAnimations }
     }
 
     @Test
     fun testPrimaryConstructor() {
-        AnimatedLEDStripServer(arrayOf(), EmulatedAnimatedLEDStrip::class)
+        AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
     }
 
     @Test
