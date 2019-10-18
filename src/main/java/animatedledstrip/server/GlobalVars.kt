@@ -26,6 +26,7 @@ package animatedledstrip.server
 import animatedledstrip.cmdline.CommandLine
 import animatedledstrip.leds.AnimatedLEDStrip
 import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
 import kotlin.reflect.KClass
 
@@ -34,14 +35,19 @@ val options = Options().apply {
     addOption("t", "Enable trace level logging")
     addOption("v", "Enable verbose logging statements")
     addOption("q", "Disable log outputs")
-    addOption("E", "Emulate LED strip")
+    addOption("E", "Emulate the LED strip")
     addOption("f", true, "Specify properties file")
-    addOption("o", true, "Specify output file name for image debugging")
-    addOption("r", true, "Specify number of renders between saves")
     addOption("i", "Enable image debugging")
+    addOption("o", true, "Specify the output file name for image debugging")
+    addOption("n", true, "Specify number of LEDs")
+    addOption("p", true, "Specify pin")
+    addOption("r", true, "Specify the number of renders between saves")
     addOption("P", "Persist animations across restarts")
-    addOption("T", "Run test")
-    addOption("L", true, "Set local connection port number")
+    addOption(
+        Option.builder().longOpt("no-persist").desc("Don't persist animations (default true)").build()
+    )
+    addOption("T", "Run test animation")
+    addOption("L", true, "Specify local connection port number")
     addOption("C", "Connect to a running server with a command line")
 }
 

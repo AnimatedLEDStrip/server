@@ -29,8 +29,10 @@ import animatedledstrip.animationutils.animation
 import animatedledstrip.animationutils.color
 import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
+import animatedledstrip.leds.StripInfo
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
+import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
@@ -47,28 +49,30 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     ledClass: KClass<T>
 ) {
 
-    /**
-     * Is the server running
-     */
+    /** Is the server running */
     internal var running = false
 
-    /* Command line options and properties file */
 
-    private val cmdline = DefaultParser().parse(options, args)
+    /* Get command line options */
 
-    internal var propertyFileName = cmdline.getOptionValue("f") ?: "led.config"
+    private val cmdline: CommandLine =
+        DefaultParser().parse(options, args)
 
-    internal var outputFileName: String? = cmdline.getOptionValue("o")
 
-    /* Set logging levels based on command line */
+    /* Set logging format and level based on command line options */
+
     init {
-        val loggingPattern =
-            if (cmdline.hasOption("v")) "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
-            else "{{level}:|min-size=8} {message}"
+        val loggingPattern: String =
+            if (cmdline.hasOption("v"))
+                "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
+            else
+                "{{level}:|min-size=8} {message}"
 
         assert(
-            if (cmdline.hasOption("v")) loggingPattern == "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
-            else loggingPattern == "{{level}:|min-size=8} {message}"
+            if (cmdline.hasOption("v"))
+                loggingPattern == "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
+            else
+                loggingPattern == "{{level}:|min-size=8} {message}"
         )
 
         val loggingLevel =
@@ -79,63 +83,105 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 else -> Level.INFO
             }
 
-        Configurator.defaultConfig().formatPattern(loggingPattern).level(loggingLevel).addWriter(SocketWriter())
+        Configurator.defaultConfig()
+            .formatPattern(loggingPattern)
+            .level(loggingLevel)
+            .addWriter(SocketWriter())
             .activate()
     }
 
-    internal val properties = Properties().apply {
-        try {
-            load(FileInputStream(propertyFileName))
-        } catch (e: FileNotFoundException) {
-            Logger.warn("File $propertyFileName not found")
+    /* Get properties file */
+
+    internal val propertyFileName: String =
+        cmdline.getOptionValue("f")
+            ?: "led.config"
+
+    internal val properties =
+        Properties().apply {
+            try {
+                load(FileInputStream(propertyFileName))
+            } catch (e: FileNotFoundException) {
+                Logger.warn("File $propertyFileName not found")
+            }
         }
-    }
+
+
+    /* Get port numbers */
+
+    internal val localPort: Int =
+        cmdline.getOptionValue("L")?.toIntOrNull()
+            ?: properties.getProperty("local_port")?.toIntOrNull()
+            ?: 1118
+
+    internal val ports =
+        mutableListOf<Int>().apply {
+            properties.getProperty("ports")?.split(' ')?.forEach {
+                requireNotNull(it.toIntOrNull()) { "Could not parse port \"$it\"" }
+                this.add(it.toInt())
+            }
+            if (!emulated)
+                this += localPort            // local port
+        }
+
 
     /* Arguments for creating the AnimatedLEDStrip instance */
 
     internal val emulated: Boolean =
-        cmdline.hasOption("E") || (ledClass == EmulatedAnimatedLEDStrip::class && !cmdline.hasOption("L"))
+        cmdline.hasOption("E") ||
+                (ledClass == EmulatedAnimatedLEDStrip::class &&
+                        !cmdline.hasOption("L"))
 
-    internal val imageDebuggingEnabled: Boolean = cmdline.hasOption("i")
+    internal val persistAnimations: Boolean =
+        !cmdline.hasOption("no-persist") &&
+                (cmdline.hasOption("P") ||
+                        properties.getProperty("persist")?.toBoolean() == true)
 
-    internal val numLEDs: Int = properties.getProperty("numLEDs")?.toInt() ?: 240
 
-    internal val pin: Int = properties.getProperty("pin")?.toInt() ?: 12
+    internal val numLEDs: Int =
+        cmdline.getOptionValue("n")?.toIntOrNull()
+            ?: properties.getProperty("numLEDs")?.toIntOrNull()
+            ?: 240
 
-    internal val localPort: Int = cmdline.getOptionValue("L")?.toInt() ?: 1118
+    internal val pin: Int =
+        cmdline.getOptionValue("p")?.toIntOrNull()
+            ?: properties.getProperty("pin")?.toInt()
+            ?: 12
 
-    internal val ports = mutableListOf<Int>().apply {
-        properties.getProperty("ports")?.split(' ')?.forEach {
-            requireNotNull(it.toIntOrNull())
-            this.add(it.toInt())
-        }
-        if (!emulated) this += localPort            // local port
-    }
+    internal val imageDebuggingEnabled: Boolean =
+        cmdline.hasOption("i")
 
-    internal val rendersBeforeSave =
-        properties.getProperty("renders")?.toIntOrNull() ?: cmdline.getOptionValue("r")?.toIntOrNull() ?: 1000
+    internal var outputFileName: String? =
+        cmdline.getOptionValue("o")
 
-    private val leds =
+    internal val rendersBeforeSave: Int =
+        cmdline.getOptionValue("r")?.toIntOrNull()
+            ?: properties.getProperty("renders")?.toIntOrNull()
+            ?: 1000
+
+
+    /* Create strip instance and animation handler */
+
+    private val leds: AnimatedLEDStrip =
         ledClass.primaryConstructor!!.call(
             numLEDs,
             pin,
             imageDebuggingEnabled,
             outputFileName,
             rendersBeforeSave
-        ) as AnimatedLEDStrip
+        )
 
+    internal val animationHandler =
+        AnimationHandler(leds, persistAnimations = persistAnimations)
 
-    internal val persistAnimations =
-        properties.getProperty("persist")?.toBoolean() ?: cmdline.hasOption("P")
-
-    internal val animationHandler = AnimationHandler(leds, persistAnimations = persistAnimations)
-
-    internal val stripInfo = leds.stripInfo
+    internal val stripInfo: StripInfo =
+        leds.stripInfo
 
     /**
      * The test animation
      */
-    var testAnimation = AnimationData().animation(Animation.COLOR).color(CCBlue)
+    var testAnimation: AnimationData =
+        AnimationData().animation(Animation.COLOR).color(CCBlue)
+
 
     /* Start and stop methods */
 
@@ -160,9 +206,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         return this
     }
 
-    /**
-     * Stop the server
-     */
+    /** Stop the server */
     fun stop() {
         leds.setStripColor(0)
         delayBlocking(500)
