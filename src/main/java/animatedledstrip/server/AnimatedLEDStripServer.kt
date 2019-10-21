@@ -204,6 +204,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         ports.forEach {
             SocketConnections.connections[it]?.open()
         }
+        if (createLocalPort) SocketConnections.localConnection?.open()
         if (cmdline.hasOption("T")) animationHandler.addAnimation(testAnimation)
         return this
     }
@@ -218,6 +219,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     }
 
     internal fun parseTextCommand(command: String) {
+        Logger.trace("Parsing \"$command\"")
         val line = command.toUpperCase().split(" ")
         return when (line[0]) {
             "QUIT", "Q" -> {
