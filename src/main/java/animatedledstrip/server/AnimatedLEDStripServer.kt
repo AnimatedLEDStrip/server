@@ -106,6 +106,11 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         }
 
 
+    /* Determine if the local port should be created */
+    internal val createLocalPort: Boolean =
+        (ledClass != EmulatedAnimatedLEDStrip::class ||
+                cmdline.hasOption("L"))
+
     /* Get port numbers */
 
     internal val localPort: Int =
@@ -118,18 +123,16 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             properties.getProperty("ports")?.split(' ')?.forEach {
                 requireNotNull(it.toIntOrNull()) { "Could not parse port \"$it\"" }
                 this.add(it.toInt())
+                SocketConnections.add(it.toInt(), server = this@AnimatedLEDStripServer)
             }
-            if (!emulated)
+            if (createLocalPort) {
                 this += localPort            // local port
+                SocketConnections.add(localPort, server = this@AnimatedLEDStripServer, local = true)
+            }
         }
 
 
     /* Arguments for creating the AnimatedLEDStrip instance */
-
-    internal val emulated: Boolean =
-        cmdline.hasOption("E") ||
-                (ledClass == EmulatedAnimatedLEDStrip::class &&
-                        !cmdline.hasOption("L"))
 
     internal val persistAnimations: Boolean =
         !cmdline.hasOption("no-persist") &&
@@ -198,9 +201,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         }
 
         running = true
-        Logger.debug { "Ports: $ports" }
         ports.forEach {
-            SocketConnections.add(it, server = this, local = it == localPort).open()
+            SocketConnections.connections[it]?.open()
         }
         if (cmdline.hasOption("T")) animationHandler.addAnimation(testAnimation)
         return this

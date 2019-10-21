@@ -137,15 +137,15 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
-    fun testEmulated() {
+    fun testCreateLocalPort() {
         val testServer1 =
-            AnimatedLEDStripServer(arrayOf("-qE"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer1.emulated }
+            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+        assertFalse { testServer1.createLocalPort }
 
 
         val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.emulated }
+            AnimatedLEDStripServer(arrayOf("-qL", "1500"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer2.createLocalPort }
     }
 
     @Test
@@ -231,7 +231,8 @@ class AnimatedLEDStripServerTest {
     fun testPorts() {
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer1.ports.isEmpty() }
+        assertTrue { testServer1.ports.size == 1 }
+        assertTrue { testServer1.ports.contains(1118) }
 
         val testServer2 =
             AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)

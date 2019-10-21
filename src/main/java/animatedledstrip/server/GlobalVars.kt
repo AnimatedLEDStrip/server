@@ -56,7 +56,7 @@ fun <T : AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>)
     when (cmdline.hasOption("C")) {
         false -> AnimatedLEDStripServer(args, ledClass).start().waitUntilStop()
         true -> CommandLine(
-            port = cmdline.getOptionValue("L")?.toInt() ?: 1118,
+            port = cmdline.getOptionValue("L")?.toIntOrNull() ?: 1118,
             quiet = cmdline.hasOption("q")
         ).start()
     }
