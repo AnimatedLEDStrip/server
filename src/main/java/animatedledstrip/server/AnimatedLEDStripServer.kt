@@ -189,7 +189,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     /**
      * The test animation
      */
-    var testAnimation: AnimationData =
+    var testAnimation =
         AnimationData().animation(Animation.COLOR).color(CCBlue)
 
 

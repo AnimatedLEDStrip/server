@@ -179,6 +179,10 @@ class AnimatedLEDStripServerTest {
                 EmulatedAnimatedLEDStrip::class
             )
         assertTrue { testServer4.numLEDs == 100 }
+
+        val testServer5 =
+            AnimatedLEDStripServer(arrayOf("-qn", "x"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer5.numLEDs == 240 }
     }
 
 
@@ -203,6 +207,9 @@ class AnimatedLEDStripServerTest {
             )
         assertTrue { testServer4.pin == 10 }
 
+        val testServer5 =
+            AnimatedLEDStripServer(arrayOf("-qp", "x"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer5.pin == 12 }
     }
 
     @Test
@@ -271,6 +278,10 @@ class AnimatedLEDStripServerTest {
                 EmulatedAnimatedLEDStrip::class
             )
         assertTrue { testServer4.rendersBeforeSave == 750 }
+
+        val testServer5 =
+            AnimatedLEDStripServer(arrayOf("-qr", "x"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer5.rendersBeforeSave == 1000 }
     }
 
     @Test
