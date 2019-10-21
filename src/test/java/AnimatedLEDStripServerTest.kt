@@ -225,6 +225,10 @@ class AnimatedLEDStripServerTest {
                 EmulatedAnimatedLEDStrip::class
             )
         assertTrue { testServer4.localPort == 1500 }
+
+        val testServer5 =
+            AnimatedLEDStripServer(arrayOf("-qL", "x"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { testServer5.localPort == 1118 }
     }
 
     @Test
