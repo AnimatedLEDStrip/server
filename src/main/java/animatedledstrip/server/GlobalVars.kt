@@ -31,24 +31,25 @@ import org.apache.commons.cli.Options
 import kotlin.reflect.KClass
 
 val options = Options().apply {
-    addOption("d", "Enable debug level logging")
-    addOption("t", "Enable trace level logging")
-    addOption("v", "Enable verbose logging statements")
-    addOption("q", "Disable log outputs")
-    addOption("E", "Emulate the LED strip")
-    addOption("f", true, "Specify properties file")
-    addOption("i", "Enable image debugging")
-    addOption("o", true, "Specify the output file name for image debugging")
-    addOption("n", true, "Specify number of LEDs")
-    addOption("p", true, "Specify pin")
-    addOption("r", true, "Specify the number of renders between saves")
-    addOption("P", "Persist animations across restarts")
+    addOption("h", "help", false, "Show help message")
+    addOption("d", "debug", false, "Enable debug level logging")
+    addOption("t", "trace", false, "Enable trace level logging")
+    addOption("v", "verbose", false, "Enable verbose logging statements")
+    addOption("q", "quiet", false, "Disable log outputs")
+    addOption("E", "emulate", false, "Emulate the LED strip")
+    addOption("f", "prop-file", true, "Specify properties file")
+    addOption("i", "image-debug", false, "Enable image debugging")
+    addOption("o", "outfile", true, "Specify the output file name for image debugging")
+    addOption("n", "numleds", true, "Specify number of LEDs")
+    addOption("p", "pin", true, "Specify pin")
+    addOption("r", "renders", true, "Specify the number of renders between saves")
+    addOption("P", "persist", false, "Persist animations across restarts")
     addOption(
         Option.builder().longOpt("no-persist").desc("Don't persist animations (default true)").build()
     )
     addOption("T", "Run test animation")
-    addOption("L", true, "Specify local connection port number")
-    addOption("C", "Connect to a running server with a command line")
+    addOption("L", "local-port", true, "Specify local connection port number")
+    addOption("C", "command-line", false, "Connect to a running server with a command line")
 }
 
 fun <T : AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {

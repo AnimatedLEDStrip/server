@@ -34,6 +34,7 @@ import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.HelpFormatter
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
@@ -57,6 +58,12 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     private val cmdline: CommandLine =
         DefaultParser().parse(options, args)
+
+    init {
+        if (cmdline.hasOption("h")) {
+            HelpFormatter().printHelp("ledserver.jar", options)
+        }
+    }
 
 
     /* Set logging format and level based on command line options */
