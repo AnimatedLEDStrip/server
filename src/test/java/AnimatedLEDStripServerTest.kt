@@ -144,7 +144,7 @@ class AnimatedLEDStripServerTest {
 
 
         val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qL", "1500"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-qL", "1501"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer2.createLocalPort }
     }
 
@@ -310,7 +310,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testHelp() {
-        AnimatedLEDStripServer(arrayOf("-h"), EmulatedAnimatedLEDStrip::class)
+        AnimatedLEDStripServer(arrayOf("-hq"), EmulatedAnimatedLEDStrip::class)
     }
 
     @Test

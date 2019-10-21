@@ -59,12 +59,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     private val cmdline: CommandLine =
         DefaultParser().parse(options, args)
 
-    init {
-        if (cmdline.hasOption("h")) {
-            HelpFormatter().printHelp("ledserver.jar", options)
-        }
-    }
-
 
     /* Set logging format and level based on command line options */
 
@@ -95,6 +89,12 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             .level(loggingLevel)
             .addWriter(SocketWriter())
             .activate()
+    }
+
+    init {
+        if (cmdline.hasOption("h") && Logger.getLevel() != Level.OFF) {
+            HelpFormatter().printHelp("ledserver.jar", options)
+        }
     }
 
     /* Get properties file */
