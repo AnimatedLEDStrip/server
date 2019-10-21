@@ -234,7 +234,7 @@ class AnimatedLEDStripServerTest {
         assertTrue { testServer1.ports.isEmpty() }
 
         val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/ports.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer2.ports.contains(3005) }
         assertTrue { testServer2.ports.contains(3006) }
         assertTrue { testServer2.ports.contains(3007) }
