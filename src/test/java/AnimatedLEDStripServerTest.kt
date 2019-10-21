@@ -231,8 +231,7 @@ class AnimatedLEDStripServerTest {
     fun testPorts() {
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer1.ports.size == 1 }
-        assertTrue { testServer1.ports.contains(1118) }
+        assertTrue { testServer1.ports.isEmpty() }
 
         val testServer2 =
             AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
@@ -307,6 +306,11 @@ class AnimatedLEDStripServerTest {
         val testServer9 =
             AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/no-persist.config", "--no-persist"), EmulatedAnimatedLEDStrip::class)
         assertFalse { testServer9.persistAnimations }
+    }
+
+    @Test
+    fun testHelp() {
+        AnimatedLEDStripServer(arrayOf("-h"), EmulatedAnimatedLEDStrip::class)
     }
 
     @Test
