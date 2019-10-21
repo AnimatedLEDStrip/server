@@ -236,9 +236,9 @@ class AnimatedLEDStripServerTest {
 
         val testServer2 =
             AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.ports.contains(5) }
-        assertTrue { testServer2.ports.contains(6) }
-        assertTrue { testServer2.ports.contains(7) }
+        assertTrue { testServer2.ports.contains(3005) }
+        assertTrue { testServer2.ports.contains(3006) }
+        assertTrue { testServer2.ports.contains(3007) }
 
         assertFailsWith<IllegalArgumentException> {
             AnimatedLEDStripServer(
