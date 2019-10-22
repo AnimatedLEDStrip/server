@@ -92,7 +92,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     }
 
     init {
-        if (cmdline.hasOption("h") && Logger.getLevel() != Level.OFF) {
+        if (cmdline.hasOption("h")) {
             HelpFormatter().printHelp("ledserver.jar", options)
         }
     }

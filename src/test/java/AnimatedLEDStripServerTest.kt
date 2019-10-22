@@ -332,17 +332,4 @@ class AnimatedLEDStripServerTest {
     fun testPrimaryConstructor() {
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
     }
-
-    @Test
-    fun testSetLoggingLevel() {
-        val testServer =
-            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { Logger.getLevel() == Level.OFF }
-        testServer.parseTextCommand("trace")
-        assertTrue { Logger.getLevel() == Level.TRACE }
-        testServer.parseTextCommand("debug")
-        assertTrue { Logger.getLevel() == Level.DEBUG }
-        testServer.parseTextCommand("info")
-        assertTrue { Logger.getLevel() == Level.INFO }
-    }
 }
