@@ -20,15 +20,45 @@ class ServerParserTest {
 
     @Test
     fun testSetLoggingLevel() {
+        val stdout: PrintStream = System.out
+        val tempOut = ByteArrayOutputStream()
+        System.setOut(PrintStream(tempOut))
+
         val testServer =
-            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.OFF }
+
         testServer.parseTextCommand("trace")
         assertTrue { Logger.getLevel() == Level.TRACE }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "TRACE:   Set logging level to trace\n"
+        }
+        tempOut.reset()
+
         testServer.parseTextCommand("debug")
         assertTrue { Logger.getLevel() == Level.DEBUG }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n"
+        }
+        tempOut.reset()
+
         testServer.parseTextCommand("info")
         assertTrue { Logger.getLevel() == Level.INFO }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Set logging level to info\n"
+        }
+        tempOut.reset()
+
+        System.setOut(stdout)
     }
 
     @Test
