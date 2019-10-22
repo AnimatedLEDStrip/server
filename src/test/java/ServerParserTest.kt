@@ -74,7 +74,7 @@ class ServerParserTest {
             tempOut
                 .toString("utf-8")
                 .replace("\r\n", "\n") ==
-                    "INFO:    5678: AnimationData(animation=COLOR, colors=[0], center=120, continuous=true, delay=50, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\r\n"
+                    "INFO:    5678: AnimationData(animation=COLOR, colors=[0], center=120, continuous=true, delay=50, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\n"
         }
         tempOut.reset()
 
