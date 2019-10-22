@@ -41,21 +41,41 @@ class ServerParserTest {
             AnimatedLEDStripServer(arrayOf(), EmulatedAnimatedLEDStrip::class)
 
         testServer.parseTextCommand("show")
-        assertTrue { tempOut.toString("utf-8") == "INFO:    Running Animations: []\r\n" }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Running Animations: []\n"
+        }
         tempOut.reset()
 
         testServer.parseTextCommand("show 1234")
-        assertTrue { tempOut.toString("utf-8") == "INFO:    1234: NOT FOUND\r\n" }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    1234: NOT FOUND\n"
+        }
         tempOut.reset()
 
         testServer.animationHandler.addAnimation(AnimationData(continuous = true), "5678")
         delayBlocking(500)
         testServer.parseTextCommand("show")
-        assertTrue { tempOut.toString("utf-8") == "INFO:    Running Animations: [5678]\r\n" }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Running Animations: [5678]\n"
+        }
         tempOut.reset()
 
         testServer.parseTextCommand("show 5678")
-        assertTrue { tempOut.toString("utf-8") == "INFO:    5678: AnimationData(animation=COLOR, colors=[0], center=120, continuous=true, delay=50, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\r\n" }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    5678: AnimationData(animation=COLOR, colors=[0], center=120, continuous=true, delay=50, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\r\n"
+        }
         tempOut.reset()
 
         System.setOut(stdout)
