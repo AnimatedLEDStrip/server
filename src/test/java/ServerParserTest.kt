@@ -11,12 +11,91 @@ import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ServerParserTest {
 
     init {
         SocketConnections.hostIP = "0.0.0.0"
+    }
+
+    @Test
+    fun testClear() {
+        val testServer =
+            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+
+        testServer.animationHandler.addAnimation(AnimationData().addColor(0xFF))
+        delayBlocking(500)
+        checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0xFF)
+
+        testServer.parseTextCommand("clear")
+        delayBlocking(500)
+        checkAllPixels(testServer.leds, 0x0)
+    }
+
+    @Test
+    fun testEnd() {
+        val stderr: PrintStream = System.err
+        val tempOut = ByteArrayOutputStream()
+        System.setErr(PrintStream(tempOut))
+
+        val testServer =
+            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+
+        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "1234")
+        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "1357")
+        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "2431")
+        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "7654")
+        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "2653")
+        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "2521")
+
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("1234") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("1357") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2431") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("7654") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2653") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+
+        testServer.parseTextCommand("end 1234")
+        delayBlocking(200)
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1234") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("1357") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2431") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("7654") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2653") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+
+        testServer.parseTextCommand("end 1357 2431")
+        delayBlocking(200)
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1234") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1357") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2431") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("7654") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2653") }
+        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+
+        testServer.parseTextCommand("end all")
+        delayBlocking(200)
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1234") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1357") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2431") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("7654") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2653") }
+        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+
+        tempOut.reset()
+
+        testServer.parseTextCommand("end")
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "WARNING: Animation ID must be specified\n"
+        }
+        tempOut.reset()
+
+        System.setErr(stderr)
     }
 
     @Test
@@ -110,20 +189,6 @@ class ServerParserTest {
         tempOut.reset()
 
         System.setOut(stdout)
-    }
-
-    @Test
-    fun testClear() {
-        val testServer =
-            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
-
-        testServer.animationHandler.addAnimation(AnimationData().addColor(0xFF))
-        delayBlocking(500)
-        checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0xFF)
-
-        testServer.parseTextCommand("clear")
-        delayBlocking(500)
-        checkAllPixels(testServer.leds, 0x0)
     }
 
 }

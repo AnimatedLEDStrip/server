@@ -257,7 +257,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             "END" -> {
                 if (line.size > 1) {
                     if (line[1].toUpperCase() == "ALL") {
-                        val animations = animationHandler.continuousAnimations
+                        val animations = animationHandler.continuousAnimations.toMap()
                         animations.forEach {
                             animationHandler.endAnimation(it.value)
                         }
