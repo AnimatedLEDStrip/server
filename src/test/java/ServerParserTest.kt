@@ -38,7 +38,7 @@ class ServerParserTest {
         System.setOut(PrintStream(tempOut))
 
         val testServer =
-            AnimatedLEDStripServer(arrayOf(), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
 
         testServer.parseTextCommand("show")
         assertTrue {
