@@ -171,7 +171,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     /* Create strip instance and animation handler */
 
-    private val leds: AnimatedLEDStrip =
+    internal val leds: AnimatedLEDStrip =
         ledClass.primaryConstructor!!.call(
             numLEDs,
             pin,

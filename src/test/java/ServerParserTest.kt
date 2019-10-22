@@ -1,6 +1,7 @@
 package animatedledstrip.test
 
 import animatedledstrip.animationutils.AnimationData
+import animatedledstrip.animationutils.addColor
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
@@ -109,6 +110,20 @@ class ServerParserTest {
         tempOut.reset()
 
         System.setOut(stdout)
+    }
+
+    @Test
+    fun testClear() {
+        val testServer =
+            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+
+        testServer.animationHandler.addAnimation(AnimationData().addColor(0xFF))
+        delayBlocking(500)
+        checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0xFF)
+
+        testServer.parseTextCommand("clear")
+        delayBlocking(500)
+        checkAllPixels(testServer.leds, 0x0)
     }
 
 }
