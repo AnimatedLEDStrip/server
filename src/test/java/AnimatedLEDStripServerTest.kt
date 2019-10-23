@@ -27,6 +27,7 @@ import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.server.startServer
+import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
 import org.junit.Test
 import org.pmw.tinylog.Configurator
@@ -376,7 +377,11 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testTestAnimation() {
-        AnimatedLEDStripServer(arrayOf("-qT"), EmulatedAnimatedLEDStrip::class)
+        val testServer =
+            AnimatedLEDStripServer(arrayOf("-qT"), EmulatedAnimatedLEDStrip::class).start()
+        delayBlocking(500)
+        checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0xFF)
+        testServer.stop()
     }
 
     @Test
