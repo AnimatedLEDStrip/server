@@ -375,6 +375,11 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
+    fun testTestAnimation() {
+        AnimatedLEDStripServer(arrayOf("-qT"), EmulatedAnimatedLEDStrip::class)
+    }
+
+    @Test
     fun testPrimaryConstructor() {
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
     }
