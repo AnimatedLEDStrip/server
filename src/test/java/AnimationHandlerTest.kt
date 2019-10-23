@@ -91,16 +91,19 @@ class AnimationHandlerTest {
 
     @Test
     fun testRemoveNonExistentAnimation() {
-        Configurator.currentConfig().level(Level.INFO).activate()
         val stderr: PrintStream = System.err
         val tempOut = ByteArrayOutputStream()
         System.setErr(PrintStream(tempOut))
+
         tempOut.reset()
+
+        Configurator.defaultConfig()
+            .formatPattern("{{level}:|min-size=8} {message}")
+            .level(Level.INFO)
+            .activate()
 
         val handler = AnimationHandler(leds)
         handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
-        delayBlocking(1000)
-        println(tempOut.toString("utf-8").replace("LOGGER ERROR: Cannot find a writer for the name \"socket\"\r\n", ""))
 
         assertTrue {
             tempOut
@@ -111,7 +114,6 @@ class AnimationHandlerTest {
         }
 
         System.setErr(stderr)
-        Configurator.currentConfig().level(Level.OFF).activate()
     }
 
 }
