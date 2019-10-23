@@ -92,9 +92,12 @@ class AnimationHandlerTest {
         val stderr: PrintStream = System.err
         val tempOut = ByteArrayOutputStream()
         System.setErr(PrintStream(tempOut))
+        tempOut.reset()
 
         val handler = AnimationHandler(leds)
         handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
+
+        println(tempOut.toString("utf-8").replace("LOGGER ERROR: Cannot find a writer for the name \"socket\"\r\n", ""))
 
         assertTrue {
             tempOut
