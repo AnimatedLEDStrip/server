@@ -7,9 +7,6 @@ import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import org.junit.Test
-import org.pmw.tinylog.Configurator
-import org.pmw.tinylog.Level
-import org.pmw.tinylog.Logger
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertFalse
@@ -148,6 +145,28 @@ class ServerParserTest {
         testServer.parseTextCommand("end 5678")
 
         System.setOut(stdout)
+    }
+
+    @Test
+    fun testNonCommand() {
+        val stderr: PrintStream = System.err
+        val tempOut = ByteArrayOutputStream()
+        System.setErr(PrintStream(tempOut))
+
+        val testServer =
+            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+
+        testServer.parseTextCommand("notacommand")
+        delayBlocking(200)
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n")
+                .replace("LOGGER ERROR: Cannot find a writer for the name \"socket\"\n", "") ==
+                    "WARNING: notacommand is not a valid command\n"
+        }
+
+        System.setErr(stderr)
     }
 
 }

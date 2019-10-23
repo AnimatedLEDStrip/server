@@ -92,7 +92,6 @@ class AnimationHandlerTest {
         val stderr: PrintStream = System.err
         val tempOut = ByteArrayOutputStream()
         System.setErr(PrintStream(tempOut))
-        tempOut.reset()
 
         val handler = AnimationHandler(leds)
         handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
