@@ -30,6 +30,8 @@ import animatedledstrip.server.AnimationHandler
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import org.junit.Test
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertTrue
@@ -89,6 +91,7 @@ class AnimationHandlerTest {
 
     @Test
     fun testRemoveNonExistentAnimation() {
+        Configurator.currentConfig().level(Level.INFO).activate()
         val stderr: PrintStream = System.err
         val tempOut = ByteArrayOutputStream()
         System.setErr(PrintStream(tempOut))
@@ -96,7 +99,7 @@ class AnimationHandlerTest {
 
         val handler = AnimationHandler(leds)
         handler.addAnimation(AnimationData().animation(Animation.ENDANIMATION).id("TEST"))
-        delayBlocking(500)
+        delayBlocking(1000)
         println(tempOut.toString("utf-8").replace("LOGGER ERROR: Cannot find a writer for the name \"socket\"\r\n", ""))
 
         assertTrue {
@@ -108,6 +111,7 @@ class AnimationHandlerTest {
         }
 
         System.setErr(stderr)
+        Configurator.currentConfig().level(Level.OFF).activate()
     }
 
 }
