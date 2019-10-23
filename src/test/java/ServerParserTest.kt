@@ -100,51 +100,6 @@ class ServerParserTest {
     }
 
     @Test
-    fun testSetLoggingLevel() {
-        val stdout: PrintStream = System.out
-        val tempOut = ByteArrayOutputStream()
-        System.setOut(PrintStream(tempOut))
-
-        val testServer =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { Logger.getLevel() == Level.OFF }
-
-        testServer.parseTextCommand("trace")
-        assertTrue { Logger.getLevel() == Level.TRACE }
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "TRACE:   Set logging level to trace\n"
-        }
-        tempOut.reset()
-
-        testServer.parseTextCommand("debug")
-        assertTrue { Logger.getLevel() == Level.DEBUG }
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n"
-        }
-        tempOut.reset()
-
-        testServer.parseTextCommand("info")
-        assertTrue { Logger.getLevel() == Level.INFO }
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "INFO:    Set logging level to info\n"
-        }
-        tempOut.reset()
-
-        Configurator.currentConfig().level(Level.OFF).activate()
-
-        System.setOut(stdout)
-    }
-
-    @Test
     fun testShow() {
         val stdout: PrintStream = System.out
         val tempOut = ByteArrayOutputStream()
@@ -190,6 +145,7 @@ class ServerParserTest {
                     "INFO:    5678: AnimationData(animation=COLOR, colors=[0], center=120, continuous=true, delay=50, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\n"
         }
         tempOut.reset()
+        testServer.parseTextCommand("end 5678")
 
         System.setOut(stdout)
     }

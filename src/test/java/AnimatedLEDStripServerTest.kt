@@ -29,9 +29,12 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.server.startServer
 import kotlinx.coroutines.*
 import org.junit.Test
+import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.lang.reflect.InvocationTargetException
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -331,5 +334,52 @@ class AnimatedLEDStripServerTest {
     @Test
     fun testPrimaryConstructor() {
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+    }
+
+    @Test
+    fun testSetLoggingLevel() {
+        val stdout: PrintStream = System.out
+        val tempOut = ByteArrayOutputStream()
+        System.setOut(PrintStream(tempOut))
+
+        val testServer =
+            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+        assertTrue { Logger.getLevel() == Level.OFF }
+
+        tempOut.reset()
+
+        testServer.parseTextCommand("trace")
+        assertTrue { Logger.getLevel() == Level.TRACE }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "TRACE:   Set logging level to trace\n"
+        }
+        tempOut.reset()
+
+        testServer.parseTextCommand("debug")
+        assertTrue { Logger.getLevel() == Level.DEBUG }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n"
+        }
+        tempOut.reset()
+
+        testServer.parseTextCommand("info")
+        assertTrue { Logger.getLevel() == Level.INFO }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Set logging level to info\n"
+        }
+        tempOut.reset()
+
+        Configurator.currentConfig().level(Level.OFF).activate()
+
+        System.setOut(stdout)
     }
 }
