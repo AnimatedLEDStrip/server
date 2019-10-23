@@ -7,6 +7,7 @@ import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import org.junit.Test
+import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
 import java.io.ByteArrayOutputStream
@@ -137,6 +138,8 @@ class ServerParserTest {
                     "INFO:    Set logging level to info\n"
         }
         tempOut.reset()
+
+        Configurator.currentConfig().level(Level.OFF).activate()
 
         System.setOut(stdout)
     }
