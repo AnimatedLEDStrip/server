@@ -310,25 +310,68 @@ class AnimatedLEDStripServerTest {
         assertTrue { testServer5.persistAnimations }
 
         val testServer6 =
-            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/led.config", "--no-persist"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(
+                arrayOf("-qPf", "src/test/resources/led.config", "--no-persist"),
+                EmulatedAnimatedLEDStrip::class
+            )
         assertFalse { testServer6.persistAnimations }
 
         val testServer7 =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/no-persist.config"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(
+                arrayOf("-qf", "src/test/resources/no-persist.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
         assertFalse { testServer7.persistAnimations }
 
         val testServer8 =
-            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/no-persist.config"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(
+                arrayOf("-qPf", "src/test/resources/no-persist.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
         assertTrue { testServer8.persistAnimations }
 
         val testServer9 =
-            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/no-persist.config", "--no-persist"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(
+                arrayOf("-qPf", "src/test/resources/no-persist.config", "--no-persist"),
+                EmulatedAnimatedLEDStrip::class
+            )
         assertFalse { testServer9.persistAnimations }
     }
 
     @Test
     fun testHelp() {
+        val stdout: PrintStream = System.out
+        val tempOut = ByteArrayOutputStream()
+        System.setOut(PrintStream(tempOut))
+        tempOut.reset()
+
         AnimatedLEDStripServer(arrayOf("-hq"), EmulatedAnimatedLEDStrip::class)
+
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "usage: ledserver.jar\n" +
+                    " -C,--command-line       Connect to a running server with a command line\n" +
+                    " -d,--debug              Enable debug level logging\n" +
+                    " -E,--emulate            Emulate the LED strip\n" +
+                    " -f,--prop-file <arg>    Specify properties file\n" +
+                    " -h,--help               Show help message\n" +
+                    " -i,--image-debug        Enable image debugging\n" +
+                    " -L,--local-port <arg>   Specify local connection port number\n" +
+                    " -n,--numleds <arg>      Specify number of LEDs\n" +
+                    "    --no-persist         Don't persist animations (default true)\n" +
+                    " -o,--outfile <arg>      Specify the output file name for image debugging\n" +
+                    " -p,--pin <arg>          Specify pin\n" +
+                    " -P,--persist            Persist animations across restarts\n" +
+                    " -q,--quiet              Disable log outputs\n" +
+                    " -r,--renders <arg>      Specify the number of renders between saves\n" +
+                    " -t,--trace              Enable trace level logging\n" +
+                    " -T                      Run test animation\n" +
+                    " -v,--verbose            Enable verbose logging statements\n"
+        }
+
+        System.setOut(stdout)
     }
 
     @Test
