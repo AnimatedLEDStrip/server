@@ -127,24 +127,21 @@ class ServerParserTest {
                 .replace("\r\n", "\n") ==
                     "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n"
         }
-//        tempOut.reset()
-//
-//        testServer.parseTextCommand("info")
-//        assertTrue { Logger.getLevel() == Level.INFO }
-//        assertTrue {
-//            tempOut
-//                .toString("utf-8")
-//                .replace("\r\n", "\n") ==
-//                    "INFO:    Set logging level to info\n"
-//        }
-//        tempOut.reset()
+        tempOut.reset()
+
+        testServer.parseTextCommand("info")
+        assertTrue { Logger.getLevel() == Level.INFO }
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Set logging level to info\n"
+        }
+        tempOut.reset()
 
         Configurator.currentConfig().level(Level.OFF).activate()
 
         System.setOut(stdout)
-        println(tempOut.toString("utf-8"))
-        println(tempOut.toString("utf-8").toByteArray().map { it.toString() })
-
     }
 
     @Test
