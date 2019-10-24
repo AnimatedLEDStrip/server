@@ -40,7 +40,7 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
 
     private var endCmdLine = false
 
-    private var readerJob: Job? = null
+    private lateinit var readerJob: Job
 
     init {
         Configurator.defaultConfig().level(Level.OFF).activate()
@@ -85,12 +85,12 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                 when (str.toUpperCase()) {
                     "" -> continue@input
                     "EXIT" -> {
-                        readerJob?.cancel()
+                        readerJob.cancel()
                         return
                     }
                     "Q", "QUIT" -> {
                         socOut.writeObject(str)
-                        readerJob?.cancel()
+                        readerJob.cancel()
                         return
                     }
                     else -> socOut.writeObject(str)
@@ -99,11 +99,11 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
 
         } catch (e: SocketException) {
             println("Connection lost: $e")
-            readerJob?.cancel()
+            readerJob.cancel()
             return
         } catch (e: EOFException) {
             println("Connection lost: $e")
-            readerJob?.cancel()
+            readerJob.cancel()
             return
         }
     }

@@ -96,5 +96,25 @@ class CommandLineTest {
         }
     }
 
+    @Test
+    fun testNoConnection() {
+        val stdout = System.out
+        val tempOut = ByteArrayOutputStream()
+        System.setOut(PrintStream(tempOut))
+
+        val stream = ByteArrayInputStream("quit".toByteArray())
+        System.setIn(stream)
+        startServer(arrayOf("-CL", "3101"), EmulatedAnimatedLEDStrip::class)
+
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "Welcome to the AnimatedLEDStrip Server console\nCould not connect to server\n"
+        }
+
+        System.setOut(stdout)
+    }
+
 
 }
