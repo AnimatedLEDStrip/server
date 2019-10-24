@@ -65,7 +65,7 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
             readerJob = GlobalScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
-                        while (!endCmdLine) {
+                        while (true) {
                             try {
                                 println(socIn.readObject() as String? ?: "ERROR")
                             } catch (e: OptionalDataException) {
@@ -84,9 +84,13 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                 val str = readLine() ?: continue
                 when (str.toUpperCase()) {
                     "" -> continue@input
-                    "EXIT" -> return
+                    "EXIT" -> {
+                        readerJob?.cancel()
+                        return
+                    }
                     "Q", "QUIT" -> {
                         socOut.writeObject(str)
+                        readerJob?.cancel()
                         return
                     }
                     else -> socOut.writeObject(str)
