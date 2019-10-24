@@ -50,9 +50,9 @@ class CommandLineTest {
 
                 val stream = ByteArrayInputStream("q".toByteArray())
                 System.setIn(stream)
-                startServer(arrayOf("-qCL", "3101"), EmulatedAnimatedLEDStrip::class)
+                startServer(arrayOf("-qCL", "3102"), EmulatedAnimatedLEDStrip::class)
             }
-            startServer(arrayOf("-qL", "3101"), EmulatedAnimatedLEDStrip::class)
+            startServer(arrayOf("-qL", "3102"), EmulatedAnimatedLEDStrip::class)
             Unit
         }
     }
@@ -69,11 +69,11 @@ class CommandLineTest {
 
                 val stream = ByteArrayInputStream("\nquit".toByteArray())
                 System.setIn(stream)
-                startServer(arrayOf("-CL", "3101"), EmulatedAnimatedLEDStrip::class)
+                startServer(arrayOf("-CL", "3103"), EmulatedAnimatedLEDStrip::class)
 
                 System.setOut(stdout)
             }
-            startServer(arrayOf("-qL", "3101"), EmulatedAnimatedLEDStrip::class)
+            startServer(arrayOf("-qL", "3103"), EmulatedAnimatedLEDStrip::class)
             Unit
         }
     }
@@ -86,10 +86,10 @@ class CommandLineTest {
 
                 val stream = ByteArrayInputStream("exit".toByteArray())
                 System.setIn(stream)
-                startServer(arrayOf("-qCL", "3102"), EmulatedAnimatedLEDStrip::class)
+                startServer(arrayOf("-qCL", "3104"), EmulatedAnimatedLEDStrip::class)
             }
             val testServer =
-                AnimatedLEDStripServer(arrayOf("-qL", "3102"), EmulatedAnimatedLEDStrip::class).start()
+                AnimatedLEDStripServer(arrayOf("-qL", "3104"), EmulatedAnimatedLEDStrip::class).start()
             delayBlocking(10000)
             testServer.stop()
             Unit
@@ -104,7 +104,7 @@ class CommandLineTest {
 
         val stream = ByteArrayInputStream("quit".toByteArray())
         System.setIn(stream)
-        startServer(arrayOf("-CL", "3101"), EmulatedAnimatedLEDStrip::class)
+        startServer(arrayOf("-CL", "3105"), EmulatedAnimatedLEDStrip::class)
 
         assertTrue {
             tempOut
