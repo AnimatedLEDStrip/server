@@ -5,7 +5,7 @@ import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.startServer
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
