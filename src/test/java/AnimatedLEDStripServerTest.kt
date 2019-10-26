@@ -51,6 +51,7 @@ class AnimatedLEDStripServerTest {
     @Test
     fun testStartStop() = runBlocking {
         withTimeout(60000) {
+            println("A")
             val server =
                 AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
             server.start()
@@ -63,6 +64,7 @@ class AnimatedLEDStripServerTest {
     @Test
     fun testStartExtensionMethod() = runBlocking {
         withTimeout(60000) {
+            println("B")
             GlobalScope.launch {
                 delay(5000)
                 val stream = ByteArrayInputStream("show\nquit".toByteArray())
@@ -76,6 +78,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testPropertyFileName() {
+        println("C")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.propertyFileName == "led.config" }
@@ -87,6 +90,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testOutputFileName() {
+        println("D")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertNull(testServer1.outputFileName)
@@ -102,12 +106,14 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testLoggingPattern() {
+        println("E")
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         AnimatedLEDStripServer(arrayOf("-qv"), EmulatedAnimatedLEDStrip::class)
     }
 
     @Test
     fun testLoggingLevels() {
+        println("F")
         AnimatedLEDStripServer(arrayOf("-tf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.TRACE }
         AnimatedLEDStripServer(arrayOf("-tqf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
@@ -131,6 +137,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testLoadProperties() {
+        println("G")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.properties.isEmpty }
@@ -142,6 +149,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testCreateLocalPort() {
+        println("H")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertFalse { testServer1.createLocalPort }
@@ -154,6 +162,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testImageDebuggingEnabled() {
+        println("I")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertFalse { testServer1.imageDebuggingEnabled }
@@ -165,6 +174,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testNumLEDs() {
+        println("J")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.numLEDs == 240 }
@@ -192,6 +202,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testPin() {
+        println("K")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.pin == 12 }
@@ -218,6 +229,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testLocalPort() {
+        println("L")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.localPort == 1118 }
@@ -244,6 +256,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testPorts() {
+        println("M")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.ports.isEmpty() }
@@ -264,6 +277,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testRendersBeforeSave() {
+        println("N")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer1.rendersBeforeSave == 1000 }
@@ -290,6 +304,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testPersistAnimations() {
+        println("O")
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
         assertFalse { testServer1.persistAnimations }
@@ -341,6 +356,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testHelp() {
+        println("P")
         val stdout: PrintStream = System.out
         val tempOut = ByteArrayOutputStream()
         System.setOut(PrintStream(tempOut))
@@ -377,6 +393,7 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testTestAnimation() {
+        println("Q")
         val testServer =
             AnimatedLEDStripServer(arrayOf("-qT"), EmulatedAnimatedLEDStrip::class).start()
         delayBlocking(500)
@@ -386,11 +403,13 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testPrimaryConstructor() {
+        println("R")
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
     }
 
     @Test
     fun testSetLoggingLevel() {
+        println("S")
         val stdout: PrintStream = System.out
         val tempOut = ByteArrayOutputStream()
         System.setOut(PrintStream(tempOut))
