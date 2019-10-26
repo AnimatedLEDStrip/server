@@ -30,7 +30,6 @@ import animatedledstrip.utils.json
 import animatedledstrip.utils.jsonToAnimationData
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
-import java.io.EOFException
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.ServerSocket
@@ -131,7 +130,7 @@ object SocketConnections {
                         var input = ByteArray(1000)
                         while (connected) {
                             val count = socIn.read(input)
-                            if (count == -1) break
+                            if (count == -1) throw SocketException("Connection closed")
                             when (local) {
                                 true -> server.parseTextCommand(
                                     input.toString(Charset.forName("utf-8"))
@@ -142,9 +141,6 @@ object SocketConnections {
                             input = ByteArray(1000)
                         }
                     } catch (e: SocketException) {  // Catch disconnections
-                        Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}Lost: $e")
-                        connected = false
-                    } catch (e: EOFException) {
                         Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}Lost: $e")
                         connected = false
                     }
