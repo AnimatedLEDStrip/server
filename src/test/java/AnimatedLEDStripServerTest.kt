@@ -29,6 +29,7 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.server.startServer
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
+import org.junit.Ignore
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
@@ -61,6 +62,7 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
+    @Ignore
     fun testStartExtensionMethod() = runBlocking {
         withTimeout(60000) {
             GlobalScope.launch {
