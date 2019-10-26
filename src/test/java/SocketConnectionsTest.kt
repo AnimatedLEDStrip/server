@@ -108,13 +108,11 @@ class SocketConnectionsTest {
         server.stop()
         socket.close()
         delayBlocking(2000)
-        println(tempOut.size())
-        println(tempOut.toString("utf-8"))
 
         assertTrue {
             Regex(
                 "WARNING: Connection on port $port lost: " +
-                        "java.net.SocketException: Connection closed.*\n"
+                        "java.net.SocketException.*\n"
             ).matches(
                 tempOut
                     .toString("utf-8")
