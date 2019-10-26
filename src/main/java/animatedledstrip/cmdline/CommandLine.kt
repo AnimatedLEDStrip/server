@@ -27,12 +27,11 @@ import kotlinx.coroutines.*
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import java.io.EOFException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.io.OptionalDataException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketException
+import java.nio.charset.Charset
 
 class CommandLine(private val port: Int, private val quiet: Boolean = false) {
 
@@ -60,14 +59,16 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
         }
         println("Connected")
         try {
-            val socOut = ObjectOutputStream(socket.getOutputStream())
-            val socIn = ObjectInputStream(socket.getInputStream())
+            val socOut = socket.getOutputStream()
+            val socIn = socket.getInputStream()
             readerJob = GlobalScope.launch {
                 withContext(Dispatchers.IO) {
                     try {
                         while (true) {
+                            val input = ByteArray(1000)
                             try {
-                                println(socIn.readObject() as String? ?: "ERROR")
+                                socIn.read(input)
+                                println(input.toString(Charset.forName("utf-8")))
                             } catch (e: OptionalDataException) {
                                 println("Exception: $e")
                             }
@@ -89,11 +90,11 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                         return
                     }
                     "Q", "QUIT" -> {
-                        socOut.writeObject(str)
+                        socOut.write(str.toByteArray())
                         readerJob.cancel()
                         return
                     }
-                    else -> socOut.writeObject(str)
+                    else -> socOut.write(str.toByteArray())
                 }
             }
 

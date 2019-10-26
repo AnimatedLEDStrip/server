@@ -29,9 +29,6 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
 import org.junit.Test
-import java.io.BufferedInputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.net.Socket
 import kotlin.test.assertTrue
 
@@ -59,8 +56,6 @@ class SocketConnectionsTest {
             val job = GlobalScope.launch {
                 withContext(Dispatchers.IO) {
                     val socket = Socket("0.0.0.0", 1201)
-                    ObjectOutputStream(socket.getOutputStream())
-                    ObjectInputStream(BufferedInputStream(socket.getInputStream()))
 
                     delayBlocking(5000)
 

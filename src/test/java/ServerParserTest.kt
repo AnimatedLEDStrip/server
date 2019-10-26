@@ -168,5 +168,4 @@ class ServerParserTest {
 
         System.setErr(stderr)
     }
-
 }

@@ -26,15 +26,17 @@ package animatedledstrip.server
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.id
+import animatedledstrip.utils.json
+import animatedledstrip.utils.jsonToAnimationData
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.io.EOFException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import java.io.OutputStream
 import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
+import java.nio.charset.Charset
 
 /**
  * An object for creating, tracking and using connections that clients can connect to
@@ -88,7 +90,7 @@ object SocketConnections {
         var clientSocket: Socket? = null
         var connected = false
             private set
-        private var socOut: ObjectOutputStream? = null
+        private var socOut: OutputStream? = null
 
         /**
          * Open the connection
@@ -114,8 +116,8 @@ object SocketConnections {
                 while (server.running) {
                     try {
                         clientSocket = serverSocket.accept()
-                        val socIn = ObjectInputStream(clientSocket?.getInputStream())
-                        socOut = ObjectOutputStream(clientSocket?.getOutputStream())
+                        val socIn = clientSocket?.getInputStream() ?: error("Could not create inputstream")
+                        socOut = clientSocket?.getOutputStream()
                         Logger.info("Connection on port $port Established")
                         connected = true
                         // Send info about this strip and all current running continuous animations
@@ -126,21 +128,18 @@ object SocketConnections {
                                 it.value.sendStartAnimation(this@Connection)
                             }
                         }
-                        var input: Any?
+                        var input = ByteArray(1000)
                         while (connected) {
-                            try {
-                                input = when (local) {
-                                    true -> socIn.readObject() as String
-                                    false -> socIn.readObject() as AnimationData
-                                }
-                                when (input) {
-                                    is AnimationData -> server.animationHandler.addAnimation(input)
-                                    is String -> server.parseTextCommand(input)
-                                }
-                            } catch (e: ClassCastException) {
-                                Logger.error("Could not cast input to ${if (local) "String" else "AnimationData"}")
-                                continue
+                            val count = socIn.read(input)
+                            if (count == -1) break
+                            when (local) {
+                                true -> server.parseTextCommand(
+                                    input.toString(Charset.forName("utf-8"))
+                                        .take(count)
+                                )
+                                false -> server.animationHandler.addAnimation(input.jsonToAnimationData(count))
                             }
+                            input = ByteArray(1000)
                         }
                     } catch (e: SocketException) {  // Catch disconnections
                         Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}Lost: $e")
@@ -155,7 +154,7 @@ object SocketConnections {
 
         /**
          * Send animation data to the client along with an ID.
-         * Does not work for port 1118 (local connection).
+         * Does not work for local connections.
          *
          * @param animation An AnimationData containing data about the animation
          * @param id The ID for the animation
@@ -166,7 +165,7 @@ object SocketConnections {
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut?.writeObject(
+                            socOut?.write(
                                 animation
                                     .id(
                                         if ((animation.animation == Animation.CUSTOMANIMATION ||
@@ -175,7 +174,7 @@ object SocketConnections {
                                         )
                                             "${animation.id} $id"
                                         else id
-                                    )
+                                    ).json()
                             )
                                 ?: Logger.debug("Could not send animation $id: Connection socket null")
                             if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
@@ -188,7 +187,7 @@ object SocketConnections {
 
         /**
          * Send strip info to the client.
-         * Does not work for port 1118 (local connection).
+         * Does not work for local connections.
          */
         fun sendInfo() {
             check(!local) { "Cannot send strip info to local port" }
@@ -196,7 +195,7 @@ object SocketConnections {
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut?.writeObject(server.stripInfo)
+                            socOut?.write(server.stripInfo.json())
                         }
                     }
                 }
@@ -205,7 +204,7 @@ object SocketConnections {
 
         /**
          * Send a string to the local port.
-         * Only works for a connection with port 1118 (local connection)
+         * Only works for a local connection.
          */
         fun sendString(str: String) {
             check(local) { "Cannot send string to non-local port" }
@@ -213,7 +212,7 @@ object SocketConnections {
                 runBlocking {
                     withTimeout(5000) {
                         withContext(Dispatchers.IO) {
-                            socOut?.writeObject(str)
+                            socOut?.write(str.toByteArray(Charset.forName("utf-8")))
                         }
                     }
                 }
