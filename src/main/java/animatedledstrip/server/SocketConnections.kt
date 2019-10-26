@@ -111,9 +111,9 @@ object SocketConnections {
          */
         private suspend fun openSocket() {
             withContext(Dispatchers.IO) {
-                Logger.debug("Socket at port $port started")
                 while (server.running) {
                     try {
+                        Logger.debug("Socket at port $port started")
                         clientSocket = serverSocket.accept()
                         val socIn = clientSocket?.getInputStream() ?: error("Could not create inputstream")
                         socOut = clientSocket?.getOutputStream()
@@ -141,7 +141,7 @@ object SocketConnections {
                             input = ByteArray(1000)
                         }
                     } catch (e: SocketException) {  // Catch disconnections
-                        Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}Lost: $e")
+                        Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}lost: $e")
                         connected = false
                     }
                 }
