@@ -26,14 +26,14 @@ package animatedledstrip.test
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
-import animatedledstrip.server.startServer
 import animatedledstrip.utils.delayBlocking
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.lang.reflect.InvocationTargetException
@@ -56,20 +56,6 @@ class AnimatedLEDStripServerTest {
             server.start()
             delay(5000)
             server.stop()
-            Unit
-        }
-    }
-
-    @Test
-    fun testStartExtensionMethod() = runBlocking {
-        withTimeout(60000) {
-            GlobalScope.launch {
-                delay(5000)
-                val stream = ByteArrayInputStream("show\nquit".toByteArray())
-                System.setIn(stream)
-                startServer(arrayOf("-qCL", "3100"), EmulatedAnimatedLEDStrip::class)
-            }
-            startServer(arrayOf("-qL", "3100"), EmulatedAnimatedLEDStrip::class)
             Unit
         }
     }

@@ -29,9 +29,10 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.*
 import org.junit.Test
-import java.io.BufferedInputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.net.Socket
 import kotlin.test.assertTrue
 
@@ -59,17 +60,70 @@ class SocketConnectionsTest {
             val job = GlobalScope.launch {
                 withContext(Dispatchers.IO) {
                     val socket = Socket("0.0.0.0", 1201)
-                    ObjectOutputStream(socket.getOutputStream())
-                    ObjectInputStream(BufferedInputStream(socket.getInputStream()))
 
                     delayBlocking(5000)
 
                     server.stop()
-                    socket.shutdownOutput()
+                    socket.close()
                 }
             }
             job.join()
         }
+    }
+
+    @Test
+    fun testToString() {
+        val port = 1202
+
+        val server =
+            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+        SocketConnections.hostIP = "0.0.0.0"
+        val socket = SocketConnections.add(port, server)
+
+        assertTrue { socket.toString() == "Connection@0.0.0.0:$port" }
+    }
+
+    @Test
+    fun testDisconnection() {
+        val port = 1203
+        val server =
+            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class).start()
+
+        val stderr: PrintStream = System.err
+        val tempOut = ByteArrayOutputStream()
+        System.setErr(PrintStream(tempOut))
+
+        tempOut.reset()
+        Configurator.defaultConfig()
+            .formatPattern("{{level}:|min-size=8} {message}")
+            .level(Level.WARNING)
+            .activate()
+
+        SocketConnections.add(port, server).open()
+
+        val socket = Socket("0.0.0.0", port)
+
+        delayBlocking(5000)
+
+        server.stop()
+        socket.close()
+        delayBlocking(2000)
+
+        assertTrue {
+            Regex(
+                "WARNING: Connection on port $port lost: " +
+                        "java.net.SocketException.*\n"
+            ).matches(
+                tempOut
+                    .toString("utf-8")
+                    .replace("\r\n", "\n")
+            )
+        }
+
+        System.setErr(stderr)
+        Configurator.defaultConfig()
+            .level(Level.OFF)
+            .activate()
     }
 
 }

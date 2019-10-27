@@ -33,7 +33,7 @@ import org.pmw.tinylog.writers.Writer
 @PropertiesSupport(name = "socket", properties = [])
 class SocketWriter : Writer {
 
-    val delimiter = ":"
+    private val delimiter = ":"
 
     override fun init(p0: Configuration?) {
     }
@@ -42,10 +42,10 @@ class SocketWriter : Writer {
         return mutableSetOf(LogEntryValue.LEVEL, LogEntryValue.MESSAGE)
     }
 
-    override fun write(log: LogEntry?) {
+    override fun write(log: LogEntry) {
         SocketConnections.localConnection?.sendString(
-            "${log?.level.toString()}$delimiter".padEnd(8, ' ') +
-                    "${log?.message}"
+            "${log.level}$delimiter".padEnd(8, ' ') +
+                    log.message
         )
     }
 
