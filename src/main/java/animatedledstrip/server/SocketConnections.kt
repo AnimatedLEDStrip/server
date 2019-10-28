@@ -26,6 +26,7 @@ package animatedledstrip.server
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.id
+import animatedledstrip.utils.getDataTypePrefix
 import animatedledstrip.utils.json
 import animatedledstrip.utils.jsonToAnimationData
 import kotlinx.coroutines.*
@@ -127,16 +128,23 @@ object SocketConnections {
                                 it.value.sendStartAnimation(this@Connection)
                             }
                         }
-                        var input = ByteArray(1000)
+                        var input = ByteArray(10000)
                         while (connected) {
                             val count = socIn.read(input)
                             if (count == -1) throw SocketException("Connection closed")
+                            Logger.debug(input.toString(Charset.forName("utf-8")).take(count))
+                            Logger.debug("Bytes: ${input.toString(Charset.forName("utf-8")).take(count).toByteArray().map { it.toString() }}")
                             when (local) {
                                 true -> server.parseTextCommand(
                                     input.toString(Charset.forName("utf-8"))
                                         .take(count)
                                 )
-                                false -> server.animationHandler.addAnimation(input.jsonToAnimationData(count))
+                                false -> {
+                                    when (input.getDataTypePrefix()) {
+                                        "DATA" -> server.animationHandler.addAnimation(input.jsonToAnimationData(count))
+                                        else -> Logger.warn("Incorrect data type")
+                                    }
+                                }
                             }
                             input = ByteArray(1000)
                         }
