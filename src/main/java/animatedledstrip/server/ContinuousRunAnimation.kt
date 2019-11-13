@@ -26,6 +26,7 @@ package animatedledstrip.server
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.leds.AnimatedLEDStrip
+import animatedledstrip.leds.prepare
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.io.File
@@ -88,7 +89,7 @@ internal class ContinuousRunAnimation(
      *  Send message to client(s) that animation has started
      */
     fun sendStartAnimation(connection: SocketConnections.Connection? = null) {
-        SocketConnections.sendAnimation(params, id, connection)
+        SocketConnections.sendAnimation(params.prepare(leds), id, connection)
     }
 
     /**
