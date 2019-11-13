@@ -94,6 +94,22 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                         readerJob.cancel()
                         return
                     }
+                    "HELP" -> {
+                        kotlin.io.println("""
+                            Valid commands:
+                            quit        Stop the server and close the command line connection
+                            exit        Close the command line connection (server continues to run)
+                            debug       Change logging level to debug
+                            trace       Change logging level to trace
+                            info        Change logging level to info
+                            clear       Clear the LED strip (i.e. turn off all pixels)
+                            show        Print a list of all running animations
+                            show ID     Print information about a specific running animation
+                            end ID      End a specific running animation
+                            end all     End all running animations
+                            help        Show this help message
+                        """.trimIndent())
+                    }
                     else -> socOut.write(str.toByteArray())
                 }
             }
