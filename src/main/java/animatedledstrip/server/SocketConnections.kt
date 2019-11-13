@@ -29,6 +29,7 @@ import animatedledstrip.animationutils.id
 import animatedledstrip.utils.getDataTypePrefix
 import animatedledstrip.utils.json
 import animatedledstrip.utils.jsonToAnimationData
+import animatedledstrip.utils.toUTF8
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.io.OutputStream
@@ -136,12 +137,11 @@ object SocketConnections {
                             Logger.debug("Bytes: ${input.toString(Charset.forName("utf-8")).take(count).toByteArray().map { it.toString() }}")
                             when (local) {
                                 true -> server.parseTextCommand(
-                                    input.toString(Charset.forName("utf-8"))
-                                        .take(count)
+                                    input.toUTF8(count)
                                 )
                                 false -> {
-                                    when (input.getDataTypePrefix()) {
-                                        "DATA" -> server.animationHandler.addAnimation(input.jsonToAnimationData(count))
+                                    when (input.toUTF8(count).getDataTypePrefix()) {
+                                        "DATA" -> server.animationHandler.addAnimation(input.toUTF8(count).jsonToAnimationData())
                                         else -> Logger.warn("Incorrect data type")
                                     }
                                 }
