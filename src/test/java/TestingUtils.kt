@@ -1,5 +1,3 @@
-package animatedledstrip.test
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,18 +20,12 @@ package animatedledstrip.test
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.test
 
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
-import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStripNonConcurrent
 import kotlin.test.assertTrue
 
 fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStrip, color: Long) {
-    testLEDs.pixelColorList.forEach {
-        assertTrue { it == color }
-    }
-}
-
-fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStripNonConcurrent, color: Long) {
     testLEDs.pixelColorList.forEach {
         assertTrue { it == color }
     }

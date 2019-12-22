@@ -1,5 +1,3 @@
-package animatedledstrip.server
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,7 +20,9 @@ package animatedledstrip.server
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.server
 
+import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.utils.delayBlocking
 
 fun AnimatedLEDStripServer<*>.waitUntilStop() {
@@ -30,3 +30,6 @@ fun AnimatedLEDStripServer<*>.waitUntilStop() {
         delayBlocking(1)
     }
 }
+
+val AnimationData.fileName: String
+    get() = "$id.anim"
