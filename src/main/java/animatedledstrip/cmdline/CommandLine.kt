@@ -1,5 +1,3 @@
-package animatedledstrip.cmdline
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,6 +20,7 @@ package animatedledstrip.cmdline
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.cmdline
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Configurator

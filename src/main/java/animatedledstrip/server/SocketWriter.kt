@@ -1,5 +1,3 @@
-package animatedledstrip.server
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,6 +20,7 @@ package animatedledstrip.server
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.server
 
 import org.pmw.tinylog.Configuration
 import org.pmw.tinylog.LogEntry
