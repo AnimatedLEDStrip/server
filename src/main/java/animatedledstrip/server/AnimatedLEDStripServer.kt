@@ -253,6 +253,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                             it.delete()
                         } catch (e: InvalidClassException) {
                             it.delete()
+                        } catch (e: FileNotFoundException) {
                         }
                     }
                 }
@@ -261,7 +262,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         running = true
         ports.forEach {
-            if (!SocketConnections.connections.containsKey(it))
+            if (it != localPort && !SocketConnections.connections.containsKey(it))
                 SocketConnections.add(it, server = this)
             SocketConnections.connections[it]?.open()
         }

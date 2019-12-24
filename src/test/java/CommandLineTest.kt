@@ -26,6 +26,7 @@ import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.startServer
 import animatedledstrip.utils.delayBlocking
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -39,7 +40,7 @@ class CommandLineTest {
 
     @Test
     fun testCommandLine() = runBlocking {
-        launch {
+        GlobalScope.launch {
             delay(5000)
 
             val stdout = System.out
@@ -48,7 +49,7 @@ class CommandLineTest {
 
             val stream = ByteArrayInputStream("quit".toByteArray())
             System.setIn(stream)
-            startServer(arrayOf("-CL", "3201"), EmulatedAnimatedLEDStrip::class)
+            startServer(arrayOf("-CL", "3101"), EmulatedAnimatedLEDStrip::class)
 
             assertTrue {
                 tempOut
@@ -59,26 +60,26 @@ class CommandLineTest {
 
             System.setOut(stdout)
         }
-        startServer(arrayOf("-qL", "3201"), EmulatedAnimatedLEDStrip::class)
+        startServer(arrayOf("-qL", "3101"), EmulatedAnimatedLEDStrip::class)
         Unit
     }
 
     @Test
     fun testQuit() = runBlocking {
-        launch {
+        GlobalScope.launch {
             delay(5000)
 
             val stream = ByteArrayInputStream("q".toByteArray())
             System.setIn(stream)
-            startServer(arrayOf("-qCL", "3202"), EmulatedAnimatedLEDStrip::class)
+            startServer(arrayOf("-qCL", "3102"), EmulatedAnimatedLEDStrip::class)
         }
-        startServer(arrayOf("-qL", "3202"), EmulatedAnimatedLEDStrip::class)
+        startServer(arrayOf("-qL", "3102"), EmulatedAnimatedLEDStrip::class)
         Unit
     }
 
     @Test
     fun testNoCommand() = runBlocking {
-        launch {
+        GlobalScope.launch {
             delay(5000)
 
             val stdout = System.out
@@ -87,25 +88,25 @@ class CommandLineTest {
 
             val stream = ByteArrayInputStream("\nquit".toByteArray())
             System.setIn(stream)
-            startServer(arrayOf("-CL", "3203"), EmulatedAnimatedLEDStrip::class)
+            startServer(arrayOf("-CL", "3103"), EmulatedAnimatedLEDStrip::class)
 
             System.setOut(stdout)
         }
-        startServer(arrayOf("-qL", "3203"), EmulatedAnimatedLEDStrip::class)
+        startServer(arrayOf("-qL", "3103"), EmulatedAnimatedLEDStrip::class)
         Unit
     }
 
     @Test
     fun testExit() = runBlocking {
-        launch {
+        GlobalScope.launch {
             delay(5000)
 
             val stream = ByteArrayInputStream("exit".toByteArray())
             System.setIn(stream)
-            startServer(arrayOf("-qCL", "3204"), EmulatedAnimatedLEDStrip::class)
+            startServer(arrayOf("-qCL", "3104"), EmulatedAnimatedLEDStrip::class)
         }
         val testServer =
-            AnimatedLEDStripServer(arrayOf("-qL", "3204"), EmulatedAnimatedLEDStrip::class).start()
+            AnimatedLEDStripServer(arrayOf("-qL", "3104"), EmulatedAnimatedLEDStrip::class).start()
         delayBlocking(10000)
         testServer.stop()
         Unit
@@ -119,7 +120,7 @@ class CommandLineTest {
 
         val stream = ByteArrayInputStream("quit".toByteArray())
         System.setIn(stream)
-        startServer(arrayOf("-CL", "3205"), EmulatedAnimatedLEDStrip::class)
+        startServer(arrayOf("-CL", "3105"), EmulatedAnimatedLEDStrip::class)
 
         assertTrue {
             tempOut

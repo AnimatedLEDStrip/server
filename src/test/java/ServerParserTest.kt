@@ -212,12 +212,33 @@ class ServerParserTest {
 
     @Test
     fun testConnections() {
+        val stdout: PrintStream = System.out
+        val tempOut = ByteArrayOutputStream()
+        System.setOut(PrintStream(tempOut))
         val testServer =
             AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/ports.config"), EmulatedAnimatedLEDStrip::class)
+
         testServer.parseTextCommand("connections list")
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Port 3005: Not Found\nINFO:    Port 3006: Not Found\nINFO:    Port 3007: Not Found\n"
+        }
+        tempOut.reset()
+
         testServer.start()
         delayBlocking(5000)
 
         testServer.parseTextCommand("connections list")
+        assertTrue {
+            tempOut
+                .toString("utf-8")
+                .replace("\r\n", "\n") ==
+                    "INFO:    Port 3005: Waiting\nINFO:    Port 3006: Waiting\nINFO:    Port 3007: Waiting\n"
+        }
+        tempOut.reset()
+
+        System.setOut(stdout)
     }
 }
