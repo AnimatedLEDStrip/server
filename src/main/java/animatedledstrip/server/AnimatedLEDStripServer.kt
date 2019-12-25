@@ -267,8 +267,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             SocketConnections.connections[it]?.open()
         }
         if (createLocalPort) {
-            if (SocketConnections.localConnection == null)
-                SocketConnections.add(localPort, server = this, local = true)
+//            if (SocketConnections.localConnection == null)
+            SocketConnections.add(localPort, server = this, local = true)
             SocketConnections.localConnection?.open()
         }
         if (cmdline.hasOption("T")) leds.addAnimation(testAnimation)
