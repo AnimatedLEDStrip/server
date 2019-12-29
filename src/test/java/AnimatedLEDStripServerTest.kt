@@ -48,14 +48,12 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testStartStop() = runBlocking {
-        withTimeout(60000) {
-            val server =
-                AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-            server.start()
-            delay(5000)
-            server.stop()
-            Unit
-        }
+        val server =
+            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
+        server.start()
+        delay(5000)
+        server.stop()
+        Unit
     }
 
     @Test
