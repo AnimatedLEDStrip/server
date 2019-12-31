@@ -1,5 +1,3 @@
-package animatedledstrip.test
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,10 +20,21 @@ package animatedledstrip.test
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.test
 
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
-import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStripNonConcurrent
+import animatedledstrip.utils.toUTF8
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import kotlin.test.assertTrue
+
+private val exitStream = ByteArrayInputStream("exit\n".toByteArray())
+private var stream = ByteArrayInputStream("".toByteArray())
+val outStream = ByteArrayOutputStream()
 
 fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStrip, color: Long) {
     testLEDs.pixelColorList.forEach {
@@ -33,8 +42,32 @@ fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStrip, color: Long) {
     }
 }
 
-fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStripNonConcurrent, color: Long) {
-    testLEDs.pixelColorList.forEach {
-        assertTrue { it == color }
+private fun ByteArrayOutputStream.toCleanedString(): String {
+    return this
+        .toByteArray().filter { it != 0.toByte() }.toByteArray().toUTF8()   // remove excess null bytes
+        .replace("\r\n", "\n")
+        .replace("Welcome to the AnimatedLEDStrip Server console\nConnected\n", "")
+        .replace(Regex("INFO:\\{.*};\n"), "")
+        .replace(Regex("DATA:\\{.*};\n"), "")
+}
+
+fun checkOutput(expected: String) {
+    assertTrue { outStream.toCleanedString() == expected }
+    outStream.reset()
+}
+
+fun newCommandStream(newString: String) {
+    stream = ByteArrayInputStream(newString.toByteArray())
+    System.setIn(stream)
+
+    exitStream.reset()
+    GlobalScope.launch {
+        delay(4000)
+        System.setIn(exitStream)
     }
+}
+
+fun redirectOutput() {
+    outStream.reset()
+    System.setOut(PrintStream(outStream))
 }

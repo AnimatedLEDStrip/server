@@ -1,14 +1,36 @@
+/*
+ *  Copyright (c) 2019 AnimatedLEDStrip
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+
 package animatedledstrip.test
 
+import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.addColor
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
+import animatedledstrip.server.startServer
 import animatedledstrip.utils.delayBlocking
 import org.junit.Test
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -23,149 +45,148 @@ class ServerParserTest {
         val testServer =
             AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
 
-        testServer.animationHandler.addAnimation(AnimationData().addColor(0xFF))
+        testServer.leds.addAnimation(AnimationData().addColor(0xFF))
         delayBlocking(500)
         checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0xFF)
 
-        testServer.parseTextCommand("clear")
+        testServer.parseTextCommand("clear", null)
         delayBlocking(500)
-        checkAllPixels(testServer.leds, 0x0)
+        checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0x0)
     }
 
     @Test
     fun testEnd() {
-        val stderr: PrintStream = System.err
-        val tempOut = ByteArrayOutputStream()
-        System.setErr(PrintStream(tempOut))
-
         val testServer =
-            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(
+                arrayOf("-f", "src/test/resources/empty.config", "-P", "3200"),
+                EmulatedAnimatedLEDStrip::class
+            ).start()
 
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "1234")
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "1357")
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "2431")
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "7654")
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "2653")
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "2521")
+        testServer.leds.addAnimation(
+            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+            "1234"
+        )
+        testServer.leds.addAnimation(
+            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+            "1357"
+        )
+        testServer.leds.addAnimation(
+            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+            "2431"
+        )
+        testServer.leds.addAnimation(
+            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+            "7654"
+        )
+        testServer.leds.addAnimation(
+            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+            "2653"
+        )
+        testServer.leds.addAnimation(
+            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+            "2521"
+        )
 
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("1234") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("1357") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2431") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("7654") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2653") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("1234") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("1357") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2431") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("7654") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2653") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
-        testServer.parseTextCommand("end 1234")
-        delayBlocking(200)
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1234") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("1357") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2431") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("7654") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2653") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+        testServer.parseTextCommand("end 1234", null)
+        delayBlocking(500)
+        assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("1357") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2431") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("7654") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2653") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
-        testServer.parseTextCommand("end 1357 2431")
-        delayBlocking(200)
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1234") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1357") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2431") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("7654") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2653") }
-        assertTrue { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+        testServer.parseTextCommand("end 1357 2431", null)
+        delayBlocking(2000)
+        assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("1357") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("2431") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("7654") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2653") }
+        assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
-        testServer.parseTextCommand("end all")
-        delayBlocking(200)
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1234") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("1357") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2431") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("7654") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2653") }
-        assertFalse { testServer.animationHandler.continuousAnimations.containsKey("2521") }
+        testServer.parseTextCommand("end all", null)
+        delayBlocking(2000)
+        assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("1357") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("2431") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("7654") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("2653") }
+        assertFalse { testServer.leds.runningAnimations.ids.contains("2521") }
 
-        tempOut.reset()
+        redirectOutput()
 
-        testServer.parseTextCommand("end")
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "WARNING: Animation ID must be specified\n"
-        }
-        tempOut.reset()
-
-        System.setErr(stderr)
+        newCommandStream("end\n")
+        startServer(arrayOf("-CP", "3200"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "INVALID COMMAND: Animation ID or \"all\" must be specified\n")
     }
 
     @Test
     fun testShow() {
-        val stdout: PrintStream = System.out
-        val tempOut = ByteArrayOutputStream()
-        System.setOut(PrintStream(tempOut))
-
         val testServer =
-            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
-
-        testServer.parseTextCommand("show")
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "INFO:    Running Animations: []\n"
-        }
-        tempOut.reset()
-
-        testServer.parseTextCommand("show 1234")
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "INFO:    1234: NOT FOUND\n"
-        }
-        tempOut.reset()
-
-        testServer.animationHandler.addAnimation(AnimationData(continuous = true), "5678")
+            AnimatedLEDStripServer(
+                arrayOf("-qf", "src/test/resources/empty.config", "-P", "3201 3202 3203 3204"),
+                EmulatedAnimatedLEDStrip::class
+            ).start()
         delayBlocking(500)
-        testServer.parseTextCommand("show")
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "INFO:    Running Animations: [5678]\n"
-        }
-        tempOut.reset()
 
-        testServer.parseTextCommand("show 5678")
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "INFO:    5678: AnimationData(animation=COLOR, colors=[0], center=120, continuous=true, delay=50, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\n"
-        }
-        tempOut.reset()
-        testServer.parseTextCommand("end 5678")
+        redirectOutput()
 
-        System.setOut(stdout)
+        newCommandStream("show\n")
+        startServer(arrayOf("-CP", "3201"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Running Animations: []\n")
+
+        newCommandStream("show 1234\n")
+        startServer(arrayOf("-CP", "3202"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "1234: NOT FOUND\n")
+
+        testServer.leds.addAnimation(AnimationData(animation = Animation.ALTERNATE, continuous = true), "5678")
+        delayBlocking(500)
+        newCommandStream("show\n")
+        startServer(arrayOf("-CP", "3203"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Running Animations: [5678]\n")
+
+        newCommandStream("show 5678\n")
+        startServer(arrayOf("-CP", "3204"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(
+            expected = "5678: AnimationData(animation=ALTERNATE, colors=[0], center=120, continuous=true, delay=1000, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\n"
+        )
     }
 
     @Test
     fun testNonCommand() {
-        val stderr: PrintStream = System.err
-        val tempOut = ByteArrayOutputStream()
-        System.setErr(PrintStream(tempOut))
+        AnimatedLEDStripServer(
+            arrayOf("-qf", "src/test/resources/empty.config", "-P", "3205"),
+            EmulatedAnimatedLEDStrip::class
+        ).start()
+        delayBlocking(500)
 
-        val testServer =
-            AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
+        redirectOutput()
 
-        testServer.parseTextCommand("notacommand")
-        delayBlocking(200)
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n")
-                .replace("LOGGER ERROR: Cannot find a writer for the name \"socket\"\n", "") ==
-                    "WARNING: notacommand is not a valid command\n"
-        }
+        newCommandStream("notacommand\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "INVALID COMMAND: notacommand is not a valid command\n")
+    }
 
-        System.setErr(stderr)
+    @Test
+    fun testConnections() {
+        AnimatedLEDStripServer(
+            arrayOf("-qf", "src/test/resources/ports.config", "-P", "3206"),
+            EmulatedAnimatedLEDStrip::class
+        ).start()
+        delayBlocking(1000)
+
+        redirectOutput()
+
+        newCommandStream("connections list\n")
+        startServer(arrayOf("-CP", "3206"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3206: Connected\n")
     }
 }

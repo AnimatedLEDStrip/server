@@ -1,5 +1,3 @@
-package animatedledstrip.server
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,6 +20,7 @@ package animatedledstrip.server
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.server
 
 import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
@@ -32,11 +31,9 @@ import animatedledstrip.utils.jsonToAnimationData
 import animatedledstrip.utils.toUTF8
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
+import java.io.InputStream
 import java.io.OutputStream
-import java.net.InetAddress
-import java.net.ServerSocket
-import java.net.Socket
-import java.net.SocketException
+import java.net.*
 import java.nio.charset.Charset
 
 /**
@@ -53,11 +50,6 @@ object SocketConnections {
     val connections = mutableMapOf<Int, Connection>()
 
     /**
-     * The connection on port 1118 from the local machine's terminal
-     */
-    var localConnection: Connection? = null
-
-    /**
      * Initialize a new connection. Creates a Connection instance with the
      * specified port, then adds the port and Connection instance to
      * [connections] before returning the Connection instance.
@@ -65,10 +57,9 @@ object SocketConnections {
      * @param port The port to use when creating the ServerSocket in the
      * connection
      */
-    fun add(port: Int, server: AnimatedLEDStripServer<*>, local: Boolean = false): Connection {
-        val connection = Connection(port, server, local)
-        if (local) localConnection = connection
-        else connections[port] = connection
+    fun add(port: Int, server: AnimatedLEDStripServer<*>): Connection {
+        val connection = Connection(port, server)
+        connections[port] = connection
         return connection
     }
 
@@ -81,7 +72,7 @@ object SocketConnections {
      * @property port The port to use
      * @property server The server creating the connection
      */
-    class Connection(val port: Int, private val server: AnimatedLEDStripServer<*>, private val local: Boolean = false) {
+    class Connection(val port: Int, private val server: AnimatedLEDStripServer<*>) {
 
         private val serverSocket = ServerSocket(
             port,
@@ -89,18 +80,37 @@ object SocketConnections {
             if (hostIP == null) null else InetAddress.getByName(hostIP)
         )
         var clientSocket: Socket? = null
-        var connected = false
-            private set
+        val connected: Boolean
+            get() = clientSocket?.isConnected ?: false
+
+        var sendLogs = false
+
         private var socOut: OutputStream? = null
+        var job: Job? = null
+
+        fun status(): String {
+            return when {
+                job == null -> "Stopped"
+                !connected -> "Waiting"
+                connected -> "Connected"
+                else -> "Unknown"
+            }
+        }
 
         /**
          * Open the connection
          */
         fun open() {
-            GlobalScope.launch(connectionThreadPool) {
-                Logger.debug("Starting port $port")
-                openSocket()
-            }
+            if (job?.isActive != true)
+                job = GlobalScope.launch(connectionThreadPool) {
+                    Logger.debug("Starting port $port")
+                    openSocket()
+                }
+            else Logger.warn("Port $port already running")
+        }
+
+        fun close() {
+            job?.cancel()
         }
 
         /**
@@ -112,113 +122,112 @@ object SocketConnections {
          *      If there is a disconnection and the server is not shutting down, wait for a new connection
          */
         private suspend fun openSocket() {
-            withContext(Dispatchers.IO) {
-                while (server.running) {
-                    try {
-                        Logger.debug("Socket at port $port started")
+            while (server.running) {
+                try {
+                    Logger.debug("Socket at port $port started")
+                    var socIn: InputStream? = null
+                    withContext(Dispatchers.IO) {
                         clientSocket = serverSocket.accept()
-                        val socIn = clientSocket?.getInputStream() ?: error("Could not create inputstream")
+                        yield()
+                        socIn = clientSocket?.getInputStream() ?: error("Could not create input stream")
                         socOut = clientSocket?.getOutputStream()
-                        Logger.info("Connection on port $port Established")
-                        connected = true
-                        // Send info about this strip and all current running continuous animations
-                        // to newly connected client
-                        if (!local) {
-                            sendInfo()
-                            server.animationHandler.continuousAnimations.forEach {
-                                it.value.sendStartAnimation(this@Connection)
-                            }
-                        }
-                        var input = ByteArray(10000)
-                        while (connected) {
-                            val count = socIn.read(input)
-                            if (count == -1) throw SocketException("Connection closed")
-                            Logger.debug(input.toString(Charset.forName("utf-8")).take(count))
-                            Logger.debug("Bytes: ${input.toString(Charset.forName("utf-8")).take(count).toByteArray().map { it.toString() }}")
-                            when (local) {
-                                true -> server.parseTextCommand(
-                                    input.toUTF8(count)
-                                )
-                                false -> {
-                                    when (input.toUTF8(count).getDataTypePrefix()) {
-                                        "DATA" -> server.animationHandler.addAnimation(input.toUTF8(count).jsonToAnimationData())
-                                        else -> Logger.warn("Incorrect data type")
-                                    }
-                                }
-                            }
-                            input = ByteArray(1000)
-                        }
-                    } catch (e: SocketException) {  // Catch disconnections
-                        Logger.warn("Connection on port $port ${if (local) "(Local) " else ""}lost: $e")
-                        connected = false
+                        clientSocket?.soTimeout = 1000
                     }
+                    Logger.info("Connection on port $port Established")
+                    // Send info about this strip and all current running continuous animations
+                    // to newly connected client
+                    sendInfo()
+                    server.leds.runningAnimations.animations.forEach {
+                        sendAnimation(it.animation, client = this@Connection)
+                    }
+                    var input = ByteArray(10000)
+                    var count = -1
+                    while (connected) {
+                        while (true)
+                            try {
+                                withContext(Dispatchers.IO) {
+                                    count = socIn?.read(input) ?: throw SocketException("Socket null")
+                                }
+                                break
+                            } catch (e: SocketTimeoutException) {
+                                yield()
+                                continue
+                            }
+
+                        if (count == -1) throw SocketException("Connection closed")
+                        Logger.debug(input.toString(Charset.forName("utf-8")).take(count))
+                        Logger.debug("Bytes: ${input.toString(Charset.forName("utf-8")).take(count).toByteArray().map { it.toString() }}")
+                        when (input.toUTF8(count).getDataTypePrefix()) {
+                            "DATA" -> server.leds.addAnimation(input.toUTF8(count).jsonToAnimationData())
+                            "CMD " -> server.parseTextCommand(input.toUTF8(count), client = this)
+                            else -> Logger.warn("Incorrect data type")
+                        }
+                        input = ByteArray(1000)
+                    }
+                } catch (e: SocketException) {  // Catch disconnections
+                    Logger.warn("Connection on port $port lost: $e")
                 }
             }
         }
 
         /**
          * Send animation data to the client along with an ID.
-         * Does not work for local connections.
          *
          * @param animation An AnimationData containing data about the animation
          * @param id The ID for the animation
          */
-        fun sendAnimation(animation: AnimationData, id: String) {
-            check(!local) { "Cannot send animation to local port" }
-            if (connected) {
-                runBlocking {
-                    withTimeout(5000) {
-                        withContext(Dispatchers.IO) {
-                            socOut?.write(
-                                animation
-                                    .id(
-                                        if ((animation.animation == Animation.CUSTOMANIMATION ||
-                                                    animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
-                                            animation.id.length == 1
-                                        )
-                                            "${animation.id} $id"
-                                        else id
-                                    ).json()
-                            )
-                                ?: Logger.debug("Could not send animation $id: Connection socket null")
-                            if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
-                            else Logger.debug("Sent animation $id")
-                        }
-                    }
+        fun sendAnimation(animation: AnimationData, id: String = animation.id) {
+            if (!connected) {
+                Logger.debug("Could not send animation on port $port: Not Connected")
+                return
+            }
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    socOut?.write(
+                        animation
+                            .id(
+                                if ((animation.animation == Animation.CUSTOMANIMATION ||
+                                            animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
+                                    animation.id.length == 1
+                                )
+                                    "${animation.id} $id"
+                                else id
+                            ).json()
+                    )
+                        ?: Logger.debug("Could not send animation $id: Connection socket null")
+                    if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
+                    else Logger.debug("Sent animation $id")
                 }
             }
         }
 
         /**
          * Send strip info to the client.
-         * Does not work for local connections.
          */
         fun sendInfo() {
-            check(!local) { "Cannot send strip info to local port" }
-            if (connected) {
-                runBlocking {
-                    withTimeout(5000) {
-                        withContext(Dispatchers.IO) {
-                            socOut?.write(server.stripInfo.json())
-                        }
-                    }
+            if (!connected) {
+                Logger.debug("Could not send info on port $port: Not Connected")
+                return
+            }
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    socOut?.write(server.stripInfo.json())
                 }
             }
         }
 
         /**
-         * Send a string to the local port.
-         * Only works for a local connection.
+         * Send a string to the client.
          */
         fun sendString(str: String) {
-            check(local) { "Cannot send string to non-local port" }
-            if (connected) {
-                runBlocking {
-                    withTimeout(5000) {
-                        withContext(Dispatchers.IO) {
-                            socOut?.write(str.toByteArray(Charset.forName("utf-8")))
-                        }
-                    }
+            // Note: Don't include any logging statements in this function
+            // (this will create an endless loop)
+            if (!connected) {
+                return
+            }
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    socOut?.write(str.toByteArray(Charset.forName("utf-8")))
                 }
             }
         }
@@ -233,15 +242,31 @@ object SocketConnections {
     /**
      * Send animation data to one or all client(s).
      *
-     * @param animation A Map<*, *> containing info about the animation
+     * @param animation An AnimationData instance containing info about the animation
      * @param id The ID for the animation
      * @param client Used to specify which client should receive the data. If
      * null, data is sent to all clients
      */
-    fun sendAnimation(animation: AnimationData, id: String, client: Connection? = null) {
+    fun sendAnimation(animation: AnimationData, id: String = animation.id, client: Connection? = null) {
         if (client != null) client.sendAnimation(animation, id)
         else connections.forEach {
             it.value.sendAnimation(animation, id)
+        }
+    }
+
+    /**
+     * Send a string to one or all terminal client(s).
+     *
+     * @param str The string to send to the terminal client
+     * @param client Used to specify which client should receive the string. If
+     * null, string is sent to all terminal clients
+     */
+    fun sendLog(str: String, client: Connection? = null) {
+        // Note: Don't include any logging statements in this function
+        // (this will create an endless loop)
+        if (client != null) client.sendString(str)
+        else connections.forEach {
+            if (it.value.sendLogs) it.value.sendString(str)
         }
     }
 

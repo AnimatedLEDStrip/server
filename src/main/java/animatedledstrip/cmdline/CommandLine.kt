@@ -1,5 +1,3 @@
-package animatedledstrip.cmdline
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,12 +20,14 @@ package animatedledstrip.cmdline
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.cmdline
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import java.io.EOFException
 import java.io.OptionalDataException
+import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketException
@@ -47,6 +47,10 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
 
     private fun println(message: String) {
         if (!quiet) kotlin.io.println(message)
+    }
+
+    private fun sendCmd(cmd: String, stream: OutputStream) {
+        stream.write("CMD :$cmd".toByteArray())
     }
 
     fun start() {
@@ -90,7 +94,7 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                         return
                     }
                     "Q", "QUIT" -> {
-                        socOut.write(str.toByteArray())
+                        sendCmd(str, socOut)
                         readerJob.cancel()
                         return
                     }
@@ -110,7 +114,7 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                             help        Show this help message
                         """.trimIndent())
                     }
-                    else -> socOut.write(str.toByteArray())
+                    else -> sendCmd(str, socOut)
                 }
             }
 

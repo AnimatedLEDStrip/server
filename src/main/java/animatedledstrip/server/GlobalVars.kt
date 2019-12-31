@@ -1,5 +1,3 @@
-package animatedledstrip.server
-
 /*
  *  Copyright (c) 2019 AnimatedLEDStrip
  *
@@ -22,13 +20,10 @@ package animatedledstrip.server
  *  THE SOFTWARE.
  */
 
+package animatedledstrip.server
 
-import animatedledstrip.cmdline.CommandLine
-import animatedledstrip.leds.AnimatedLEDStrip
-import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
-import kotlin.reflect.KClass
 
 val options = Options().apply {
     addOption("h", "help", false, "Show help message")
@@ -43,22 +38,14 @@ val options = Options().apply {
     addOption("n", "numleds", true, "Specify number of LEDs")
     addOption("p", "pin", true, "Specify pin")
     addOption("r", "renders", true, "Specify the number of renders between saves")
-    addOption("P", "persist", false, "Persist animations across restarts")
+    addOption("P", "port", true, "Add a port for clients to connect to")
+    addOption(
+        Option.builder().longOpt("persist").desc("Persist animations across restarts").build()
+    )
     addOption(
         Option.builder().longOpt("no-persist").desc("Don't persist animations (default true)").build()
     )
     addOption("T", "Run test animation")
     addOption("L", "local-port", true, "Specify local connection port number")
     addOption("C", "command-line", false, "Connect to a running server with a command line")
-}
-
-fun <T : AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {
-    val cmdline = DefaultParser().parse(options, args)
-    when (cmdline.hasOption("C")) {
-        false -> AnimatedLEDStripServer(args, ledClass).start().waitUntilStop()
-        true -> CommandLine(
-            port = cmdline.getOptionValue("L")?.toIntOrNull() ?: 1118,
-            quiet = cmdline.hasOption("q")
-        ).start()
-    }
 }
