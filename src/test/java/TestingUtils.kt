@@ -62,7 +62,7 @@ fun newCommandStream(newString: String) {
 
     exitStream.reset()
     GlobalScope.launch {
-        delay(2000)
+        delay(4000)
         System.setIn(exitStream)
     }
 }
