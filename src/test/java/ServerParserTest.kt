@@ -104,7 +104,7 @@ class ServerParserTest {
         assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
         testServer.parseTextCommand("end 1357 2431", null)
-        delayBlocking(500)
+        delayBlocking(1000)
         assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("1357") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("2431") }
@@ -113,7 +113,7 @@ class ServerParserTest {
         assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
         testServer.parseTextCommand("end all", null)
-        delayBlocking(500)
+        delayBlocking(1000)
         assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("1357") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("2431") }

@@ -29,7 +29,6 @@ import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -39,33 +38,28 @@ import kotlin.test.assertTrue
 class CommandLineTest {
 
     @Test
-    fun testCommandLine() = runBlocking {
+    fun testCommandLine() {
         GlobalScope.launch {
             delay(5000)
 
-            val stdout = System.out
-            val tempOut = ByteArrayOutputStream()
-            System.setOut(PrintStream(tempOut))
+            redirectOutput()
 
             val stream = ByteArrayInputStream("quit".toByteArray())
             System.setIn(stream)
             startServer(arrayOf("-CP", "3101"), EmulatedAnimatedLEDStrip::class)
 
             assertTrue {
-                tempOut
+                outStream
                     .toString("utf-8")
                     .replace("\r\n", "\n") ==
                         "Welcome to the AnimatedLEDStrip Server console\nConnected\n"
             }
-
-            System.setOut(stdout)
         }
         startServer(arrayOf("-qP", "3101"), EmulatedAnimatedLEDStrip::class)
-        Unit
     }
 
     @Test
-    fun testQuit() = runBlocking {
+    fun testQuit() {
         GlobalScope.launch {
             delay(5000)
 
@@ -74,11 +68,10 @@ class CommandLineTest {
             startServer(arrayOf("-qCP", "3102"), EmulatedAnimatedLEDStrip::class)
         }
         startServer(arrayOf("-qP", "3102"), EmulatedAnimatedLEDStrip::class)
-        Unit
     }
 
     @Test
-    fun testNoCommand() = runBlocking {
+    fun testNoCommand() {
         GlobalScope.launch {
             delay(5000)
 
@@ -93,11 +86,10 @@ class CommandLineTest {
             System.setOut(stdout)
         }
         startServer(arrayOf("-qP", "3103"), EmulatedAnimatedLEDStrip::class)
-        Unit
     }
 
     @Test
-    fun testExit() = runBlocking {
+    fun testExit() {
         GlobalScope.launch {
             delay(5000)
 
@@ -109,28 +101,21 @@ class CommandLineTest {
             AnimatedLEDStripServer(arrayOf("-qP", "3104"), EmulatedAnimatedLEDStrip::class).start()
         delayBlocking(10000)
         testServer.stop()
-        Unit
     }
 
     @Test
     fun testNoConnection() {
-        val stdout = System.out
-        val tempOut = ByteArrayOutputStream()
-        System.setOut(PrintStream(tempOut))
+        redirectOutput()
 
         val stream = ByteArrayInputStream("quit".toByteArray())
         System.setIn(stream)
         startServer(arrayOf("-CP", "3105"), EmulatedAnimatedLEDStrip::class)
 
         assertTrue {
-            tempOut
+            outStream
                 .toString("utf-8")
                 .replace("\r\n", "\n") ==
                     "Welcome to the AnimatedLEDStrip Server console\nCould not connect to server\n"
         }
-
-        System.setOut(stdout)
     }
-
-
 }

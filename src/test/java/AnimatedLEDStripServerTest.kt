@@ -32,8 +32,6 @@ import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
@@ -250,11 +248,11 @@ class AnimatedLEDStripServerTest {
         assertFalse { testServer1.persistAnimations }
 
         val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qP"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-q", "--persist"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer2.persistAnimations }
 
         val testServer3 =
-            AnimatedLEDStripServer(arrayOf("-qP", "--no-persist"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(arrayOf("-q", "--persist", "--no-persist"), EmulatedAnimatedLEDStrip::class)
         assertFalse { testServer3.persistAnimations }
 
         val testServer4 =
@@ -262,12 +260,15 @@ class AnimatedLEDStripServerTest {
         assertTrue { testServer4.persistAnimations }
 
         val testServer5 =
-            AnimatedLEDStripServer(arrayOf("-qPf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
+            AnimatedLEDStripServer(
+                arrayOf("-q", "--persist", "-f", "src/test/resources/led.config"),
+                EmulatedAnimatedLEDStrip::class
+            )
         assertTrue { testServer5.persistAnimations }
 
         val testServer6 =
             AnimatedLEDStripServer(
-                arrayOf("-qPf", "src/test/resources/led.config", "--no-persist"),
+                arrayOf("-q", "--persist", "-f", "src/test/resources/led.config", "--no-persist"),
                 EmulatedAnimatedLEDStrip::class
             )
         assertFalse { testServer6.persistAnimations }
@@ -281,14 +282,14 @@ class AnimatedLEDStripServerTest {
 
         val testServer8 =
             AnimatedLEDStripServer(
-                arrayOf("-qPf", "src/test/resources/no-persist.config"),
+                arrayOf("-q", "--persist", "-f", "src/test/resources/no-persist.config"),
                 EmulatedAnimatedLEDStrip::class
             )
         assertTrue { testServer8.persistAnimations }
 
         val testServer9 =
             AnimatedLEDStripServer(
-                arrayOf("-qPf", "src/test/resources/no-persist.config", "--no-persist"),
+                arrayOf("-q", "--persist", "f", "src/test/resources/no-persist.config", "--no-persist"),
                 EmulatedAnimatedLEDStrip::class
             )
         assertFalse { testServer9.persistAnimations }
@@ -296,18 +297,13 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testHelp() {
-        val stdout: PrintStream = System.out
-        val tempOut = ByteArrayOutputStream()
-        System.setOut(PrintStream(tempOut))
-        tempOut.reset()
+        redirectOutput()
 
         AnimatedLEDStripServer(arrayOf("-hq"), EmulatedAnimatedLEDStrip::class)
 
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "usage: ledserver.jar\n" +
+        checkOutput(
+            expected =
+            "usage: ledserver.jar\n" +
                     " -C,--command-line       Connect to a running server with a command line\n" +
                     " -d,--debug              Enable debug level logging\n" +
                     " -E,--emulate            Emulate the LED strip\n" +
@@ -319,15 +315,15 @@ class AnimatedLEDStripServerTest {
                     "    --no-persist         Don't persist animations (default true)\n" +
                     " -o,--outfile <arg>      Specify the output file name for image debugging\n" +
                     " -p,--pin <arg>          Specify pin\n" +
-                    " -P,--persist            Persist animations across restarts\n" +
+                    " -P,--port <arg>         Add a port for clients to connect to" +
+                    "    --persist            Persist animations across restarts\n" +
                     " -q,--quiet              Disable log outputs\n" +
                     " -r,--renders <arg>      Specify the number of renders between saves\n" +
                     " -t,--trace              Enable trace level logging\n" +
                     " -T                      Run test animation\n" +
                     " -v,--verbose            Enable verbose logging statements\n"
-        }
+        )
 
-        System.setOut(stdout)
     }
 
     @Test
@@ -346,48 +342,24 @@ class AnimatedLEDStripServerTest {
 
     @Test
     fun testSetLoggingLevel() {
-        val stdout: PrintStream = System.out
-        val tempOut = ByteArrayOutputStream()
-        System.setOut(PrintStream(tempOut))
+        redirectOutput()
 
         val testServer =
             AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
         assertTrue { Logger.getLevel() == Level.OFF }
 
-        tempOut.reset()
-
         testServer.parseTextCommand("trace", null)
         assertTrue { Logger.getLevel() == Level.TRACE }
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "TRACE:   Set logging level to trace\n"
-        }
-        tempOut.reset()
+        checkOutput(expected = "TRACE:   Set logging level to trace\n")
 
         testServer.parseTextCommand("debug", null)
         assertTrue { Logger.getLevel() == Level.DEBUG }
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n"
-        }
-        tempOut.reset()
+        checkOutput(expected = "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n")
 
         testServer.parseTextCommand("info", null)
         assertTrue { Logger.getLevel() == Level.INFO }
-        assertTrue {
-            tempOut
-                .toString("utf-8")
-                .replace("\r\n", "\n") ==
-                    "INFO:    Set logging level to info\n"
-        }
-        tempOut.reset()
+        checkOutput(expected = "INFO:    Set logging level to info\n")
 
         Configurator.currentConfig().level(Level.OFF).activate()
-
-        System.setOut(stdout)
     }
 }

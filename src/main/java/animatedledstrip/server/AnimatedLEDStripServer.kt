@@ -199,14 +199,15 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         // TODO: Change saved files to use JSON
         leds.startAnimationCallback = {
             SocketConnections.sendAnimation(it)
-            GlobalScope.launch {
-                withContext(Dispatchers.IO) {
-                    ObjectOutputStream(FileOutputStream(".animations/${it.fileName}")).apply {
-                        writeObject(it)
-                        close()
+            if (persistAnimations)
+                GlobalScope.launch {
+                    withContext(Dispatchers.IO) {
+                        ObjectOutputStream(FileOutputStream(".animations/${it.fileName}")).apply {
+                            writeObject(it)
+                            close()
+                        }
                     }
                 }
-            }
         }
         leds.endAnimationCallback = {
             SocketConnections.sendAnimation(it.copy(animation = Animation.ENDANIMATION))
@@ -214,9 +215,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 Files.delete(Paths.get(".animations/${it.fileName}"))
         }
     }
-
-//    internal val animationHandler =
-//        AnimationHandler(leds, persistAnimations = persistAnimations)
 
     /**
      * The test animation
@@ -304,9 +302,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     when (line[1]) {
                         "ON" -> client?.sendLogs = true
                         "OFF" -> client?.sendLogs = false
-                        else -> reply ("INVALID COMMAND: \"on\" or \"off\" must be specified")
+                        else -> reply("INVALID COMMAND: \"on\" or \"off\" must be specified")
                     }
-                } else reply ("INVALID COMMAND: \"on\" or \"off\" must be specified")
+                } else reply("INVALID COMMAND: \"on\" or \"off\" must be specified")
             }
             "CLEAR" -> {
                 leds.addAnimation(AnimationData().animation(Animation.COLOR))

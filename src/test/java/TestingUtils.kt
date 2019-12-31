@@ -42,16 +42,17 @@ fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStrip, color: Long) {
     }
 }
 
+private fun ByteArrayOutputStream.toCleanedString(): String {
+    return this
+        .toByteArray().filter { it != 0.toByte() }.toByteArray().toUTF8()   // remove excess null bytes
+        .replace("\r\n", "\n")
+        .replace("Welcome to the AnimatedLEDStrip Server console\nConnected\n", "")
+        .replace(Regex("INFO:\\{.*};\n"), "")
+        .replace(Regex("DATA:\\{.*};\n"), "")
+}
+
 fun checkOutput(expected: String) {
-    assertTrue {
-        outStream
-            .toByteArray().filter { it != 0.toByte() }.toByteArray().toUTF8()   // remove excess null bytes
-            .replace("\r\n", "\n")
-            .replace("Welcome to the AnimatedLEDStrip Server console\nConnected\n", "")
-            .replace(Regex("INFO:\\{.*};\n"), "")
-            .replace(Regex("DATA:\\{.*};\n"), "") ==
-                expected
-    }
+    assertTrue { outStream.toCleanedString() == expected }
     outStream.reset()
 }
 
