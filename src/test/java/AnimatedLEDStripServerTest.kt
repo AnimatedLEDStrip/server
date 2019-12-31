@@ -28,7 +28,6 @@ import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import org.junit.Test
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
@@ -199,32 +198,6 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
-    fun testLocalPort() {
-        val testServer1 =
-            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer1.localPort == 1118 }
-
-        val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qL", "3456"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.localPort == 3456 }
-
-        val testServer3 =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer3.localPort == 2132 }
-
-        val testServer4 =
-            AnimatedLEDStripServer(
-                arrayOf("-qL", "1500", "-f", "src/test/resources/led.config"),
-                EmulatedAnimatedLEDStrip::class
-            )
-        assertTrue { testServer4.localPort == 1500 }
-
-        val testServer5 =
-            AnimatedLEDStripServer(arrayOf("-qL", "x"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer5.localPort == 1118 }
-    }
-
-    @Test
     fun testPorts() {
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
@@ -383,7 +356,7 @@ class AnimatedLEDStripServerTest {
 
         tempOut.reset()
 
-        testServer.parseTextCommand("trace")
+        testServer.parseTextCommand("trace", null)
         assertTrue { Logger.getLevel() == Level.TRACE }
         assertTrue {
             tempOut
@@ -393,7 +366,7 @@ class AnimatedLEDStripServerTest {
         }
         tempOut.reset()
 
-        testServer.parseTextCommand("debug")
+        testServer.parseTextCommand("debug", null)
         assertTrue { Logger.getLevel() == Level.DEBUG }
         assertTrue {
             tempOut
@@ -403,7 +376,7 @@ class AnimatedLEDStripServerTest {
         }
         tempOut.reset()
 
-        testServer.parseTextCommand("info")
+        testServer.parseTextCommand("info", null)
         assertTrue { Logger.getLevel() == Level.INFO }
         assertTrue {
             tempOut

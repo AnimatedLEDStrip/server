@@ -42,7 +42,7 @@ class SocketWriter : Writer {
     }
 
     override fun write(log: LogEntry) {
-        SocketConnections.localConnection?.sendString(
+        SocketConnections.sendLog(
             "${log.level}$delimiter".padEnd(8, ' ') +
                     log.message
         )

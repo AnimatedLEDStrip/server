@@ -122,20 +122,16 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 cmdline.hasOption("L"))
 
     /* Get port numbers */
-
-    internal val localPort: Int =
-        cmdline.getOptionValue("L")?.toIntOrNull()
-            ?: properties.getProperty("local_port")?.toIntOrNull()
-            ?: 1118
-
     internal val ports =
         mutableListOf<Int>().apply {
-            properties.getProperty("ports")?.split(' ')?.forEach {
+            cmdline.getOptionValue("P")?.split(' ')?.forEach {
                 requireNotNull(it.toIntOrNull()) { "Could not parse port \"$it\"" }
                 this += it.toInt()
             }
-            if (createLocalPort) {
-                this += localPort            // local port
+
+            properties.getProperty("ports")?.split(' ')?.forEach {
+                requireNotNull(it.toIntOrNull()) { "Could not parse port \"$it\"" }
+                this += it.toInt()
             }
         }
 
@@ -144,7 +140,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val persistAnimations: Boolean =
         !cmdline.hasOption("no-persist") &&
-                (cmdline.hasOption("P") ||
+                (cmdline.hasOption("persist") ||
                         properties.getProperty("persist")?.toBoolean() == true)
 
 
@@ -262,14 +258,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         running = true
         ports.forEach {
-            if (it != localPort && !SocketConnections.connections.containsKey(it))
+            if (!SocketConnections.connections.containsKey(it))
                 SocketConnections.add(it, server = this)
             SocketConnections.connections[it]?.open()
-        }
-        if (createLocalPort) {
-//            if (SocketConnections.localConnection == null)
-            SocketConnections.add(localPort, server = this, local = true)
-            SocketConnections.localConnection?.open()
         }
         if (cmdline.hasOption("T")) leds.addAnimation(testAnimation)
         return this
@@ -284,12 +275,16 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
         running = false
     }
 
-    internal fun parseTextCommand(command: String) {
+    internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) {
+        fun reply(str: String) {
+            client?.sendString(str)
+        }
+
         Logger.trace("Parsing \"$command\"")
-        val line = command.toUpperCase().split(" ")
+        val line = command.removePrefix("CMD :").toUpperCase().split(" ")
         return when (line[0]) {
             "QUIT", "Q" -> {
-                Logger.info("Shutting down server")
+                Logger.warn("Shutting down server")
                 stop()
             }
             "DEBUG" -> {
@@ -304,43 +299,50 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 setLoggingLevel(Level.INFO)
                 Logger.info("Set logging level to info")
             }
+            "LOGS" -> {
+                if (line.size > 1) {
+                    when (line[1]) {
+                        "ON" -> client?.sendLogs = true
+                        "OFF" -> client?.sendLogs = false
+                        else -> reply ("INVALID COMMAND: \"on\" or \"off\" must be specified")
+                    }
+                } else reply ("INVALID COMMAND: \"on\" or \"off\" must be specified")
+            }
             "CLEAR" -> {
                 leds.addAnimation(AnimationData().animation(Animation.COLOR))
-                Unit
+                Logger.debug("Cleared strip")
             }
             "SHOW", "S" -> {
-                if (line.size > 1) Logger.info(
+                if (line.size > 1) reply(
                     "${line[1]}: ${leds.runningAnimations.entries.toMap()[line[1]]?.animation ?: "NOT FOUND"}"
                 )
-                else Logger.info("Running Animations: ${leds.runningAnimations.ids}")
+                else reply("Running Animations: ${leds.runningAnimations.ids}")
             }
             "CONNECTIONS", "C" -> {
                 if (line.size > 1) {
                     when (line[1]) {
                         "LIST" -> {
-                            for (port in ports) {
-                                Logger.info(
-                                    "Port $port: ${SocketConnections.connections[port]?.status() ?: "Not Found"}"
-                                )
+                            for (port in ports.sorted()) {
+                                reply("Port $port: ${SocketConnections.connections[port]?.status()}")
                             }
                         }
                         "START" -> {
                             if (line.size > 2) {
                                 Logger.debug("Manually starting connection at port ${line[2]}")
                                 SocketConnections.connections.getOrDefault(line[2].toIntOrNull(), null)?.open()
-                                    ?: Logger.warn("No connection on port ${line[2]}")
-                            } else Logger.warn("Port must be specified")
+                                    ?: reply("WARNING: No connection on port ${line[2]}")
+                            } else reply("INVALID COMMAND: Port must be specified")
                         }
                         "STOP" -> {
                             if (line.size > 2) {
                                 Logger.debug("Manually stopping connection at port ${line[2]}")
                                 SocketConnections.connections.getOrDefault(line[2].toIntOrNull(), null)?.close()
-                                    ?: Logger.warn("No connection on port ${line[2]}")
-                            } else Logger.warn("Port must be specified")
+                                    ?: reply("WARNING: No connection on port ${line[2]}")
+                            } else reply("INVALID COMMAND: Port must be specified")
                         }
-                        else -> Logger.warn("Invalid sub-command")
+                        else -> reply("INVALID COMMAND: Invalid sub-command")
                     }
-                } else Logger.warn("Sub-command must be specified")
+                } else reply("INVALID COMMAND: Sub-command must be specified")
             }
             "END" -> {
                 if (line.size > 1) {
@@ -351,9 +353,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         }
                     } else for (i in 1 until line.size)
                         leds.endAnimation(line[i])
-                } else Logger.warn("Animation ID or \"all\" must be specified")
+                } else reply("INVALID COMMAND: Animation ID or \"all\" must be specified")
             }
-            else -> Logger.warn("$command is not a valid command")
+            else -> reply("INVALID COMMAND: ${command.removePrefix("CMD :")} is not a valid command")
         }
     }
 
