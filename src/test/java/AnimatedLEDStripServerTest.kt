@@ -315,7 +315,7 @@ class AnimatedLEDStripServerTest {
                     "    --no-persist         Don't persist animations (default true)\n" +
                     " -o,--outfile <arg>      Specify the output file name for image debugging\n" +
                     " -p,--pin <arg>          Specify pin\n" +
-                    " -P,--port <arg>         Add a port for clients to connect to" +
+                    " -P,--port <arg>         Add a port for clients to connect to\n" +
                     "    --persist            Persist animations across restarts\n" +
                     " -q,--quiet              Disable log outputs\n" +
                     " -r,--renders <arg>      Specify the number of renders between saves\n" +
