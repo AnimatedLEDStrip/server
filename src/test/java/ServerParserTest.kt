@@ -104,7 +104,7 @@ class ServerParserTest {
         assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
         testServer.parseTextCommand("end 1357 2431", null)
-        delayBlocking(1000)
+        delayBlocking(2000)
         assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("1357") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("2431") }
@@ -113,7 +113,7 @@ class ServerParserTest {
         assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
         testServer.parseTextCommand("end all", null)
-        delayBlocking(1000)
+        delayBlocking(2000)
         assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("1357") }
         assertFalse { testServer.leds.runningAnimations.ids.contains("2431") }
@@ -181,7 +181,7 @@ class ServerParserTest {
             arrayOf("-qf", "src/test/resources/ports.config", "-P", "3206"),
             EmulatedAnimatedLEDStrip::class
         ).start()
-        delayBlocking(500)
+        delayBlocking(1000)
 
         redirectOutput()
 
