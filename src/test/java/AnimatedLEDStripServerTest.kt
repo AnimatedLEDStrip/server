@@ -57,7 +57,7 @@ class AnimatedLEDStripServerTest {
     fun testPropertyFileName() {
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer1.propertyFileName == "led.config" }
+        assertTrue { testServer1.propertyFileName == "/etc/leds/led.config" }
 
         val testServer2 =
             AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/led.config"), EmulatedAnimatedLEDStrip::class)
