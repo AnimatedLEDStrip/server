@@ -26,26 +26,27 @@ import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
 
 val options = Options().apply {
-    addOption("h", "help", false, "Show help message")
+    addOption("C", "command-line", false, "Connect to a running server with a command line")
     addOption("d", "debug", false, "Enable debug level logging")
-    addOption("t", "trace", false, "Enable trace level logging")
-    addOption("v", "verbose", false, "Enable verbose logging statements")
-    addOption("q", "quiet", false, "Disable log outputs")
     addOption("E", "emulate", false, "Emulate the LED strip")
     addOption("f", "prop-file", true, "Specify properties file")
+    addOption("h", "help", false, "Show help message")
     addOption("i", "image-debug", false, "Enable image debugging")
-    addOption("o", "outfile", true, "Specify the output file name for image debugging")
     addOption("n", "numleds", true, "Specify number of LEDs")
+    addLongOption("no-persist", false, "Don't persist animations (overrides --persist and persist=true)")
+    addOption("o", "outfile", true, "Specify the output file name for image debugging")
     addOption("p", "pin", true, "Specify pin")
-    addOption("r", "renders", true, "Specify the number of renders between saves")
     addOption("P", "port", true, "Add a port for clients to connect to")
-    addOption(
-        Option.builder().longOpt("persist").desc("Persist animations across restarts").build()
-    )
-    addOption(
-        Option.builder().longOpt("no-persist").desc("Don't persist animations (default true)").build()
-    )
+    addLongOption("persist", false, "Persist animations across restarts")
+    addOption("q", "quiet", false, "Disable log outputs")
+    addOption("r", "renders", true, "Specify the number of renders between saves")
+    addOption("t", "trace", false, "Enable trace level logging")
     addOption("T", "Run test animation")
-    addOption("L", "local-port", true, "Specify local connection port number")
-    addOption("C", "command-line", false, "Connect to a running server with a command line")
+    addOption("v", "verbose", false, "Enable verbose logging statements")
+}
+
+fun Options.addLongOption(longOpt: String, hasArg: Boolean, description: String) {
+    addOption(
+        Option.builder().longOpt(longOpt).desc(description).hasArg(hasArg).build()
+    )
 }

@@ -29,7 +29,6 @@ import animatedledstrip.animationutils.color
 import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.StripInfo
-import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -104,7 +103,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val propertyFileName: String =
         cmdline.getOptionValue("f")
-            ?: "led.config"
+            ?: "/etc/leds/led.config"
 
     internal val properties =
         Properties().apply {
@@ -114,12 +113,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 Logger.warn("File $propertyFileName not found")
             }
         }
-
-
-    /* Determine if the local port should be created */
-    internal val createLocalPort: Boolean =
-        (ledClass != EmulatedAnimatedLEDStrip::class ||
-                cmdline.hasOption("L"))
 
     /* Get port numbers */
     internal val ports =

@@ -120,18 +120,6 @@ class AnimatedLEDStripServerTest {
     }
 
     @Test
-    fun testCreateLocalPort() {
-        val testServer1 =
-            AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-        assertFalse { testServer1.createLocalPort }
-
-
-        val testServer2 =
-            AnimatedLEDStripServer(arrayOf("-qL", "1501"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { testServer2.createLocalPort }
-    }
-
-    @Test
     fun testImageDebuggingEnabled() {
         val testServer1 =
             AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
@@ -304,24 +292,24 @@ class AnimatedLEDStripServerTest {
         checkOutput(
             expected =
             "usage: ledserver.jar\n" +
-                    " -C,--command-line       Connect to a running server with a command line\n" +
-                    " -d,--debug              Enable debug level logging\n" +
-                    " -E,--emulate            Emulate the LED strip\n" +
-                    " -f,--prop-file <arg>    Specify properties file\n" +
-                    " -h,--help               Show help message\n" +
-                    " -i,--image-debug        Enable image debugging\n" +
-                    " -L,--local-port <arg>   Specify local connection port number\n" +
-                    " -n,--numleds <arg>      Specify number of LEDs\n" +
-                    "    --no-persist         Don't persist animations (default true)\n" +
-                    " -o,--outfile <arg>      Specify the output file name for image debugging\n" +
-                    " -p,--pin <arg>          Specify pin\n" +
-                    " -P,--port <arg>         Add a port for clients to connect to\n" +
-                    "    --persist            Persist animations across restarts\n" +
-                    " -q,--quiet              Disable log outputs\n" +
-                    " -r,--renders <arg>      Specify the number of renders between saves\n" +
-                    " -t,--trace              Enable trace level logging\n" +
-                    " -T                      Run test animation\n" +
-                    " -v,--verbose            Enable verbose logging statements\n"
+                    " -C,--command-line      Connect to a running server with a command line\n" +
+                    " -d,--debug             Enable debug level logging\n" +
+                    " -E,--emulate           Emulate the LED strip\n" +
+                    " -f,--prop-file <arg>   Specify properties file\n" +
+                    " -h,--help              Show help message\n" +
+                    " -i,--image-debug       Enable image debugging\n" +
+                    " -n,--numleds <arg>     Specify number of LEDs\n" +
+                    "    --no-persist        Don't persist animations (overrides --persist and\n" +
+                    "                        persist=true)\n" +
+                    " -o,--outfile <arg>     Specify the output file name for image debugging\n" +
+                    " -p,--pin <arg>         Specify pin\n" +
+                    " -P,--port <arg>        Add a port for clients to connect to\n" +
+                    "    --persist           Persist animations across restarts\n" +
+                    " -q,--quiet             Disable log outputs\n" +
+                    " -r,--renders <arg>     Specify the number of renders between saves\n" +
+                    " -t,--trace             Enable trace level logging\n" +
+                    " -T                     Run test animation\n" +
+                    " -v,--verbose           Enable verbose logging statements\n"
         )
 
     }
