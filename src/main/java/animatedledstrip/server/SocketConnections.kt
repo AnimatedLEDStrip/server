@@ -123,27 +123,40 @@ object SocketConnections {
          */
         private suspend fun openSocket() {
             while (server.running) {
+                clientSocket?.soTimeout = 1000
+                Logger.debug("Socket at port $port started")
+                var socIn: InputStream? = null
+                withContext(Dispatchers.IO) {
+                    while (server.running) {
+                        while (true)
+                            try {
+                                clientSocket = serverSocket.accept()
+                                break
+                            } catch (e: SocketTimeoutException) {
+                                yield()
+                                continue
+                            }
+                        try {
+                            socIn = clientSocket?.getInputStream() ?: error("Could not create input stream")
+                            socOut = clientSocket?.getOutputStream()
+                            break
+                        } catch (e: SocketException) {
+                            continue
+                        }
+                    }
+                }
+                Logger.info("Connection on port $port Established")
+                // Send info about this strip and all current running continuous animations
+                // to newly connected client
+                sendInfo()
+                server.leds.runningAnimations.animations.forEach {
+                    sendAnimation(it.animation, client = this@Connection)
+                }
                 try {
-                    Logger.debug("Socket at port $port started")
-                    var socIn: InputStream? = null
-                    withContext(Dispatchers.IO) {
-                        clientSocket = serverSocket.accept()
-                        yield()
-                        socIn = clientSocket?.getInputStream() ?: error("Could not create input stream")
-                        socOut = clientSocket?.getOutputStream()
-                        clientSocket?.soTimeout = 1000
-                    }
-                    Logger.info("Connection on port $port Established")
-                    // Send info about this strip and all current running continuous animations
-                    // to newly connected client
-                    sendInfo()
-                    server.leds.runningAnimations.animations.forEach {
-                        sendAnimation(it.animation, client = this@Connection)
-                    }
                     var input = ByteArray(10000)
                     var count = -1
-                    while (connected) {
-                        while (true)
+                    while (connected && server.running) {
+                        while (server.running)
                             try {
                                 withContext(Dispatchers.IO) {
                                     count = socIn?.read(input) ?: throw SocketException("Socket null")
@@ -162,7 +175,7 @@ object SocketConnections {
                             "CMD " -> server.parseTextCommand(input.toUTF8(count), client = this)
                             else -> Logger.warn("Incorrect data type")
                         }
-                        input = ByteArray(1000)
+                        input = ByteArray(10000)
                     }
                 } catch (e: SocketException) {  // Catch disconnections
                     Logger.warn("Connection on port $port lost: $e")
@@ -177,44 +190,25 @@ object SocketConnections {
          * @param id The ID for the animation
          */
         fun sendAnimation(animation: AnimationData, id: String = animation.id) {
-            if (!connected) {
-                Logger.debug("Could not send animation on port $port: Not Connected")
-                return
-            }
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    socOut?.write(
-                        animation
-                            .id(
-                                if ((animation.animation == Animation.CUSTOMANIMATION ||
-                                            animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
-                                    animation.id.length == 1
-                                )
-                                    "${animation.id} $id"
-                                else id
-                            ).json()
-                    )
-                        ?: Logger.debug("Could not send animation $id: Connection socket null")
-                    if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
-                    else Logger.debug("Sent animation $id")
-                }
-            }
+            send(
+                animation
+                    .id(
+                        if ((animation.animation == Animation.CUSTOMANIMATION ||
+                                    animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
+                            animation.id.length == 1
+                        )
+                            "${animation.id} $id"
+                        else id
+                    ).json()
+            )
+            if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
+            else Logger.debug("Sent animation $id")
         }
 
         /**
          * Send strip info to the client.
          */
-        fun sendInfo() {
-            if (!connected) {
-                Logger.debug("Could not send info on port $port: Not Connected")
-                return
-            }
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    socOut?.write(server.stripInfo.json())
-                }
-            }
-        }
+        fun sendInfo() = send(server.stripInfo.json())
 
         /**
          * Send a string to the client.
@@ -225,9 +219,31 @@ object SocketConnections {
             if (!connected) {
                 return
             }
+            // Note that this does not use the send method in order to prevent
+            // loops caused by the log statements in that function
             runBlocking {
                 withContext(Dispatchers.IO) {
-                    socOut?.write(str.toByteArray(Charset.forName("utf-8")))
+                    try {
+                        socOut?.write(str.toByteArray(Charset.forName("utf-8")))
+                    } catch (e: SocketException) {
+                    }
+                }
+            }
+        }
+
+        private fun send(data: ByteArray) {
+            if (!connected) {
+                Logger.debug("Could not send to port $port: Not Connected")
+                return
+            }
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    try {
+                        socOut?.write(data)
+                            ?: Logger.debug("Could not to port $port: Connection socket null")
+                    } catch (e: SocketException) {
+                        Logger.debug("Could not send to port $port: Disconnect")
+                    }
                 }
             }
         }
