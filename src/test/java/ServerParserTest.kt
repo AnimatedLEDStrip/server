@@ -181,7 +181,7 @@ class ServerParserTest {
             arrayOf("-qf", "src/test/resources/ports.config", "-P", "3206"),
             EmulatedAnimatedLEDStrip::class
         ).start()
-        delayBlocking(1000)
+        delayBlocking(1500)
 
         redirectOutput()
 
