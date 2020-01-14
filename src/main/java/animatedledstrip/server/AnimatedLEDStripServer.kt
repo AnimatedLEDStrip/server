@@ -249,8 +249,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         running = true
         ports.forEach {
-            if (!SocketConnections.connections.containsKey(it))
-                SocketConnections.add(it, server = this)
+            SocketConnections.add(it, server = this)
             SocketConnections.connections[it]?.open()
         }
         if (cmdline.hasOption("T")) leds.addAnimation(testAnimation)
@@ -268,7 +267,12 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) {
         fun reply(str: String) {
+            Logger.trace("Replying to client on port ${client?.port}: $str")
             client?.sendString(str)
+        }
+
+        fun invalidCommand(reason: String) {
+            reply("INVALID COMMAND: $reason")
         }
 
         Logger.trace("Parsing \"$command\"")
@@ -295,9 +299,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     when (line[1]) {
                         "ON" -> client?.sendLogs = true
                         "OFF" -> client?.sendLogs = false
-                        else -> reply("INVALID COMMAND: \"on\" or \"off\" must be specified")
+                        else -> invalidCommand("\"on\" or \"off\" must be specified")
                     }
-                } else reply("INVALID COMMAND: \"on\" or \"off\" must be specified")
+                } else invalidCommand("\"on\" or \"off\" must be specified")
             }
             "CLEAR" -> {
                 leds.addAnimation(AnimationData().animation(Animation.COLOR))
@@ -319,34 +323,60 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         }
                         "START" -> {
                             if (line.size > 2) {
-                                Logger.debug("Manually starting connection at port ${line[2]}")
-                                SocketConnections.connections.getOrDefault(line[2].toIntOrNull(), null)?.open()
-                                    ?: reply("WARNING: No connection on port ${line[2]}")
-                            } else reply("INVALID COMMAND: Port must be specified")
+                                val port = line[2].toIntOrNull() ?: run {
+                                    invalidCommand("Invalid port: ${line[2]}")
+                                    return
+                                }
+                                Logger.debug("Manually starting connection at port $port")
+                                reply("Starting port $port")
+                                SocketConnections.connections.getOrDefault(port, null)?.open()
+                                    ?: invalidCommand("No connection on port $port")
+                            } else invalidCommand("Port must be specified")
                         }
                         "STOP" -> {
                             if (line.size > 2) {
-                                Logger.debug("Manually stopping connection at port ${line[2]}")
-                                SocketConnections.connections.getOrDefault(line[2].toIntOrNull(), null)?.close()
-                                    ?: reply("WARNING: No connection on port ${line[2]}")
-                            } else reply("INVALID COMMAND: Port must be specified")
+                                val port = line[2].toIntOrNull() ?: run {
+                                    invalidCommand("Invalid port: ${line[2]}")
+                                    return
+                                }
+                                Logger.debug("Manually stopping connection at port $port")
+                                reply("Stopping port $port")
+                                SocketConnections.connections.getOrDefault(port, null)?.close()
+                                    ?: invalidCommand("No connection on port $port")
+                            } else invalidCommand("Port must be specified")
                         }
-                        else -> reply("INVALID COMMAND: Invalid sub-command")
+                        "ADD" -> {
+                            if (line.size > 2) {
+                                val port = line[2].toIntOrNull() ?: run {
+                                    invalidCommand("Invalid port: ${line[2]}")
+                                    return
+                                }
+                                Logger.debug("Adding port $port")
+                                if (SocketConnections.connections.containsKey(port))
+                                    invalidCommand("Port $port already has a connection")
+                                else {
+                                    SocketConnections.add(port, server = this)
+                                    ports += port
+                                    reply("Added port $port")
+                                }
+                            } else invalidCommand("Port must be specified")
+                        }
+                        else -> invalidCommand("Invalid sub-command")
                     }
-                } else reply("INVALID COMMAND: Sub-command must be specified")
+                } else invalidCommand("Sub-command must be specified")
             }
             "END" -> {
                 if (line.size > 1) {
-                    if (line[1].toUpperCase() == "ALL") {
+                    if (line[1] == "ALL") {
                         val animations = leds.runningAnimations.ids.toList()
                         animations.forEach {
                             leds.endAnimation(it)
                         }
                     } else for (i in 1 until line.size)
                         leds.endAnimation(line[i])
-                } else reply("INVALID COMMAND: Animation ID or \"all\" must be specified")
+                } else invalidCommand("Animation ID or \"all\" must be specified")
             }
-            else -> reply("INVALID COMMAND: ${command.removePrefix("CMD :")} is not a valid command")
+            else -> invalidCommand("${command.removePrefix("CMD :")} is not a valid command")
         }
     }
 

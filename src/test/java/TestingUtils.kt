@@ -23,6 +23,7 @@
 package animatedledstrip.test
 
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
+import animatedledstrip.server.SocketConnections
 import animatedledstrip.utils.toUTF8
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -70,4 +71,9 @@ fun newCommandStream(newString: String) {
 fun redirectOutput() {
     outStream.reset()
     System.setOut(PrintStream(outStream))
+}
+
+fun SocketConnections.Connection.reset() {
+    close()
+    open()
 }

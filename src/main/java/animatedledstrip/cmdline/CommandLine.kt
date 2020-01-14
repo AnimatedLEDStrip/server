@@ -101,18 +101,24 @@ class CommandLine(private val port: Int, private val quiet: Boolean = false) {
                     "HELP" -> {
                         kotlin.io.println("""
                             Valid commands:
-                            quit          Stop the server and close the command line connection
-                            exit          Close the command line connection (server continues to run)
-                            debug         Change logging level to debug
-                            trace         Change logging level to trace
-                            info          Change logging level to info
-                            logs [on|off] Turn logs to this port on or off
-                            clear         Clear the LED strip (i.e. turn off all pixels)
-                            show          Print a list of all running animations
-                            show ID       Print information about a specific running animation
-                            end ID        End a specific running animation
-                            end all       End all running animations
-                            help          Show this help message
+                            quit            Stop the server and close the command line connection
+                            exit            Close the command line connection (server continues to run)
+                            debug           Change global logging level to debug
+                            trace           Change global logging level to trace
+                            info            Change global logging level to info
+                            logs [on|off]   Turn logs to this port on or off
+                            connections list  
+                                            Show a list of all connections associated with this server
+                            connections [start|stop] PORT
+                                            Start/stop the server connection on the specified port
+                            connections add PORT
+                                            Create a new connection associated with the specified port
+                            clear           Clear the LED strip (i.e. turn off all pixels)
+                            show            Print a list of all running animations
+                            show ID         Print information about a specific running animation
+                            end ID          End a specific running animation
+                            end all         End all running animations
+                            help            Show this help message
                         """.trimIndent())
                     }
                     else -> sendCmd(str, socOut)

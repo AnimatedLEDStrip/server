@@ -161,9 +161,61 @@ class ServerParserTest {
     }
 
     @Test
+    fun testConnections() {
+        AnimatedLEDStripServer(
+            arrayOf("-qf", "src/test/resources/ports.config", "-P", "3205"),
+            EmulatedAnimatedLEDStrip::class
+        ).start()
+        delayBlocking(1500)
+
+        redirectOutput()
+
+        val connection = SocketConnections.connections[3205]!!
+
+        newCommandStream("connections list\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+
+        connection.reset()
+        newCommandStream("c list\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+
+        connection.reset()
+        newCommandStream("connections stop 3005\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Stopping port 3005\n")
+
+        connection.reset()
+        newCommandStream("c list\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Port 3005: Stopped\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+
+        connection.reset()
+        newCommandStream("connections start 3005\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Starting port 3005\n")
+
+        connection.reset()
+        newCommandStream("c list\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+
+        connection.reset()
+        newCommandStream("connections add 3008\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Added port 3008\n")
+
+        connection.reset()
+        newCommandStream("c list\n")
+        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
+        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3008: Stopped\nPort 3205: Connected\n")
+    }
+
+    @Test
     fun testNonCommand() {
         AnimatedLEDStripServer(
-            arrayOf("-qf", "src/test/resources/empty.config", "-P", "3205"),
+            arrayOf("-qf", "src/test/resources/empty.config", "-P", "3206"),
             EmulatedAnimatedLEDStrip::class
         ).start()
         delayBlocking(500)
@@ -171,22 +223,7 @@ class ServerParserTest {
         redirectOutput()
 
         newCommandStream("notacommand\n")
-        startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "INVALID COMMAND: notacommand is not a valid command\n")
-    }
-
-    @Test
-    fun testConnections() {
-        AnimatedLEDStripServer(
-            arrayOf("-qf", "src/test/resources/ports.config", "-P", "3206"),
-            EmulatedAnimatedLEDStrip::class
-        ).start()
-        delayBlocking(1500)
-
-        redirectOutput()
-
-        newCommandStream("connections list\n")
         startServer(arrayOf("-CP", "3206"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3206: Connected\n")
+        checkOutput(expected = "INVALID COMMAND: notacommand is not a valid command\n")
     }
 }
