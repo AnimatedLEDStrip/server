@@ -196,6 +196,8 @@ class ServerParserTest {
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
         checkOutput(expected = "Starting port 3005\n")
 
+        delayBlocking(500)
+
         connection.reset()
         newCommandStream("c list\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
