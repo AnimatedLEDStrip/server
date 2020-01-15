@@ -47,15 +47,14 @@ private fun ByteArrayOutputStream.toCleanedString(): String {
     return this
         .toByteArray().filter { it != 0.toByte() }.toByteArray().toUTF8()   // remove excess null bytes
         .replace("\r\n", "\n")                                              // Allow CRLF and LF terminals to test
-        .replace("Welcome to the AnimatedLEDStrip Server console\nConnected\n", "")
-        .replace(Regex("INFO:\\{.*};\n"), "")
-        .replace(Regex("DATA:\\{.*};\n"), "")
+        .replace("\n", "")                                                 // Remove newlines
+        .replace("Welcome to the AnimatedLEDStrip Server consoleConnected", "")
+        .replace(Regex("INFO:\\{.*};"), "")
+        .replace(Regex("DATA:\\{.*};"), "")
 }
 
 fun checkOutput(expected: String) {
-    System.err.println("Actual: ${outStream.toCleanedString()}")
-    System.err.println("Expected: $expected")
-    assertTrue { outStream.toCleanedString() == expected }
+    assertTrue { outStream.toCleanedString() == expected.filterNot { it == '\n' || it == '\r' } }
     outStream.reset()
 }
 
