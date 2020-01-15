@@ -53,7 +53,12 @@ private fun ByteArrayOutputStream.toCleanedString(): String {
 }
 
 fun checkOutput(expected: String) {
+    try {
     assertTrue { outStream.toCleanedString() == expected }
+    } catch (e: AssertionError) {
+        println("Actual: ${outStream.toCleanedString()}; Expected: $expected")
+        throw e
+    }
     outStream.reset()
 }
 
