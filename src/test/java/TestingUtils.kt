@@ -28,6 +28,7 @@ import animatedledstrip.utils.toUTF8
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.pmw.tinylog.Logger
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -56,7 +57,7 @@ fun checkOutput(expected: String) {
     try {
     assertTrue { outStream.toCleanedString() == expected }
     } catch (e: AssertionError) {
-        println("Actual: ${outStream.toCleanedString()}; Expected: $expected")
+        Logger.error("Actual: ${outStream.toCleanedString()}; Expected: $expected")
         throw e
     }
     outStream.reset()
