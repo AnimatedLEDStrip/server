@@ -28,7 +28,6 @@ import animatedledstrip.utils.toUTF8
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.pmw.tinylog.Logger
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -48,18 +47,14 @@ private fun ByteArrayOutputStream.toCleanedString(): String {
     return this
         .toByteArray().filter { it != 0.toByte() }.toByteArray().toUTF8()   // remove excess null bytes
         .replace("\r\n", "\n")                                              // Allow CRLF and LF terminals to test
-        .replace("Welcome to the AnimatedLEDStrip Server console\nConnected\n", "")
-        .replace(Regex("INFO:\\{.*};\n"), "")
-        .replace(Regex("DATA:\\{.*};\n"), "")
+        .replace("\n", "")                                                 // Remove newlines
+        .replace("Welcome to the AnimatedLEDStrip Server consoleConnected", "")
+        .replace(Regex("INFO:\\{.*};"), "")
+        .replace(Regex("DATA:\\{.*};"), "")
 }
 
 fun checkOutput(expected: String) {
-    try {
-    assertTrue { outStream.toCleanedString() == expected }
-    } catch (e: AssertionError) {
-        Logger.error("Actual: ${outStream.toCleanedString()}; Expected: $expected")
-        throw e
-    }
+    assertTrue { outStream.toCleanedString() == expected.filterNot { it == '\n' || it == '\r' } }
     outStream.reset()
 }
 

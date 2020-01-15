@@ -125,7 +125,7 @@ class ServerParserTest {
 
         newCommandStream("end\n")
         startServer(arrayOf("-CP", "3200"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "INVALID COMMAND: Animation ID or \"all\" must be specified\n")
+        checkOutput(expected = "INVALID COMMAND: Animation ID or \"all\" must be specified")
     }
 
     @Test
@@ -141,22 +141,22 @@ class ServerParserTest {
 
         newCommandStream("show\n")
         startServer(arrayOf("-CP", "3201"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Running Animations: []\n")
+        checkOutput(expected = "Running Animations: []")
 
         newCommandStream("show 1234\n")
         startServer(arrayOf("-CP", "3202"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "1234: NOT FOUND\n")
+        checkOutput(expected = "1234: NOT FOUND")
 
         testServer.leds.addAnimation(AnimationData(animation = Animation.ALTERNATE, continuous = true), "5678")
         delayBlocking(500)
         newCommandStream("show\n")
         startServer(arrayOf("-CP", "3203"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Running Animations: [5678]\n")
+        checkOutput(expected = "Running Animations: [5678]")
 
         newCommandStream("show 5678\n")
         startServer(arrayOf("-CP", "3204"), EmulatedAnimatedLEDStrip::class)
         checkOutput(
-            expected = "5678: AnimationData(animation=ALTERNATE, colors=[0], center=120, continuous=true, delay=1000, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)\n"
+            expected = "5678: AnimationData(animation=ALTERNATE, colors=[0], center=120, continuous=true, delay=1000, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)"
         )
     }
 
@@ -174,44 +174,42 @@ class ServerParserTest {
 
         newCommandStream("connections list\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+        checkOutput(expected = "Port 3005: WaitingPort 3006: WaitingPort 3007: WaitingPort 3205: Connected")
 
         connection.reset()
         newCommandStream("c list\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+        checkOutput(expected = "Port 3005: WaitingPort 3006: WaitingPort 3007: WaitingPort 3205: Connected")
 
         connection.reset()
         newCommandStream("connections stop 3005\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Stopping port 3005\n")
+        checkOutput(expected = "Stopping port 3005")
 
         connection.reset()
         newCommandStream("c list\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Port 3005: Stopped\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+        checkOutput(expected = "Port 3005: StoppedPort 3006: WaitingPort 3007: WaitingPort 3205: Connected")
 
         connection.reset()
         newCommandStream("connections start 3005\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Starting port 3005\n")
-
-        delayBlocking(500)
+        checkOutput(expected = "Starting port 3005")
 
         connection.reset()
         newCommandStream("c list\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3205: Connected\n")
+        checkOutput(expected = "Port 3005: WaitingPort 3006: WaitingPort 3007: WaitingPort 3205: Connected")
 
         connection.reset()
         newCommandStream("connections add 3008\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Added port 3008\n")
+        checkOutput(expected = "Added port 3008")
 
         connection.reset()
         newCommandStream("c list\n")
         startServer(arrayOf("-CP", "3205"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "Port 3005: Waiting\nPort 3006: Waiting\nPort 3007: Waiting\nPort 3008: Stopped\nPort 3205: Connected\n")
+        checkOutput(expected = "Port 3005: WaitingPort 3006: WaitingPort 3007: WaitingPort 3008: StoppedPort 3205: Connected")
     }
 
     @Test
@@ -226,6 +224,6 @@ class ServerParserTest {
 
         newCommandStream("notacommand\n")
         startServer(arrayOf("-CP", "3206"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "INVALID COMMAND: notacommand is not a valid command\n")
+        checkOutput(expected = "INVALID COMMAND: notacommand is not a valid command")
     }
 }
