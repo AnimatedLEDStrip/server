@@ -95,7 +95,7 @@ class ServerParserTest {
         assertTrue { testServer.leds.runningAnimations.ids.contains("2521") }
 
         testServer.parseTextCommand("end 1234", null)
-        delayBlocking(500)
+        delayBlocking(2000)
         assertFalse { testServer.leds.runningAnimations.ids.contains("1234") }
         assertTrue { testServer.leds.runningAnimations.ids.contains("1357") }
         assertTrue { testServer.leds.runningAnimations.ids.contains("2431") }
