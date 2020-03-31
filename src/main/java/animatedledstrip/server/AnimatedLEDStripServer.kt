@@ -30,6 +30,8 @@ import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.StripInfo
 import animatedledstrip.utils.delayBlocking
+import animatedledstrip.utils.json
+import animatedledstrip.utils.jsonToAnimationData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -195,8 +197,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             if (persistAnimations)
                 GlobalScope.launch {
                     withContext(Dispatchers.IO) {
-                        ObjectOutputStream(FileOutputStream(".animations/${it.fileName}")).apply {
-                            writeObject(it)
+                        FileOutputStream(".animations/${it.fileName}").apply {
+                            write(it.json())
                             close()
                         }
                     }
@@ -231,15 +233,11 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 GlobalScope.launch {
                     File(".animations/").walk().forEach {
                         if (!it.isDirectory && it.name.endsWith(".anim")) try {
-                            ObjectInputStream(FileInputStream(it)).apply {
-                                val obj = readObject() as AnimationData
+                            FileInputStream(it).apply {
+                                val obj = readAllBytes().toString().jsonToAnimationData()
                                 leds.addAnimation(obj)
                                 close()
                             }
-                        } catch (e: ClassCastException) {
-                            it.delete()
-                        } catch (e: InvalidClassException) {
-                            it.delete()
                         } catch (e: FileNotFoundException) {
                         }
                     }
