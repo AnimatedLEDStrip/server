@@ -342,7 +342,7 @@ class AnimatedLEDStripServerTest {
 
         testServer.parseTextCommand("debug", null)
         assertTrue { Logger.getLevel() == Level.DEBUG }
-        checkOutput(expected = "TRACE:   Parsing \"debug\"\nDEBUG:   Set logging level to debug\n")
+        checkOutput(expected = "DEBUG:   Set logging level to debug\n")
 
         testServer.parseTextCommand("info", null)
         assertTrue { Logger.getLevel() == Level.INFO }

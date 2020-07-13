@@ -38,24 +38,35 @@ private var stream = ByteArrayInputStream("".toByteArray())
 val outStream = ByteArrayOutputStream()
 
 fun checkAllPixels(testLEDs: EmulatedAnimatedLEDStrip, color: Long) {
-    testLEDs.pixelColorList.forEach {
+    testLEDs.pixelProlongedColorList.forEach {
         assertTrue { it == color }
     }
 }
 
-private fun ByteArrayOutputStream.toCleanedString(): String {
-    return this
+private fun ByteArrayOutputStream.toCleanedString(removeInfo: Boolean = true, removeData: Boolean = true): String {
+    var returnStr = this
         .toByteArray().filter { it != 0.toByte() }.toByteArray().toUTF8()   // remove excess null bytes
         .replace("\r\n", "\n")                                              // Allow CRLF and LF terminals to test
         .replace("\n", "")                                                 // Remove newlines
         .replace("Welcome to the AnimatedLEDStrip Server consoleConnected", "")
-        .replace(Regex("INFO:\\{.*};"), "")
-        .replace(Regex("DATA:\\{.*};"), "")
+    if (removeInfo) returnStr = returnStr.replace(Regex("Strip Info:[\\s\\S]*End Strip Info"), "")
+    if (removeData) returnStr = returnStr.replace(Regex("AnimationData \\d*:[\\s\\S]*End AnimationData"), "")
+    return returnStr
 }
 
-fun checkOutput(expected: String) {
-    assertTrue { outStream.toCleanedString() == expected.filterNot { it == '\n' || it == '\r' } }
-    outStream.reset()
+fun checkOutput(expected: String, removeInfo: Boolean = true, removeData: Boolean = true) {
+    try {
+        assertTrue {
+            outStream.toCleanedString(removeInfo, removeData) ==
+                    expected.filterNot { it == '\n' || it == '\r' }
+        }
+        outStream.reset()
+    } catch (e: AssertionError) {
+        System.err.println("expected: " + expected.filterNot { it == '\n' || it == '\r' })
+        System.err.println()
+        System.err.println("actual:   " + outStream.toCleanedString())
+        throw e
+    }
 }
 
 fun newCommandStream(newString: String) {

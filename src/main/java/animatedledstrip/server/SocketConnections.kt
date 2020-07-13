@@ -22,13 +22,12 @@
 
 package animatedledstrip.server
 
-import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
-import animatedledstrip.animationutils.id
-import animatedledstrip.utils.getDataTypePrefix
-import animatedledstrip.utils.json
-import animatedledstrip.utils.jsonToAnimationData
-import animatedledstrip.utils.toUTF8
+import animatedledstrip.animationutils.EndAnimation
+import animatedledstrip.animationutils.definedAnimations
+import animatedledstrip.leds.AnimatedLEDStrip
+import animatedledstrip.server.SocketConnections.connections
+import animatedledstrip.utils.*
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.io.InputStream
@@ -40,6 +39,12 @@ import java.nio.charset.Charset
  * An object for creating, tracking and using connections that clients can connect to
  */
 object SocketConnections {
+
+    init {
+//        newDefinedAnimationCallback = { info ->
+//            sendData(info)
+//        }
+    }
 
     /**
      * Used in testing by setting it equal to "0.0.0.0"
@@ -144,8 +149,10 @@ object SocketConnections {
                                 continue    // otherwise try again
                             }
                         try {
-                            socIn = clientSocket?.getInputStream() ?: throw SocketException("Could not create input stream")
-                            socOut = clientSocket?.getOutputStream() ?: throw SocketException("Could not create output stream")
+                            socIn =
+                                clientSocket?.getInputStream() ?: throw SocketException("Could not create input stream")
+                            socOut = clientSocket?.getOutputStream()
+                                ?: throw SocketException("Could not create output stream")
                             break           // Input and output streams have been created successfully
                         } catch (e: SocketException) {
                             continue        // Something happened when creating streams, start over with new connection
@@ -159,7 +166,10 @@ object SocketConnections {
                 // to newly connected client
                 sendInfo()
                 server.leds.runningAnimations.animations.forEach {
-                    sendAnimation(it.animation, client = this@Connection)
+                    sendAnimation(it.data, client = this@Connection)
+                }
+                definedAnimations.forEach {
+                    send(it.value.info.json())
                 }
 
                 // Receive and process input
@@ -182,19 +192,23 @@ object SocketConnections {
                             throw SocketException("Connection closed")
 
                         // Output string and array of bytes received for debugging
-                        Logger.debug(input.toString(Charset.forName("utf-8")).take(count))
-                        Logger.debug("Bytes: ${input
-                            .toString(Charset.forName("utf-8"))
-                            .take(count)
-                            .toByteArray()
-                            .map { it.toString() }}"
+                        Logger.debug(input.toUTF8(count))
+                        Logger.debug(
+                            "Bytes: ${input
+                                .toUTF8(count)
+                                .toByteArray()
+                                .map { it.toString() }}"
                         )
 
+                        val data = input.toUTF8(count)
+
                         // Pass input to appropriate function
-                        when (input.toUTF8(count).getDataTypePrefix()) {
-                            "DATA" -> server.leds.addAnimation(input.toUTF8(count).jsonToAnimationData())
-                            "CMD " -> server.parseTextCommand(input.toUTF8(count), client = this)
-                            else -> Logger.warn("Incorrect data type")
+                        when (val dataType = data.getDataTypePrefix()) {
+                            AnimationData.prefix -> server.leds.startAnimation(data.jsonToAnimationData())
+                            "CMD " -> server.parseTextCommand(data, client = this)
+                            EndAnimation.prefix -> server.leds.endAnimation(data.jsonToEndAnimation())
+                            AnimatedLEDStrip.sectionPrefix -> TODO()
+                            else -> Logger.warn("Incorrect data type: $dataType")
                         }
 
                         input = ByteArray(10000)    // Reset ByteArray
@@ -205,23 +219,13 @@ object SocketConnections {
             }
         }
 
-        /**
-         * Send animation data to the client along with an ID
-         */
-        fun sendAnimation(animation: AnimationData, id: String = animation.id) {
-            send(
-                animation
-                    .id(
-                        if ((animation.animation == Animation.CUSTOMANIMATION ||
-                                    animation.animation == Animation.CUSTOMREPETITIVEANIMATION) &&
-                            animation.id.length == 1
-                        )
-                            "${animation.id} $id"
-                        else id
-                    ).json()
-            )
-            if (animation.animation == Animation.ENDANIMATION) Logger.debug("Sent end of animation $id")
-            else Logger.debug("Sent animation $id")
+        fun sendData(data: SendableData) {
+            send(data.json())
+            when (data) {
+                is AnimationData -> Logger.debug("Sent animation ${data.id}")
+                is EndAnimation -> Logger.debug("Sent end of animation ${data.id}")
+                else -> Logger.debug("Sent $data")
+            }
         }
 
         /**
@@ -262,7 +266,7 @@ object SocketConnections {
                 withContext(Dispatchers.IO) {
                     try {
                         socOut?.write(data)
-                            ?: Logger.debug("Could not to port $port: Connection socket null")
+                            ?: Logger.debug("Could not send to port $port: Connection socket null")
                     } catch (e: SocketException) {
                         Logger.debug("Could not send to port $port: Disconnect")
                     }
@@ -277,18 +281,24 @@ object SocketConnections {
     }
 
 
+    fun sendData(data: SendableData, client: Connection? = null) {
+        if (client != null) client.sendData(data)
+        else connections.forEach {
+            it.value.sendData(data)
+        }
+    }
+
     /**
      * Send animation data to one or all client(s).
      *
      * @param client Used to specify which client should receive the data. If
      * null, data is sent to all clients
      */
-    fun sendAnimation(animation: AnimationData, id: String = animation.id, client: Connection? = null) {
-        if (client != null) client.sendAnimation(animation, id)
-        else connections.forEach {
-            it.value.sendAnimation(animation, id)
-        }
-    }
+    fun sendAnimation(animation: AnimationData, client: Connection? = null) =
+        sendData(animation, client)
+
+    fun sendEndAnimation(animation: EndAnimation, client: Connection? = null) =
+        sendData(animation, client)
 
     /**
      * Send a string to one or all client(s).
@@ -299,9 +309,9 @@ object SocketConnections {
     fun sendLog(str: String, client: Connection? = null) {
         // Note: Don't include any logging statements in this function
         // (this will create an endless loop)
-        if (client != null) client.sendString(str)
+        if (client != null) client.sendString(str + DELIMITER)
         else connections.forEach {
-            if (it.value.sendLogs) it.value.sendString(str)
+            if (it.value.sendLogs) it.value.sendString(str + DELIMITER)
         }
     }
 

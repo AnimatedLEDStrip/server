@@ -34,8 +34,7 @@ class SocketWriter : Writer {
 
     private val delimiter = ":"
 
-    override fun init(p0: Configuration?) {
-    }
+    override fun init(p0: Configuration?) {}
 
     override fun getRequiredLogEntryValues(): MutableSet<LogEntryValue> {
         return mutableSetOf(LogEntryValue.LEVEL, LogEntryValue.MESSAGE)
@@ -48,10 +47,8 @@ class SocketWriter : Writer {
         )
     }
 
-    override fun flush() {
-    }
+    override fun flush() {}
 
-    override fun close() {
-    }
+    override fun close() {}
 
 }

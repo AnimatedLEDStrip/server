@@ -26,7 +26,6 @@ import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
 
 val options = Options().apply {
-    addOption("C", "command-line", false, "Connect to a running server with a command line")
     addOption("d", "debug", false, "Enable debug level logging")
     addOption("E", "emulate", false, "Emulate the LED strip")
     addOption("f", "prop-file", true, "Specify properties file")

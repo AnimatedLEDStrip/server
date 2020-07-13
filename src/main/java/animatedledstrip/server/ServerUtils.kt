@@ -23,21 +23,12 @@
 package animatedledstrip.server
 
 import animatedledstrip.animationutils.AnimationData
-import animatedledstrip.cmdline.CommandLine
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.utils.delayBlocking
-import org.apache.commons.cli.DefaultParser
 import kotlin.reflect.KClass
 
 fun <T : AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {
-    val cmdline = DefaultParser().parse(options, args)
-    when (cmdline.hasOption("C")) {
-        false -> AnimatedLEDStripServer(args, ledClass).start().waitUntilStop()
-        true -> CommandLine(
-            port = cmdline.getOptionValue("P")?.toIntOrNull() ?: 1118,
-            quiet = cmdline.hasOption("q")
-        ).start()
-    }
+    AnimatedLEDStripServer(args, ledClass).start().waitUntilStop()
 }
 
 fun AnimatedLEDStripServer<*>.waitUntilStop() {

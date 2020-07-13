@@ -22,7 +22,6 @@
 
 package animatedledstrip.test
 
-import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.addColor
 import animatedledstrip.leds.emulated.EmulatedAnimatedLEDStrip
@@ -45,7 +44,7 @@ class ServerParserTest {
         val testServer =
             AnimatedLEDStripServer(arrayOf("-f", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
 
-        testServer.leds.addAnimation(AnimationData().addColor(0xFF))
+        testServer.leds.startAnimation(AnimationData().addColor(0xFF))
         delayBlocking(500)
         checkAllPixels(testServer.leds as EmulatedAnimatedLEDStrip, 0xFF)
 
@@ -62,28 +61,28 @@ class ServerParserTest {
                 EmulatedAnimatedLEDStrip::class
             ).start()
 
-        testServer.leds.addAnimation(
-            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+        testServer.leds.startAnimation(
+            AnimationData(animation = "Alternate", continuous = true, delay = 50),
             "1234"
         )
-        testServer.leds.addAnimation(
-            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+        testServer.leds.startAnimation(
+            AnimationData(animation = "Alternate", continuous = true, delay = 50),
             "1357"
         )
-        testServer.leds.addAnimation(
-            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+        testServer.leds.startAnimation(
+            AnimationData(animation = "Alternate", continuous = true, delay = 50),
             "2431"
         )
-        testServer.leds.addAnimation(
-            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+        testServer.leds.startAnimation(
+            AnimationData(animation = "Alternate", continuous = true, delay = 50),
             "7654"
         )
-        testServer.leds.addAnimation(
-            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+        testServer.leds.startAnimation(
+            AnimationData(animation = "Alternate", continuous = true, delay = 50),
             "2653"
         )
-        testServer.leds.addAnimation(
-            AnimationData(animation = Animation.ALTERNATE, continuous = true, delay = 50),
+        testServer.leds.startAnimation(
+            AnimationData(animation = "Alternate", continuous = true, delay = 50),
             "2521"
         )
 
@@ -125,11 +124,11 @@ class ServerParserTest {
 
         newCommandStream("end\n")
         startServer(arrayOf("-CP", "3200"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "INVALID COMMAND: Animation ID or \"all\" must be specified")
+        checkOutput(expected = "Animation ID or \"all\" must be specified")
     }
 
     @Test
-    fun testShow() {
+    fun testRunning() {
         val testServer =
             AnimatedLEDStripServer(
                 arrayOf("-qf", "src/test/resources/empty.config", "-P", "3201 3202 3203 3204"),
@@ -139,24 +138,24 @@ class ServerParserTest {
 
         redirectOutput()
 
-        newCommandStream("show\n")
+        newCommandStream("running\n")
         startServer(arrayOf("-CP", "3201"), EmulatedAnimatedLEDStrip::class)
         checkOutput(expected = "Running Animations: []")
 
-        newCommandStream("show 1234\n")
+        newCommandStream("running 1234\n")
         startServer(arrayOf("-CP", "3202"), EmulatedAnimatedLEDStrip::class)
         checkOutput(expected = "1234: NOT FOUND")
 
-        testServer.leds.addAnimation(AnimationData(animation = Animation.ALTERNATE, continuous = true), "5678")
+        testServer.leds.startAnimation(AnimationData(animation = "Alternate", continuous = true), "5678")
         delayBlocking(500)
-        newCommandStream("show\n")
+        newCommandStream("running\n")
         startServer(arrayOf("-CP", "3203"), EmulatedAnimatedLEDStrip::class)
         checkOutput(expected = "Running Animations: [5678]")
 
-        newCommandStream("show 5678\n")
+        newCommandStream("running 5678\n")
         startServer(arrayOf("-CP", "3204"), EmulatedAnimatedLEDStrip::class)
         checkOutput(
-            expected = "5678: AnimationData(animation=ALTERNATE, colors=[0], center=120, continuous=true, delay=1000, delayMod=1.0, direction=FORWARD, distance=240, endPixel=239, id=5678, spacing=3, startPixel=0)"
+            expected = "5678: AnimationData(animation=Alternate, colors=[0], center=120, continuous=true, delay=1000, delayMod=1.0, direction=FORWARD, distance=240, id=5678, section=, spacing=3)"
         )
     }
 
@@ -224,6 +223,18 @@ class ServerParserTest {
 
         newCommandStream("notacommand\n")
         startServer(arrayOf("-CP", "3206"), EmulatedAnimatedLEDStrip::class)
-        checkOutput(expected = "INVALID COMMAND: notacommand is not a valid command")
+        checkOutput(expected = "BAD COMMAND: NOTACOMMAND")
+    }
+
+    @Test
+    fun testHelp() {
+        val testServer =
+            AnimatedLEDStripServer(
+                arrayOf("-qf", "src/test/resources/empty.config"),
+                EmulatedAnimatedLEDStrip::class
+            ).start()
+        delayBlocking(500)
+
+        testServer.parseTextCommand("help", null)
     }
 }

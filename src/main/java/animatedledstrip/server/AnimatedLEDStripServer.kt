@@ -22,27 +22,35 @@
 
 package animatedledstrip.server
 
-import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.animation
 import animatedledstrip.animationutils.color
+import animatedledstrip.animationutils.findAnimationOrNull
 import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.StripInfo
+import animatedledstrip.parser.CommandParser
+import animatedledstrip.parser.action
+import animatedledstrip.parser.command
+import animatedledstrip.parser.subCommand
+import animatedledstrip.utils.DELIMITER
 import animatedledstrip.utils.delayBlocking
-import animatedledstrip.utils.json
+import animatedledstrip.utils.endAnimation
 import animatedledstrip.utils.jsonToAnimationData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.net.BindException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -167,11 +175,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     val stripInfo: StripInfo
     val leds: AnimatedLEDStrip
 
-    /*
-      Check validity of constructor before calling so user can be notified about
-      what changes need to be made rather than just throwing an IllegalArgumentException
-      without any explanation
-    */
     init {
         stripInfo = StripInfo(
             numLEDs = numLEDs,
@@ -182,6 +185,11 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             threadCount = threadCount
         )
 
+        /*
+          Check validity of constructor before calling so user can be notified about
+          what changes need to be made rather than just throwing an IllegalArgumentException
+          without any explanation
+        */
         val ledConstructor = ledClass.primaryConstructor
         requireNotNull(ledConstructor)
         require(ledConstructor.parameters.size == 1)
@@ -191,23 +199,277 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             stripInfo
         )
 
-        // TODO: Change saved files to use JSON
         leds.startAnimationCallback = {
             SocketConnections.sendAnimation(it)
             if (persistAnimations)
-                GlobalScope.launch {
-                    withContext(Dispatchers.IO) {
-                        FileOutputStream(".animations/${it.fileName}").apply {
-                            write(it.json())
-                            close()
-                        }
+                GlobalScope.launch(Dispatchers.IO) {
+                    FileOutputStream(".animations/${it.fileName}").apply {
+                        write(it.json())
+                        close()
                     }
                 }
         }
         leds.endAnimationCallback = {
-            SocketConnections.sendAnimation(it.copy(animation = Animation.ENDANIMATION))
+            SocketConnections.sendEndAnimation(it.endAnimation())
             if (File(".animations/${it.fileName}").exists())
                 Files.delete(Paths.get(".animations/${it.fileName}"))
+        }
+    }
+
+    val commandParser =
+        CommandParser<AnimatedLEDStripServer<T>, SocketConnections.Connection?>(
+            this
+        )
+
+    init {
+        commandParser.apply {
+            fun reply(str: String, client: SocketConnections.Connection?) {
+                Logger.trace("Replying to client on port ${client?.port}: $str")
+                client?.sendString(str + DELIMITER)
+            }
+
+            invalidCommandAction = { client, cmd ->
+                reply("BAD COMMAND: $cmd", client)
+            }
+
+            helpMessageAction = { client, msg ->
+                if (client != null) reply(msg, client)
+                else println(msg)
+            }
+
+            command("quit") {
+                shortIdentifier = "q"
+                description = "Stop the server"
+
+                action { _, _ ->
+                    Logger.warn("Shutting down server")
+                    stop()
+                }
+            }
+
+            command("logs") {
+                description = "Modify logging settings"
+
+                subCommand("on") {
+                    description = "Turn on logs to this port"
+
+                    action { client, _ ->
+                        client?.sendLogs = true
+                    }
+                }
+
+                subCommand("off") {
+                    description = "Turn off logs to this port"
+
+                    action { client, _ ->
+                        client?.sendLogs = false
+                    }
+                }
+
+                subCommand("level") {
+                    description = "Get or set the global logging level"
+                    subCommand("info") {
+                        description = "Set global logging level to info"
+
+                        action { _, _ ->
+                            setLoggingLevel(Level.INFO)
+                            Logger.info("Set logging level to info")
+                        }
+                    }
+
+                    subCommand("debug") {
+                        description = "Set global logging level to debug"
+
+                        action { _, _ ->
+                            setLoggingLevel(Level.DEBUG)
+                            Logger.debug("Set logging level to debug")
+                        }
+                    }
+
+                    subCommand("trace") {
+                        shortIdentifier = "t"
+                        description = "Set global logging level to trace"
+
+                        action { _, _ ->
+                            setLoggingLevel(Level.TRACE)
+                            Logger.trace("Set logging level to trace")
+                        }
+                    }
+
+                    action { client, _ ->
+                        reply("Logging level is ${Logger.getLevel()}", client)
+                    }
+                }
+            }
+
+            command("strip") {
+                subCommand("clear") {
+                    description = "Clear the LED strip (i.e. turn off all pixels)"
+
+                    action { client, _ ->
+                        leds.clear()
+                        reply("Cleared strip", client)
+                    }
+                }
+
+            }
+
+            command("running") {
+                shortIdentifier = "r"
+                description = "Get information about currently running animations"
+
+                subCommand("list") {
+                    shortIdentifier = "l"
+                    description = "Print a list of all running animations"
+
+                    action { client, _ ->
+                        reply("Running Animations: ${leds.runningAnimations.ids}", client)
+                    }
+                }
+
+                subCommand("info") {
+                    shortIdentifier = "i"
+                    description = "Print info about a running animation"
+                    argStr = "ID"
+
+                    action { client, args ->
+                        val anim = args.firstOrNull()
+                            ?: run { reply("ID of animation required", client); return@action }
+                        reply(
+                            leds.runningAnimations.entries.toMap()[anim]?.data?.toHumanReadableString()
+                                ?: "$anim: NOT FOUND",
+                            client
+                        )
+                    }
+                }
+            }
+
+            command("end") {
+                description = "End one or more running animations"
+                argStr = "ID..."
+
+                subCommand("all") {
+                    description = "End all running animations"
+
+                    action { client, _ ->
+                        leds.runningAnimations.ids.toList().forEach {
+                            reply("Ending animation $it", client)
+                            leds.endAnimation(it)
+                        }
+                    }
+                }
+
+                action { client, args ->
+                    args.forEach {
+                        reply("Ending animation $it", client)
+                        leds.endAnimation(it)
+                    }
+                }
+            }
+
+            command("animation") {
+                shortIdentifier = "a"
+                description = "Get information about a defined animation"
+                argStr = "NAME"
+
+                action { client, args ->
+                    val animName = args.firstOrNull() ?: run {
+                        reply("Name of animation required", client)
+                        return@action
+                    }
+                    val anim = findAnimationOrNull(animName) ?: run {
+                        reply("Animation $animName not found", client)
+                        return@action
+                    }
+
+                    client?.sendData(anim.info)
+                }
+
+            }
+
+            command("connections") {
+                shortIdentifier = "c"
+                description = "Manage the server's socket connections"
+
+                subCommand("list") {
+                    shortIdentifier = "l"
+                    description = "Show a list of all connections associated with this server"
+
+                    action { client, _ ->
+                        for (port in ports.sorted()) {
+                            reply("Port $port: ${SocketConnections.connections[port]?.status()}", client)
+                        }
+                    }
+                }
+
+                subCommand("add") {
+                    shortIdentifier = "a"
+                    description = "Add a new connection"
+                    argStr = "PORT"
+
+                    action { client, args ->
+                        when (val port = args.firstOrNull()) {
+                            null -> reply("Port must be specified", client)
+                            else -> when (val portNum = port.toIntOrNull()) {
+                                null -> reply("""Invalid port: "$port"""", client)
+                                else -> {
+                                    Logger.debug("Adding port $portNum")
+                                    when (SocketConnections.connections.containsKey(portNum)) {
+                                        true -> reply("ERROR: Port $portNum already has a connection", client)
+                                        false -> {
+                                            SocketConnections.add(portNum, server = this)
+                                            ports += portNum
+                                            reply("Added port $portNum", client)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                subCommand("start") {
+                    description = "Start the server connection on the specified port"
+                    argStr = "PORT"
+
+                    action { client, args ->
+                        when (val port = args.firstOrNull()) {
+                            null -> reply("Port must be specified", client)
+                            else -> when (val portNum = port.toIntOrNull()) {
+                                null -> reply("""Invalid port: "$port"""", client)
+                                else -> {
+                                    Logger.debug("Manually starting connection at port $portNum")
+                                    reply("Starting port $portNum", client)
+                                    SocketConnections.connections.getOrDefault(portNum, null)?.open()
+                                        ?: reply("ERROR: No connection on port $port", client)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                subCommand("stop") {
+                    description = "Start the server connection on the specified port"
+                    argStr = "PORT"
+
+                    action { client, args ->
+                        when (val port = args.firstOrNull()) {
+                            null -> reply("Port must be specified", client)
+                            else -> when (val portNum = port.toIntOrNull()) {
+                                null -> reply("""Invalid port: "$port"""", client)
+                                else -> {
+                                    Logger.debug("Manually stopping connection at port $portNum")
+                                    reply("Stopping port $portNum", client)
+                                    SocketConnections.connections.getOrDefault(portNum, null)?.close()
+                                        ?: reply("ERROR: No connection on port $portNum", client)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Unit
         }
     }
 
@@ -215,7 +477,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
      * The test animation
      */
     var testAnimation =
-        AnimationData().animation(Animation.COLOR).color(CCBlue)
+        AnimationData().animation("Color").color(CCBlue)
 
     /* Start and stop methods */
 
@@ -235,11 +497,12 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         if (!it.isDirectory && it.name.endsWith(".anim")) try {
                             FileInputStream(it).apply {
                                 val obj = readAllBytes().toString().jsonToAnimationData()
-                                leds.addAnimation(obj)
+                                leds.startAnimation(obj)
                                 close()
                             }
                         } catch (e: FileNotFoundException) {
                         }
+
                     }
                 }
             }
@@ -247,136 +510,28 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
         running = true
         ports.forEach {
-            SocketConnections.add(it, server = this)
-            SocketConnections.connections[it]?.open()
+            try {
+                SocketConnections.add(it, server = this)
+                SocketConnections.connections[it]?.open()
+            } catch (e: BindException) {
+                Logger.error("Could not bind to port $it")
+            }
         }
-        if (cmdline.hasOption("T")) leds.addAnimation(testAnimation)
+        if (cmdline.hasOption("T")) leds.startAnimation(testAnimation)
         return this
     }
 
     /** Stop the server */
     fun stop() {
-        leds.setStripColor(0)
+        leds.wholeStrip.setProlongedStripColor(0)
         delayBlocking(500)
         leds.toggleRender()
         delayBlocking(2000)
         running = false
     }
 
-    internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) {
-        fun reply(str: String) {
-            Logger.trace("Replying to client on port ${client?.port}: $str")
-            client?.sendString(str)
-        }
-
-        fun invalidCommand(reason: String) {
-            reply("INVALID COMMAND: $reason")
-        }
-
-        Logger.trace("Parsing \"$command\"")
-        val line = command.removePrefix("CMD :").toUpperCase().split(" ")
-        return when (line[0]) {
-            "QUIT", "Q" -> {
-                Logger.warn("Shutting down server")
-                stop()
-            }
-            "DEBUG" -> {
-                setLoggingLevel(Level.DEBUG)
-                Logger.debug("Set logging level to debug")
-            }
-            "TRACE" -> {
-                setLoggingLevel(Level.TRACE)
-                Logger.trace("Set logging level to trace")
-            }
-            "INFO" -> {
-                setLoggingLevel(Level.INFO)
-                Logger.info("Set logging level to info")
-            }
-            "LOGS" -> {
-                if (line.size > 1) {
-                    when (line[1]) {
-                        "ON" -> client?.sendLogs = true
-                        "OFF" -> client?.sendLogs = false
-                        else -> invalidCommand("\"on\" or \"off\" must be specified")
-                    }
-                } else invalidCommand("\"on\" or \"off\" must be specified")
-            }
-            "CLEAR" -> {
-                leds.addAnimation(AnimationData().animation(Animation.COLOR))
-                Logger.debug("Cleared strip")
-            }
-            "SHOW", "S" -> {
-                if (line.size > 1) reply(
-                    "${line[1]}: ${leds.runningAnimations.entries.toMap()[line[1]]?.animation ?: "NOT FOUND"}"
-                )
-                else reply("Running Animations: ${leds.runningAnimations.ids}")
-            }
-            "CONNECTIONS", "C" -> {
-                if (line.size > 1) {
-                    when (line[1]) {
-                        "LIST" -> {
-                            for (port in ports.sorted()) {
-                                reply("Port $port: ${SocketConnections.connections[port]?.status()}")
-                            }
-                        }
-                        "START" -> {
-                            if (line.size > 2) {
-                                val port = line[2].toIntOrNull() ?: run {
-                                    invalidCommand("Invalid port: ${line[2]}")
-                                    return
-                                }
-                                Logger.debug("Manually starting connection at port $port")
-                                reply("Starting port $port")
-                                SocketConnections.connections.getOrDefault(port, null)?.open()
-                                    ?: invalidCommand("No connection on port $port")
-                            } else invalidCommand("Port must be specified")
-                        }
-                        "STOP" -> {
-                            if (line.size > 2) {
-                                val port = line[2].toIntOrNull() ?: run {
-                                    invalidCommand("Invalid port: ${line[2]}")
-                                    return
-                                }
-                                Logger.debug("Manually stopping connection at port $port")
-                                reply("Stopping port $port")
-                                SocketConnections.connections.getOrDefault(port, null)?.close()
-                                    ?: invalidCommand("No connection on port $port")
-                            } else invalidCommand("Port must be specified")
-                        }
-                        "ADD" -> {
-                            if (line.size > 2) {
-                                val port = line[2].toIntOrNull() ?: run {
-                                    invalidCommand("Invalid port: ${line[2]}")
-                                    return
-                                }
-                                Logger.debug("Adding port $port")
-                                if (SocketConnections.connections.containsKey(port))
-                                    invalidCommand("Port $port already has a connection")
-                                else {
-                                    SocketConnections.add(port, server = this)
-                                    ports += port
-                                    reply("Added port $port")
-                                }
-                            } else invalidCommand("Port must be specified")
-                        }
-                        else -> invalidCommand("Invalid sub-command")
-                    }
-                } else invalidCommand("Sub-command must be specified")
-            }
-            "END" -> {
-                if (line.size > 1) {
-                    if (line[1] == "ALL") {
-                        val animations = leds.runningAnimations.ids.toList()
-                        animations.forEach {
-                            leds.endAnimation(it)
-                        }
-                    } else for (i in 1 until line.size)
-                        leds.endAnimation(line[i])
-                } else invalidCommand("Animation ID or \"all\" must be specified")
-            }
-            else -> invalidCommand("${command.removePrefix("CMD :")} is not a valid command")
-        }
-    }
+    internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) =
+        commandParser.parseCommand(command, client)
 
     private fun setLoggingLevel(level: Level) {
         Configurator.currentConfig().level(level).activate()
