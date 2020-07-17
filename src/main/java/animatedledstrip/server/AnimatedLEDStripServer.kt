@@ -29,14 +29,14 @@ import animatedledstrip.animationutils.findAnimationOrNull
 import animatedledstrip.colors.ccpresets.CCBlue
 import animatedledstrip.leds.AnimatedLEDStrip
 import animatedledstrip.leds.StripInfo
-import animatedledstrip.parser.CommandParser
-import animatedledstrip.parser.action
-import animatedledstrip.parser.command
-import animatedledstrip.parser.subCommand
 import animatedledstrip.utils.DELIMITER
 import animatedledstrip.utils.delayBlocking
 import animatedledstrip.utils.endAnimation
 import animatedledstrip.utils.jsonToAnimationData
+import io.github.maxnz.parser.CommandParser
+import io.github.maxnz.parser.action
+import io.github.maxnz.parser.command
+import io.github.maxnz.parser.commandGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -228,17 +228,18 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 client?.sendString(str + DELIMITER)
             }
 
-            invalidCommandAction = { client, cmd ->
-                reply("BAD COMMAND: $cmd", client)
-            }
+            val replyAction: AnimatedLEDStripServer<T>.(SocketConnections.Connection?, String) -> Unit =
+                { client, msg ->
+                    if (client != null) reply(msg, client)
+                    else println(msg)
+                }
 
-            helpMessageAction = { client, msg ->
-                if (client != null) reply(msg, client)
-                else println(msg)
-            }
+            badCommandAction = replyAction
+            commandNeedsSubCommandAction = replyAction
+            helpMessageAction = replyAction
+            tooManyMatchingCommandsAction = replyAction
 
             command("quit") {
-                shortIdentifier = "q"
                 description = "Stop the server"
 
                 action { _, _ ->
@@ -247,63 +248,72 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 }
             }
 
-            command("logs") {
+            commandGroup("logs") {
                 description = "Modify logging settings"
 
-                subCommand("on") {
+                command("on") {
                     description = "Turn on logs to this port"
 
                     action { client, _ ->
                         client?.sendLogs = true
+                        reply("Enabled logs to port ${client?.port}", client)
                     }
                 }
 
-                subCommand("off") {
+                command("off") {
                     description = "Turn off logs to this port"
 
                     action { client, _ ->
                         client?.sendLogs = false
+                        reply("Disabled logs to port ${client?.port}", client)
                     }
                 }
 
-                subCommand("level") {
+                commandGroup("level") {
                     description = "Get or set the global logging level"
-                    subCommand("info") {
-                        description = "Set global logging level to info"
+                    commandGroup("set") {
+                        description = "Set the global logging level"
 
-                        action { _, _ ->
-                            setLoggingLevel(Level.INFO)
-                            Logger.info("Set logging level to info")
+                        command("info") {
+                            description = "Set global logging level to info"
+
+                            action { _, _ ->
+                                setLoggingLevel(Level.INFO)
+                                Logger.info("Set logging level to info")
+                            }
+                        }
+
+                        command("debug") {
+                            description = "Set global logging level to debug"
+
+                            action { _, _ ->
+                                setLoggingLevel(Level.DEBUG)
+                                Logger.debug("Set logging level to debug")
+                            }
+                        }
+
+                        command("trace") {
+                            description = "Set global logging level to trace"
+
+                            action { _, _ ->
+                                setLoggingLevel(Level.TRACE)
+                                Logger.trace("Set logging level to trace")
+                            }
                         }
                     }
 
-                    subCommand("debug") {
-                        description = "Set global logging level to debug"
+                    command("get") {
+                        description = "Get the global logging level"
 
-                        action { _, _ ->
-                            setLoggingLevel(Level.DEBUG)
-                            Logger.debug("Set logging level to debug")
+                        action { client, _ ->
+                            reply("Logging level is ${Logger.getLevel()}", client)
                         }
-                    }
-
-                    subCommand("trace") {
-                        shortIdentifier = "t"
-                        description = "Set global logging level to trace"
-
-                        action { _, _ ->
-                            setLoggingLevel(Level.TRACE)
-                            Logger.trace("Set logging level to trace")
-                        }
-                    }
-
-                    action { client, _ ->
-                        reply("Logging level is ${Logger.getLevel()}", client)
                     }
                 }
             }
 
-            command("strip") {
-                subCommand("clear") {
+            commandGroup("strip") {
+                command("clear") {
                     description = "Clear the LED strip (i.e. turn off all pixels)"
 
                     action { client, _ ->
@@ -312,14 +322,19 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     }
                 }
 
+                command("info") {
+                    description = "Get information about the server"
+
+                    action { client, _ ->
+                        client?.sendInfo()
+                    }
+                }
             }
 
-            command("running") {
-                shortIdentifier = "r"
+            commandGroup("running") {
                 description = "Get information about currently running animations"
 
-                subCommand("list") {
-                    shortIdentifier = "l"
+                command("list") {
                     description = "Print a list of all running animations"
 
                     action { client, _ ->
@@ -327,10 +342,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     }
                 }
 
-                subCommand("info") {
-                    shortIdentifier = "i"
+                command("info") {
                     description = "Print info about a running animation"
-                    argStr = "ID"
+                    argHelpStr = "ID"
 
                     action { client, args ->
                         val anim = args.firstOrNull()
@@ -344,33 +358,32 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 }
             }
 
-            command("end") {
-                description = "End one or more running animations"
-                argStr = "ID..."
-
-                subCommand("all") {
-                    description = "End all running animations"
-
-                    action { client, _ ->
-                        leds.runningAnimations.ids.toList().forEach {
-                            reply("Ending animation $it", client)
-                            leds.endAnimation(it)
-                        }
-                    }
-                }
-
-                action { client, args ->
-                    args.forEach {
-                        reply("Ending animation $it", client)
-                        leds.endAnimation(it)
-                    }
-                }
-            }
+//            command("end") {
+//                description = "End one or more running animations"
+//                argHelpStr = "ID..."
+//
+//                subCommand("all") {
+//                    description = "End all running animations"
+//
+//                    action { client, _ ->
+//                        leds.runningAnimations.ids.toList().forEach {
+//                            reply("Ending animation $it", client)
+//                            leds.endAnimation(it)
+//                        }
+//                    }
+//                }
+//
+//                action { client, args ->
+//                    args.forEach {
+//                        reply("Ending animation $it", client)
+//                        leds.endAnimation(it)
+//                    }
+//                }
+//            }
 
             command("animation") {
-                shortIdentifier = "a"
                 description = "Get information about a defined animation"
-                argStr = "NAME"
+                argHelpStr = "NAME"
 
                 action { client, args ->
                     val animName = args.firstOrNull() ?: run {
@@ -387,12 +400,10 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
             }
 
-            command("connections") {
-                shortIdentifier = "c"
+            commandGroup("connections") {
                 description = "Manage the server's socket connections"
 
-                subCommand("list") {
-                    shortIdentifier = "l"
+                command("list") {
                     description = "Show a list of all connections associated with this server"
 
                     action { client, _ ->
@@ -402,10 +413,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     }
                 }
 
-                subCommand("add") {
-                    shortIdentifier = "a"
+                command("add") {
                     description = "Add a new connection"
-                    argStr = "PORT"
+                    argHelpStr = "PORT"
 
                     action { client, args ->
                         when (val port = args.firstOrNull()) {
@@ -428,9 +438,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     }
                 }
 
-                subCommand("start") {
+                command("start") {
                     description = "Start the server connection on the specified port"
-                    argStr = "PORT"
+                    argHelpStr = "PORT"
 
                     action { client, args ->
                         when (val port = args.firstOrNull()) {
@@ -448,9 +458,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     }
                 }
 
-                subCommand("stop") {
+                command("stop") {
                     description = "Start the server connection on the specified port"
-                    argStr = "PORT"
+                    argHelpStr = "PORT"
 
                     action { client, args ->
                         when (val port = args.firstOrNull()) {
@@ -531,7 +541,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     }
 
     internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) =
-        commandParser.parseCommand(command, client)
+        commandParser.parseCommand(command.removePrefix("CMD :"), client)
 
     private fun setLoggingLevel(level: Level) {
         Configurator.currentConfig().level(level).activate()
