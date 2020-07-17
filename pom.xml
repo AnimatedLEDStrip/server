@@ -36,10 +36,10 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer.git</connection>
-        <developerConnection>scm:git:https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer.git
+        <connection>scm:git:https://github.com/AnimatedLEDStrip/server.git</connection>
+        <developerConnection>scm:git:https://github.com/AnimatedLEDStrip/server.git
         </developerConnection>
-        <url>https://github.com/AnimatedLEDStrip/AnimatedLEDStripServer</url>
+        <url>https://github.com/AnimatedLEDStrip/server</url>
     </scm>
 
     <properties>
