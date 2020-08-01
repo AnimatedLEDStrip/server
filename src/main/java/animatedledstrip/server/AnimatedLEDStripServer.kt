@@ -214,6 +214,9 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             if (File(".animations/${it.fileName}").exists())
                 Files.delete(Paths.get(".animations/${it.fileName}"))
         }
+        leds.newSectionCallback = {
+            SocketConnections.sendData(it)
+        }
     }
 
     val commandParser =

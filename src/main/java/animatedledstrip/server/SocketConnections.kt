@@ -40,12 +40,6 @@ import java.nio.charset.Charset
  */
 object SocketConnections {
 
-    init {
-//        newDefinedAnimationCallback = { info ->
-//            sendData(info)
-//        }
-    }
-
     /**
      * Used in testing by setting it equal to "0.0.0.0"
      */
@@ -162,14 +156,18 @@ object SocketConnections {
 
                 Logger.info("Connection on port $port Established")
 
-                // Send info about this strip and all current running continuous animations
+                // Send info about this strip, all current running animations,
+                // all supported animations, and all sections
                 // to newly connected client
                 sendInfo()
                 server.leds.runningAnimations.animations.forEach {
-                    sendAnimation(it.data, client = this@Connection)
+                    sendData(it.data)
                 }
                 definedAnimations.forEach {
-                    send(it.value.info.json())
+                    sendData(it.value.info)
+                }
+                server.leds.sections.forEach {
+                    sendData(it.value)
                 }
 
                 // Receive and process input
@@ -207,7 +205,7 @@ object SocketConnections {
                             AnimationData.prefix -> server.leds.startAnimation(data.jsonToAnimationData())
                             "CMD " -> server.parseTextCommand(data, client = this)
                             EndAnimation.prefix -> server.leds.endAnimation(data.jsonToEndAnimation())
-                            AnimatedLEDStrip.sectionPrefix -> TODO()
+                            AnimatedLEDStrip.sectionPrefix -> server.leds.createSection(data.jsonToSection())
                             else -> Logger.warn("Incorrect data type: $dataType")
                         }
 
