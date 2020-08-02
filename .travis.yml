@@ -17,10 +17,8 @@ branches:
 
 stages:
   - name: test
-  - name: deploy snapshot
-    if: branch = master AND type != pull_request AND tag IS blank
-  - name: deploy release
-    if: tag IS present
+  - name: deploy
+    if: branch = master AND type != pull_request
 
 jobs:
   include:
@@ -28,33 +26,21 @@ jobs:
       install: skip
       after_success: bash <(curl -s https://codecov.io/bash)
 
-    - stage: deploy snapshot
+    - stage: deploy
       install: skip
       script: skip
       deploy:
         - provider: script
           script: mvn deploy --settings .maven.xml -DskipTests=true -B
           on:
+            tags: false
             branch: master
-            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ ^.*-SNAPSHOT$
-
-    - stage: deploy release
-      install: skip
-      script: skip
-      deploy:
-        - provider: script
-          script: mvn deploy --settings .maven.xml -DskipTests=true -B
-          on:
-            all_branches: true
-
-    - stage: deploy release
-      install: skip
-      script: skip
-      deploy:
         - provider: script
           script: mvn --settings .maven.xml site -DskipTests=true -B && git add dokka
           on:
-            tags: true
+            tags: false
+            branch: master
+            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ ^.*(?!-SNAPSHOT)$
         - provider: pages
           skip-cleanup: true
           github-token: $GITHUB_TOKEN
@@ -62,4 +48,6 @@ jobs:
           verbose: true
           local_dir: ./dokka
           on:
-            all_branches: true
+            tags: false
+            branch: master
+            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ ^.*(?!-SNAPSHOT)$
