@@ -233,8 +233,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
             val replyAction: AnimatedLEDStripServer<T>.(SocketConnections.Connection?, String) -> Unit =
                 { client, msg ->
-                    if (client != null) reply(msg, client)
-                    else println(msg)
+                    reply(msg, client)
                 }
 
             badCommandAction = replyAction
@@ -347,42 +346,33 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
                 command("info") {
                     description = "Print info about a running animation"
-                    argHelpStr = "ID"
+                    argHelpStr = "ID [ID...]"
 
                     action { client, args ->
-                        val anim = args.firstOrNull()
-                            ?: run { reply("ID of animation required", client); return@action }
-                        reply(
-                            leds.runningAnimations.entries.toMap()[anim]?.data?.toHumanReadableString()
-                                ?: "$anim: NOT FOUND",
-                            client
-                        )
+                        if (args.isEmpty()) reply("ID of animation required", client)
+                        args.forEach {
+                            reply(
+                                leds.runningAnimations.entries.toMap()[it]?.data?.toHumanReadableString()
+                                    ?: "$it: NOT FOUND",
+                                client
+                            )
+                        }
+                    }
+                }
+
+                command("end") {
+                    description = "End a running animation"
+                    argHelpStr = "ID [ID...]"
+
+                    action { client, args ->
+                        if (args.isEmpty()) reply("ID of animation required", client)
+                        args.forEach {
+                            reply("Ending animation $it", client)
+                            leds.endAnimation(it)
+                        }
                     }
                 }
             }
-
-//            command("end") {
-//                description = "End one or more running animations"
-//                argHelpStr = "ID..."
-//
-//                subCommand("all") {
-//                    description = "End all running animations"
-//
-//                    action { client, _ ->
-//                        leds.runningAnimations.ids.toList().forEach {
-//                            reply("Ending animation $it", client)
-//                            leds.endAnimation(it)
-//                        }
-//                    }
-//                }
-//
-//                action { client, args ->
-//                    args.forEach {
-//                        reply("Ending animation $it", client)
-//                        leds.endAnimation(it)
-//                    }
-//                }
-//            }
 
             command("animation") {
                 description = "Get information about a defined animation"
@@ -462,7 +452,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 }
 
                 command("stop") {
-                    description = "Start the server connection on the specified port"
+                    description = "Stop the server connection on the specified port"
                     argHelpStr = "PORT"
 
                     action { client, args ->
@@ -536,6 +526,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     /** Stop the server */
     fun stop() {
+        if (!running) return
         leds.wholeStrip.setProlongedStripColor(0)
         delayBlocking(500)
         leds.toggleRender()

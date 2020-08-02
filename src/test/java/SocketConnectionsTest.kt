@@ -56,15 +56,13 @@ class SocketConnectionsTest {
             val c = SocketConnections.add(1201, server)
             c.open()
 
-            val job = GlobalScope.launch {
-                withContext(Dispatchers.IO) {
-                    val socket = Socket("0.0.0.0", 1201)
+            val job = GlobalScope.launch(Dispatchers.IO) {
+                val socket = Socket("0.0.0.0", 1201)
 
-                    delayBlocking(5000)
+                delayBlocking(5000)
 
-                    server.stop()
-                    socket.close()
-                }
+                server.stop()
+                socket.close()
             }
             job.join()
         }

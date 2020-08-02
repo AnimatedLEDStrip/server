@@ -29,7 +29,6 @@ import animatedledstrip.utils.delayBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.pmw.tinylog.Configurator
 import org.pmw.tinylog.Level
 import org.pmw.tinylog.Logger
 import kotlin.test.assertFailsWith
@@ -73,10 +72,6 @@ class AnimatedLEDStripServerTest {
         val testServer2 =
             AnimatedLEDStripServer(arrayOf("-qio", "out.csv"), EmulatedAnimatedLEDStrip::class)
         assertTrue { testServer2.outputFileName == "out.csv" }
-
-//        assertFailsWith<InvocationTargetException> {
-//            AnimatedLEDStripServer(arrayOf("-qo", "out.csv"), EmulatedAnimatedLEDStrip::class)
-//        }
     }
 
     @Test
@@ -292,7 +287,6 @@ class AnimatedLEDStripServerTest {
         checkOutput(
             expected =
             "usage: ledserver.jar\n" +
-                    " -C,--command-line      Connect to a running server with a command line\n" +
                     " -d,--debug             Enable debug level logging\n" +
                     " -E,--emulate           Emulate the LED strip\n" +
                     " -f,--prop-file <arg>   Specify properties file\n" +
@@ -326,28 +320,5 @@ class AnimatedLEDStripServerTest {
     @Test
     fun testPrimaryConstructor() {
         AnimatedLEDStripServer(arrayOf("-q"), EmulatedAnimatedLEDStrip::class)
-    }
-
-    @Test
-    fun testSetLoggingLevel() {
-        redirectOutput()
-
-        val testServer =
-            AnimatedLEDStripServer(arrayOf("-qf", "src/test/resources/empty.config"), EmulatedAnimatedLEDStrip::class)
-        assertTrue { Logger.getLevel() == Level.OFF }
-
-        testServer.parseTextCommand("trace", null)
-        assertTrue { Logger.getLevel() == Level.TRACE }
-        checkOutput(expected = "TRACE:   Set logging level to trace\n")
-
-        testServer.parseTextCommand("debug", null)
-        assertTrue { Logger.getLevel() == Level.DEBUG }
-        checkOutput(expected = "DEBUG:   Set logging level to debug\n")
-
-        testServer.parseTextCommand("info", null)
-        assertTrue { Logger.getLevel() == Level.INFO }
-        checkOutput(expected = "INFO:    Set logging level to info\n")
-
-        Configurator.currentConfig().level(Level.OFF).activate()
     }
 }

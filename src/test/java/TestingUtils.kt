@@ -28,6 +28,12 @@ import animatedledstrip.utils.toUTF8
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.pmw.tinylog.Configuration
+import org.pmw.tinylog.Configurator
+import org.pmw.tinylog.Level
+import org.pmw.tinylog.LogEntry
+import org.pmw.tinylog.writers.LogEntryValue
+import org.pmw.tinylog.writers.Writer
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -89,3 +95,67 @@ fun SocketConnections.Connection.reset() {
     close()
     open()
 }
+
+/* Log Testing */
+
+object TestLogWriter : Writer {
+    private val logs = mutableSetOf<LogEntry>()
+
+    fun clearLogs() = logs.clear()
+
+    override fun getRequiredLogEntryValues(): MutableSet<LogEntryValue> =
+        mutableSetOf(LogEntryValue.LEVEL, LogEntryValue.MESSAGE)
+
+    override fun write(log: LogEntry) {
+        logs.add(log)
+    }
+
+    override fun init(p0: Configuration?) {}
+
+    override fun flush() {}
+
+    override fun close() {}
+
+    fun assertLogs(expectedLogs: Set<Pair<Level, String>>) {
+        val actualLogs = logs.map { Pair(it.level, it.message) }.toSet()
+
+        assertTrue(
+            "logs do not match:\nexpected: $expectedLogs\nactual: $actualLogs\n" +
+                    "extra values in expected: ${expectedLogs.minus(actualLogs)}"
+        ) {
+            actualLogs.containsAll(expectedLogs)
+        }
+        assertTrue(
+            "logs do not match:\nexpected: $expectedLogs\nactual: $actualLogs\n" +
+                    "extra values in actual: ${actualLogs.minus(expectedLogs)}"
+        ) {
+            expectedLogs.containsAll(actualLogs)
+        }
+    }
+
+    fun assertLogsInclude(expectedLogs: Set<Pair<Level, String>>) {
+        val actualLogs = logs.map { Pair(it.level, it.message) }.toSet()
+
+        assertTrue(
+            "logs do not match:\nexpected: $expectedLogs\nactual: $actualLogs\n" +
+                    "extra values in expected: ${expectedLogs.minus(actualLogs)}"
+        ) {
+            actualLogs.containsAll(expectedLogs)
+        }
+    }
+}
+
+fun startLogCapture() {
+    Configurator.currentConfig().level(Level.TRACE).addWriter(TestLogWriter, Level.TRACE).activate()
+    clearLogs()
+}
+
+fun stopLogCapture() {
+    Configurator.currentConfig().removeWriter(TestLogWriter).activate()
+}
+
+fun assertLogs(expectedLogs: Set<Pair<Level, String>>) = TestLogWriter.assertLogs(expectedLogs)
+
+fun assertLogsInclude(expectedLogs: Set<Pair<Level, String>>) = TestLogWriter.assertLogsInclude(expectedLogs)
+
+fun clearLogs() = TestLogWriter.clearLogs()
