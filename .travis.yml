@@ -30,17 +30,17 @@ jobs:
       install: skip
       script: skip
       deploy:
-        - provider: script
-          script: mvn deploy --settings .maven.xml -DskipTests=true -B
-          on:
-            tags: false
-            branch: master
+#        - provider: script
+#          script: mvn deploy --settings .maven.xml -DskipTests=true -B
+#          on:
+#            tags: false
+#            branch: master
         - provider: script
           script: mvn --settings .maven.xml site -DskipTests=true -B && git add dokka
           on:
             tags: false
             branch: master
-            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ ^.*(?!-SNAPSHOT)$
+            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) !~ ^.*-SNAPSHOT$
         - provider: pages
           skip-cleanup: true
           github-token: $GITHUB_TOKEN
@@ -50,4 +50,4 @@ jobs:
           on:
             tags: false
             branch: master
-            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ ^.*(?!-SNAPSHOT)$
+            condition: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) !~ ^.*-SNAPSHOT$
