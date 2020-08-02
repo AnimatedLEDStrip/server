@@ -14,20 +14,37 @@ branches:
   only:
     - master
     - /^travis.*/
-    - /^v.*/
 
 stages:
   - name: test
   - name: deploy snapshot
     if: branch = master AND type != pull_request
   - name: deploy release
-    if: branch =~ ^v.*$
+    if: tag IS present
 
 jobs:
   include:
     - stage: test
       install: skip
       after_success: bash <(curl -s https://codecov.io/bash)
+
+    - stage: deploy snapshot
+      install: skip
+      script: skip
+      deploy:
+        - provider: script
+          script: mvn deploy --settings .maven.xml -DskipTests=true -B
+          on:
+            branch: master
+
+    - stage: deploy release
+      install: skip
+      script: skip
+      deploy:
+        - provider: script
+          script: mvn deploy --settings .maven.xml -DskipTests=true -B
+          on:
+            all_branches: true
 
     - stage: deploy release
       install: skip
@@ -45,21 +62,3 @@ jobs:
           local_dir: ./dokka
           on:
             all_branches: true
-
-    - stage: deploy release
-      install: skip
-      script: skip
-      deploy:
-        - provider: script
-          script: mvn deploy --settings .maven.xml -DskipTests=true -B
-          on:
-            all_branches: true
-
-    - stage: deploy snapshot
-      install: skip
-      script: skip
-      deploy:
-        - provider: script
-          script: mvn deploy --settings .maven.xml -DskipTests=true -B
-          on:
-            branch: master
