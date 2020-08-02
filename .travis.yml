@@ -29,6 +29,8 @@ jobs:
     - stage: deploy
       install: skip
       script: skip
+      before_script:
+        - DEPLOY_DOCS=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null | grep -v SNAPSHOT)
       deploy:
 #        - provider: script
 #          script: mvn deploy --settings .maven.xml -DskipTests=true -B
@@ -40,7 +42,7 @@ jobs:
           on:
             tags: false
             branch: master
-            condition: ! $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ "^.*-SNAPSHOT$"
+            condition: $DEPLOY_DOCS
         - provider: pages
           skip-cleanup: true
           github-token: $GITHUB_TOKEN
@@ -50,4 +52,4 @@ jobs:
           on:
             tags: false
             branch: master
-            condition: ! $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null) =~ "^.*-SNAPSHOT$"
+            condition: $DEPLOY_DOCS
