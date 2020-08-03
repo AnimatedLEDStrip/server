@@ -30,7 +30,7 @@ jobs:
       install: skip
       script: skip
       before_script:
-        - DEPLOY_DOCS=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null | grep -v SNAPSHOT)
+        - DEPLOY_DOCS=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null | grep -v SNAPSHOT) || echo "Snapshot detected, skipping doc deploy"
       deploy:
         - provider: script
           script: mvn deploy --settings .maven.xml -DskipTests=true -B
@@ -38,7 +38,7 @@ jobs:
             tags: false
             branch: master
         - provider: script
-          script: mvn --settings .maven.xml site -DskipTests=true -B && git add dokka
+          script: mvn site --settings .maven.xml -DskipTests=true -B && git add dokka
           on:
             tags: false
             branch: master
