@@ -9,13 +9,12 @@
 <br/>
 <h1>add</h1>
 <a name="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))"></a>
-<code><span class="keyword">fun </span><span class="identifier">add</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/server">server</span><span class="symbol">:</span>&nbsp;<a href="../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="-connection/index.html"><span class="identifier">SocketConnections.Connection</span></a></code>
-<p>Initialize a new connection. Creates a Connection instance with the
+<code><span class="keyword">fun </span><span class="identifier">add</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections$add(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/server">server</span><span class="symbol">:</span>&nbsp;<a href="../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><span class="identifier">Connection</span></code>
+<p>Initialize a new connection. If a connection for the port doesn't
+already exist, creates a Connection instance with the
 specified port, then adds the port and Connection instance to
-<a href="connections.html">connections</a> before returning the Connection instance.</p>
-<h3>Parameters</h3>
-<p><a name="port"></a>
-<code>port</code> - The port to use when creating the ServerSocket in the
-connection</p>
+<a href="connections.html">connections</a>.</p>
+<p><strong>Return</strong><br/>
+The Connection instance associated with the port</p>
 </BODY>
 </HTML>

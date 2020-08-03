@@ -13,43 +13,44 @@
 <tbody>
 <tr>
 <td>
-<p><a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a></p>
+<h4><a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a></h4>
 </td>
 <td>
 <code><span class="keyword">class </span><span class="identifier">AnimatedLEDStripServer</span><span class="symbol">&lt;</span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">&gt;</span></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="-animation-handler/index.html">AnimationHandler</a></p>
+<h4><a href="-socket-connections/index.html">SocketConnections</a></h4>
 </td>
 <td>
-<code><span class="keyword">class </span><span class="identifier">AnimationHandler</span></code>
-<p>An object that creates ContinuousRunAnimation instances for animations and
-keeps track of currently running animations.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p><a href="-continuous-run-animation/index.html">ContinuousRunAnimation</a></p>
-</td>
-<td>
-<code><span class="keyword">class </span><span class="identifier">ContinuousRunAnimation</span></code>
-<p>Class for running an animation that repeats until stopped.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p><a href="-socket-connections/index.html">SocketConnections</a></p>
-</td>
-<td>
+<p>An object for creating, tracking and using connections that clients can connect to</p>
 <code><span class="keyword">object </span><span class="identifier">SocketConnections</span></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="-socket-writer/index.html">SocketWriter</a></p>
+<h4><a href="-socket-writer/index.html">SocketWriter</a></h4>
 </td>
 <td>
 <code><span class="keyword">class </span><span class="identifier">SocketWriter</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">Writer</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Extensions for External Classes</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="animatedledstrip.animationutils.-animation-data/index.html">animatedledstrip.animationutils.AnimationData</a></h4>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<h4><a href="org.apache.commons.cli.-options/index.html">org.apache.commons.cli.Options</a></h4>
+</td>
+<td>
+</td>
 </tr>
 </tbody>
 </table>
@@ -58,17 +59,10 @@ keeps track of currently running animations.</p>
 <tbody>
 <tr>
 <td>
-<p><a href="options.html">options</a></p>
+<h4><a href="options.html">options</a></h4>
 </td>
 <td>
 <code><span class="keyword">val </span><span class="identifier">options</span><span class="symbol">: </span><span class="identifier">Options</span></code></td>
-</tr>
-<tr>
-<td>
-<p><a href="server.html">server</a></p>
-</td>
-<td>
-<code><span class="keyword">var </span><span class="identifier">server</span><span class="symbol">: </span><a href="-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">?</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -77,7 +71,14 @@ keeps track of currently running animations.</p>
 <tbody>
 <tr>
 <td>
-<p><a href="wait-until-stop.html">waitUntilStop</a></p>
+<h4><a href="start-server.html">startServer</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">&gt;</span> <span class="identifier">startServer</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server$startServer(kotlin.Array((kotlin.String)), kotlin.reflect.KClass((animatedledstrip.server.startServer.T)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html"><span class="identifier">Array</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server$startServer(kotlin.Array((kotlin.String)), kotlin.reflect.KClass((animatedledstrip.server.startServer.T)))/ledClass">ledClass</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html"><span class="identifier">KClass</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="wait-until-stop.html">waitUntilStop</a></h4>
 </td>
 <td>
 <code><span class="keyword">fun </span><a href="-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">.</span><span class="identifier">waitUntilStop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>

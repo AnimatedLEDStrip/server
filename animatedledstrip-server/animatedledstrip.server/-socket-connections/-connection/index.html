@@ -9,14 +9,16 @@
 <br/>
 <h1>Connection</h1>
 <code><span class="keyword">class </span><span class="identifier">Connection</span></code>
+<p>Represents a single port that a client can connect to</p>
 <h3>Constructors</h3>
 <table>
 <tbody>
 <tr>
 <td>
-<p><a href="-init-.html">&lt;init&gt;</a></p>
+<h4><a href="-init-.html">&lt;init&gt;</a></h4>
 </td>
 <td>
+<p>Represents a single port that a client can connect to</p>
 <code><span class="identifier">Connection</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$<init>(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$<init>(kotlin.Int, animatedledstrip.server.AnimatedLEDStripServer((animatedledstrip.leds.AnimatedLEDStrip)))/server">server</span><span class="symbol">:</span>&nbsp;<a href="../../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">)</span></code></td>
 </tr>
 </tbody>
@@ -26,45 +28,60 @@
 <tbody>
 <tr>
 <td>
-<p><a href="client-socket.html">clientSocket</a></p>
+<h4><a href="client-socket.html">clientSocket</a></h4>
 </td>
 <td>
 <code><span class="keyword">var </span><span class="identifier">clientSocket</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/Socket.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="connected.html">connected</a></p>
+<h4><a href="connected.html">connected</a></h4>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">connected</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+<code><span class="keyword">val </span><span class="identifier">connected</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="port.html">port</a></p>
+<h4><a href="job.html">job</a></h4>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">job</span><span class="symbol">: </span><span class="identifier">Job</span><span class="symbol">?</span></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="port.html">port</a></h4>
 </td>
 <td>
 <code><span class="keyword">val </span><span class="identifier">port</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="server.html">server</a></p>
+<h4><a href="send-logs.html">sendLogs</a></h4>
 </td>
 <td>
+<code><span class="keyword">var </span><span class="identifier">sendLogs</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="server.html">server</a></h4>
+</td>
+<td>
+<p>The server creating the connection</p>
 <code><span class="keyword">val </span><span class="identifier">server</span><span class="symbol">: </span><a href="../../-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="server-socket.html">serverSocket</a></p>
+<h4><a href="server-socket.html">serverSocket</a></h4>
 </td>
 <td>
 <code><span class="keyword">val </span><span class="identifier">serverSocket</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/net/ServerSocket.html"><span class="identifier">ServerSocket</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="soc-out.html">socOut</a></p>
+<h4><a href="soc-out.html">socOut</a></h4>
 </td>
 <td>
-<code><span class="keyword">var </span><span class="identifier">socOut</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/io/ObjectOutputStream.html"><span class="identifier">ObjectOutputStream</span></a><span class="symbol">?</span></code></td>
+<code><span class="keyword">var </span><span class="identifier">socOut</span><span class="symbol">: </span><a href="https://docs.oracle.com/javase/6/docs/api/java/io/OutputStream.html"><span class="identifier">OutputStream</span></a><span class="symbol">?</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -73,45 +90,68 @@
 <tbody>
 <tr>
 <td>
-<p><a href="open.html">open</a></p>
+<h4><a href="close.html">close</a></h4>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">open</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<code><span class="keyword">fun </span><span class="identifier">close</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="open.html">open</a></h4>
+</td>
+<td>
 <p>Open the connection</p>
-</td>
+<code><span class="keyword">fun </span><span class="identifier">open</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="open-socket.html">openSocket</a></p>
+<h4><a href="open-socket.html">openSocket</a></h4>
 </td>
 <td>
-<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">openSocket</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
 <p>Accept communication and start loop that listens for input</p>
-</td>
+<code><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">openSocket</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="send-animation.html">sendAnimation</a></p>
+<h4><a href="send.html">send</a></h4>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">sendAnimation</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/animation">animation</span><span class="symbol">:</span>&nbsp;<span class="identifier">AnimationData</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendAnimation(animatedledstrip.animationutils.AnimationData, kotlin.String)/id">id</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Send animation data to the client along with an ID.
-Does not work for port 1118 (local connection).</p>
-</td>
+<p>Send an array of bytes to a client</p>
+<code><span class="keyword">fun </span><span class="identifier">send</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$send(kotlin.ByteArray)/data">data</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="send-string.html">sendString</a></p>
+<h4><a href="send-data.html">sendData</a></h4>
 </td>
 <td>
-<code><span class="keyword">fun </span><span class="identifier">sendString</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendString(kotlin.String)/str">str</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
-<p>Send a string to the local port.
-Only works for a connection with port 1118 (local connection)</p>
-</td>
+<code><span class="keyword">fun </span><span class="identifier">sendData</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendData(animatedledstrip.utils.SendableData)/data">data</span><span class="symbol">:</span>&nbsp;<span class="identifier">SendableData</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
 </tr>
 <tr>
 <td>
-<p><a href="to-string.html">toString</a></p>
+<h4><a href="send-info.html">sendInfo</a></h4>
+</td>
+<td>
+<p>Send strip info to the client</p>
+<code><span class="keyword">fun </span><span class="identifier">sendInfo</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="send-string.html">sendString</a></h4>
+</td>
+<td>
+<p>Send a string to the client</p>
+<code><span class="keyword">fun </span><span class="identifier">sendString</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server.SocketConnections.Connection$sendString(kotlin.String)/str">str</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="status.html">status</a></h4>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">status</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="to-string.html">toString</a></h4>
 </td>
 <td>
 <code><span class="keyword">fun </span><span class="identifier">toString</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>

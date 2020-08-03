@@ -1,5 +1,5 @@
 $dokka.format:html
 $dokka.linkExtension:html
-
-animatedledstrip.cmdline
+$dokka.location:animatedledstrip.server$addLongOption(org.apache.commons.cli.Options, kotlin.String, kotlin.Boolean, kotlin.String)animatedledstrip.server/org.apache.commons.cli.-options/add-long-option.html
+$dokka.location:animatedledstrip.server$fileName#animatedledstrip.animationutils.AnimationDataanimatedledstrip.server/animatedledstrip.animationutils.-animation-data/file-name.html
 animatedledstrip.server
