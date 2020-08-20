@@ -32,9 +32,7 @@ fun <T : AnimatedLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>)
 }
 
 fun AnimatedLEDStripServer<*>.waitUntilStop() {
-    while (running) {
-        delayBlocking(1)
-    }
+    while (running) delayBlocking(1)
 }
 
 val AnimationData.fileName: String

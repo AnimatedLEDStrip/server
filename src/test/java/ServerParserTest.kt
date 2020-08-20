@@ -202,17 +202,17 @@ class ServerParserTest {
                 Pair(
                     Level.TRACE,
                     "Replying to client on port null: AnimationData for 1234\n" +
-                            "  animation: Alternate\n" +
-                            "  colors: [0]\n" +
-                            "  center: 120\n" +
-                            "  continuous: true\n" +
-                            "  delay: 50\n" +
-                            "  delayMod: 1.0\n" +
-                            "  direction: FORWARD\n" +
-                            "  distance: 240\n" +
-                            "  section: \n" +
-                            "  spacing: 3\n" +
-                            "End AnimationData"
+                    "  animation: Alternate\n" +
+                    "  colors: [0]\n" +
+                    "  center: 120\n" +
+                    "  continuous: true\n" +
+                    "  delay: 50\n" +
+                    "  delayMod: 1.0\n" +
+                    "  direction: FORWARD\n" +
+                    "  distance: 240\n" +
+                    "  section: \n" +
+                    "  spacing: 3\n" +
+                    "End AnimationData"
                 )
             )
         )
@@ -225,33 +225,33 @@ class ServerParserTest {
                 Pair(
                     Level.TRACE,
                     "Replying to client on port null: AnimationData for 1234\n" +
-                            "  animation: Alternate\n" +
-                            "  colors: [0]\n" +
-                            "  center: 120\n" +
-                            "  continuous: true\n" +
-                            "  delay: 50\n" +
-                            "  delayMod: 1.0\n" +
-                            "  direction: FORWARD\n" +
-                            "  distance: 240\n" +
-                            "  section: \n" +
-                            "  spacing: 3\n" +
-                            "End AnimationData"
+                    "  animation: Alternate\n" +
+                    "  colors: [0]\n" +
+                    "  center: 120\n" +
+                    "  continuous: true\n" +
+                    "  delay: 50\n" +
+                    "  delayMod: 1.0\n" +
+                    "  direction: FORWARD\n" +
+                    "  distance: 240\n" +
+                    "  section: \n" +
+                    "  spacing: 3\n" +
+                    "End AnimationData"
                 ),
                 Pair(
                     Level.TRACE,
                     "Replying to client on port null: AnimationData for 5678\n" +
-                            "  animation: Alternate\n" +
-                            "  colors: [0]\n" +
-                            "  center: 120\n" +
-                            "  continuous: true\n" +
-                            "  delay: 50\n" +
-                            "  delayMod: 1.0\n" +
-                            "  direction: FORWARD\n" +
-                            "  distance: 240\n" +
-                            "  section: \n" +
-                            "  spacing: 3\n" +
-                            "End AnimationData"
-                )
+                    "  animation: Alternate\n" +
+                    "  colors: [0]\n" +
+                    "  center: 120\n" +
+                    "  continuous: true\n" +
+                    "  delay: 50\n" +
+                    "  delayMod: 1.0\n" +
+                    "  direction: FORWARD\n" +
+                    "  distance: 240\n" +
+                    "  section: \n" +
+                    "  spacing: 3\n" +
+                    "End AnimationData"
+                ),
             )
         )
         stopLogCapture()
@@ -266,7 +266,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: 5432: NOT FOUND"),
-                Pair(Level.TRACE, "Replying to client on port null: 2654: NOT FOUND")
+                Pair(Level.TRACE, "Replying to client on port null: 2654: NOT FOUND"),
             )
         )
         stopLogCapture()
@@ -303,7 +303,7 @@ class ServerParserTest {
         assertLogsInclude(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Ending animation 5678"),
-                Pair(Level.TRACE, "Replying to client on port null: Ending animation 9101")
+                Pair(Level.TRACE, "Replying to client on port null: Ending animation 9101"),
             )
         )
         stopLogCapture()
@@ -342,12 +342,12 @@ class ServerParserTest {
                 Pair(
                     Level.DEBUG,
                     "Sent AnimationInfo(name=Multi Pixel Run, abbr=MPR, description=Similar to " +
-                            "[Pixel Run](Pixel-Run) but with multiple LEDs at a specified spacing., " +
-                            "signatureFile=multi_pixel_run.png, repetitive=true, minimumColors=1, " +
-                            "unlimitedColors=false, center=NOTUSED, delay=USED, direction=USED, " +
-                            "distance=NOTUSED, spacing=USED, delayDefault=100, distanceDefault=-1, " +
-                            "spacingDefault=3)"
-                )
+                    "[Pixel Run](Pixel-Run) but with multiple LEDs at a specified spacing., " +
+                    "signatureFile=multi_pixel_run.png, repetitive=true, minimumColors=1, " +
+                    "unlimitedColors=false, center=NOTUSED, delay=USED, direction=USED, " +
+                    "distance=NOTUSED, spacing=USED, delayDefault=100, distanceDefault=-1, " +
+                    "spacingDefault=3)",
+                ),
             )
         )
         stopLogCapture()
@@ -380,7 +380,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Added port 4001"),
-                Pair(Level.DEBUG, "Adding port 4001")
+                Pair(Level.DEBUG, "Adding port 4001"),
             )
         )
         stopLogCapture()
@@ -390,7 +390,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.DEBUG, "Adding port 4002"),
-                Pair(Level.TRACE, "Replying to client on port null: Added port 4002")
+                Pair(Level.TRACE, "Replying to client on port null: Added port 4002"),
             )
         )
         stopLogCapture()
@@ -400,7 +400,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Port 4001: Stopped"),
-                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Stopped")
+                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Stopped"),
             )
         )
         stopLogCapture()
@@ -410,7 +410,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.DEBUG, "Adding port 4002"),
-                Pair(Level.TRACE, "Replying to client on port null: ERROR: Port 4002 already has a connection")
+                Pair(Level.TRACE, "Replying to client on port null: ERROR: Port 4002 already has a connection"),
             )
         )
         stopLogCapture()
@@ -433,7 +433,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Port 4001: Stopped"),
-                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Stopped")
+                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Stopped"),
             )
         )
         stopLogCapture()
@@ -448,7 +448,7 @@ class ServerParserTest {
                 Pair(Level.DEBUG, "Manually starting connection at port 4002"),
                 Pair(Level.TRACE, "Replying to client on port null: Starting port 4002"),
                 Pair(Level.DEBUG, "Starting port 4002"),
-                Pair(Level.DEBUG, "Socket at port 4002 started")
+                Pair(Level.DEBUG, "Socket at port 4002 started"),
             )
         )
         stopLogCapture()
@@ -460,7 +460,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Port 4001: Stopped"),
-                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Waiting")
+                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Waiting"),
             )
         )
         stopLogCapture()
@@ -471,7 +471,7 @@ class ServerParserTest {
             setOf(
                 Pair(Level.DEBUG, "Manually starting connection at port 4003"),
                 Pair(Level.TRACE, "Replying to client on port null: Starting port 4003"),
-                Pair(Level.TRACE, "Replying to client on port null: ERROR: No connection on port 4003")
+                Pair(Level.TRACE, "Replying to client on port null: ERROR: No connection on port 4003"),
             )
         )
         stopLogCapture()
@@ -484,7 +484,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Port 4001: Stopped"),
-                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Waiting")
+                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Waiting"),
             )
         )
         stopLogCapture()
@@ -504,7 +504,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Port 4001: Stopped"),
-                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Waiting")
+                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Waiting"),
             )
         )
         stopLogCapture()
@@ -514,7 +514,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.DEBUG, "Manually stopping connection at port 4002"),
-                Pair(Level.TRACE, "Replying to client on port null: Stopping port 4002")
+                Pair(Level.TRACE, "Replying to client on port null: Stopping port 4002"),
             )
         )
         stopLogCapture()
@@ -524,7 +524,7 @@ class ServerParserTest {
         assertLogs(
             setOf(
                 Pair(Level.TRACE, "Replying to client on port null: Port 4001: Stopped"),
-                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Stopped")
+                Pair(Level.TRACE, "Replying to client on port null: Port 4002: Stopped"),
             )
         )
         stopLogCapture()
@@ -535,7 +535,7 @@ class ServerParserTest {
             setOf(
                 Pair(Level.DEBUG, "Manually stopping connection at port 4003"),
                 Pair(Level.TRACE, "Replying to client on port null: Stopping port 4003"),
-                Pair(Level.TRACE, "Replying to client on port null: ERROR: No connection on port 4003")
+                Pair(Level.TRACE, "Replying to client on port null: ERROR: No connection on port 4003"),
             )
         )
         stopLogCapture()

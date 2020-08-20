@@ -59,7 +59,7 @@ import kotlin.reflect.full.primaryConstructor
 
 class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     args: Array<String>,
-    ledClass: KClass<T>
+    ledClass: KClass<T>,
 ) {
 
     /** Is the server running */
@@ -113,7 +113,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val propertyFileName: String =
         cmdline.getOptionValue("f")
-            ?: "/etc/leds/led.config"
+        ?: "/etc/leds/led.config"
 
     internal val properties =
         Properties().apply {
@@ -143,19 +143,19 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val persistAnimations: Boolean =
         !cmdline.hasOption("no-persist") &&
-                (cmdline.hasOption("persist") ||
-                        properties.getProperty("persist")?.toBoolean() == true)
+        (cmdline.hasOption("persist") ||
+         properties.getProperty("persist")?.toBoolean() == true)
 
 
     internal val numLEDs: Int =
         cmdline.getOptionValue("n")?.toIntOrNull()
-            ?: properties.getProperty("numLEDs")?.toIntOrNull()
-            ?: 240
+        ?: properties.getProperty("numLEDs")?.toIntOrNull()
+        ?: 240
 
     internal val pin: Int =
         cmdline.getOptionValue("p")?.toIntOrNull()
-            ?: properties.getProperty("pin")?.toInt()
-            ?: 12
+        ?: properties.getProperty("pin")?.toInt()
+        ?: 12
 
     internal val imageDebuggingEnabled: Boolean =
         cmdline.hasOption("i")
@@ -165,8 +165,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
 
     internal val rendersBeforeSave: Int =
         cmdline.getOptionValue("r")?.toIntOrNull()
-            ?: properties.getProperty("renders")?.toIntOrNull()
-            ?: 1000
+        ?: properties.getProperty("renders")?.toIntOrNull()
+        ?: 1000
 
     internal val threadCount: Int = 100
 
@@ -182,7 +182,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             imageDebugging = imageDebuggingEnabled,
             fileName = outputFileName,
             rendersBeforeSave = rendersBeforeSave,
-            threadCount = threadCount
+            threadCount = threadCount,
         )
 
         /*
@@ -191,13 +191,13 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
           without any explanation
         */
         val ledConstructor = ledClass.primaryConstructor
-        requireNotNull(ledConstructor)
-        require(ledConstructor.parameters.size == 1)
-        require(ledConstructor.parameters[0].type.classifier == StripInfo::class)
+        requireNotNull(ledConstructor) { "LED class must have primary constructor" }
+        require(ledConstructor.parameters.size == 1) { "LED class primary constructor must have only one argument" }
+        require(ledConstructor.parameters[0].type.classifier == StripInfo::class) {
+            "LED class primary constructor argument must be of type StripInfo"
+        }
 
-        leds = ledConstructor.call(
-            stripInfo
-        )
+        leds = ledConstructor.call(stripInfo)
 
         leds.startAnimationCallback = {
             SocketConnections.sendAnimation(it)
@@ -353,8 +353,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         args.forEach {
                             reply(
                                 leds.runningAnimations.entries.toMap()[it]?.data?.toHumanReadableString()
-                                    ?: "$it: NOT FOUND",
-                                client
+                                ?: "$it: NOT FOUND",
+                                client,
                             )
                         }
                     }
@@ -444,7 +444,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                                     Logger.debug("Manually starting connection at port $portNum")
                                     reply("Starting port $portNum", client)
                                     SocketConnections.connections.getOrDefault(portNum, null)?.open()
-                                        ?: reply("ERROR: No connection on port $port", client)
+                                    ?: reply("ERROR: No connection on port $port", client)
                                 }
                             }
                         }
@@ -464,7 +464,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                                     Logger.debug("Manually stopping connection at port $portNum")
                                     reply("Stopping port $portNum", client)
                                     SocketConnections.connections.getOrDefault(portNum, null)?.close()
-                                        ?: reply("ERROR: No connection on port $portNum", client)
+                                    ?: reply("ERROR: No connection on port $portNum", client)
                                 }
                             }
                         }

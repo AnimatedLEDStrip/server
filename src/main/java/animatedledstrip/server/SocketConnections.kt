@@ -22,10 +22,12 @@
 
 package animatedledstrip.server
 
+import animatedledstrip.animationutils.Animation
 import animatedledstrip.animationutils.AnimationData
 import animatedledstrip.animationutils.EndAnimation
 import animatedledstrip.animationutils.definedAnimations
 import animatedledstrip.leds.AnimatedLEDStrip
+import animatedledstrip.leds.StripInfo
 import animatedledstrip.server.SocketConnections.connections
 import animatedledstrip.utils.*
 import kotlinx.coroutines.*
@@ -60,7 +62,7 @@ object SocketConnections {
      * @return The Connection instance associated with the port
      */
     fun add(port: Int, server: AnimatedLEDStripServer<*>): Connection =
-        connections.getOrPut(port, { Connection(port, server) })
+        connections.getOrPut(port) { Connection(port, server) }
 
     /**
      * A pool of threads used for connections
@@ -79,7 +81,7 @@ object SocketConnections {
         private val serverSocket = ServerSocket(
             port,
             0,
-            if (hostIP == null) null else InetAddress.getByName(hostIP)
+            if (hostIP == null) null else InetAddress.getByName(hostIP),
         )
         var clientSocket: Socket? = null
         val connected: Boolean
@@ -87,6 +89,7 @@ object SocketConnections {
 
         var sendLogs = false
 
+        private var socIn: InputStream? = null
         private var socOut: OutputStream? = null
         var job: Job? = null
 
@@ -131,7 +134,6 @@ object SocketConnections {
                 Logger.debug("Socket at port $port started")
 
                 // Accept connection
-                var socIn: InputStream? = null
                 withContext(Dispatchers.IO) {
                     while (server.running) {
                         while (true)
@@ -143,10 +145,10 @@ object SocketConnections {
                                 continue    // otherwise try again
                             }
                         try {
-                            socIn =
-                                clientSocket?.getInputStream() ?: throw SocketException("Could not create input stream")
+                            socIn = clientSocket?.getInputStream()
+                                    ?: throw SocketException("Could not create input stream")
                             socOut = clientSocket?.getOutputStream()
-                                ?: throw SocketException("Could not create output stream")
+                                     ?: throw SocketException("Could not create output stream")
                             break           // Input and output streams have been created successfully
                         } catch (e: SocketException) {
                             continue        // Something happened when creating streams, start over with new connection
@@ -172,49 +174,79 @@ object SocketConnections {
 
                 // Receive and process input
                 try {
-                    var input = ByteArray(10000)
-                    var count = -1
-                    while (connected && server.running) {
-                        while (server.running)
-                            try {
-                                withContext(Dispatchers.IO) {
-                                    count = socIn?.read(input) ?: throw SocketException("Socket null")
-                                }
-                                break       // Input has been received
-                            } catch (e: SocketTimeoutException) {
-                                yield()     // On timeout, check if coroutine has been cancelled,
-                                continue    // otherwise try again
-                            }
-
-                        if (count == -1)    // There was no input
-                            throw SocketException("Connection closed")
-
-                        // Output string and array of bytes received for debugging
-                        Logger.debug(input.toUTF8(count))
-                        Logger.debug(
-                            "Bytes: ${input
-                                .toUTF8(count)
-                                .toByteArray()
-                                .map { it.toString() }}"
-                        )
-
-                        val data = input.toUTF8(count)
-
-                        // Pass input to appropriate function
-                        when (val dataType = data.getDataTypePrefix()) {
-                            AnimationData.prefix -> server.leds.startAnimation(data.jsonToAnimationData())
-                            "CMD " -> server.parseTextCommand(data, client = this)
-                            EndAnimation.prefix -> server.leds.endAnimation(data.jsonToEndAnimation())
-                            AnimatedLEDStrip.sectionPrefix -> server.leds.createSection(data.jsonToSection())
-                            else -> Logger.warn("Incorrect data type: $dataType")
-                        }
-
-                        input = ByteArray(10000)    // Reset ByteArray
-                    }
+                    while (connected && server.running) processData(receiveData())
                 } catch (e: SocketException) {  // Catch disconnections
                     Logger.warn("Connection on port $port lost: $e")
                 }
             }
+        }
+
+        private suspend fun receiveData(): String {
+            val input = ByteArray(10000)
+            var count: Int = -1
+
+            while (true)
+                try {
+                    withContext(Dispatchers.IO) {
+                        count = socIn?.read(input) ?: throw SocketException("Socket null")
+                    }
+                    break
+                } catch (e: SocketTimeoutException) {
+                    yield()
+                    continue
+                }
+
+            if (count == -1) throw SocketException("Connection closed")
+
+            // Output string and array of bytes received for debugging
+            Logger.debug(input.toUTF8(count))
+            Logger.debug(
+                "Bytes: ${
+                    input
+                        .toUTF8(count)
+                        .toByteArray()
+                        .map { it.toString() }
+                }",
+            )
+
+            return input.toUTF8(count)
+        }
+
+        private fun processData(input: String) {
+            for (d in splitData(input)) {
+                when (val dataType = d.getDataTypePrefix()) {
+                    AnimationData.prefix -> server.leds.startAnimation(d.jsonToAnimationData())
+                    Animation.AnimationInfo.prefix -> Logger.warn("Receiving AnimationInfo is not supported by server")
+                    Command.prefix -> server.parseTextCommand(d, client = this)
+                    EndAnimation.prefix -> server.leds.endAnimation(d.jsonToEndAnimation())
+                    Message.prefix -> Logger.warn("Receiving Message is not supported by server")
+                    AnimatedLEDStrip.sectionPrefix -> server.leds.createSection(d.jsonToSection())
+                    StripInfo.prefix -> Logger.warn("Receiving StripInfo is not supported by server")
+                    else -> Logger.warn("Unrecognized data type: $dataType")
+                }
+            }
+        }
+
+        private val partialData = StringBuilder()
+
+        private fun String.withPartialData(): String {
+            val newStr = partialData.toString() + this
+            partialData.clear()
+            return newStr
+        }
+
+        private fun handlePartialData(inputData: List<String>): List<String> {
+            partialData.append(inputData.last())
+            return inputData.dropLast(1)
+        }
+
+        private fun splitData(input: String): List<String> {
+            val inputData = input.withPartialData().split(DELIMITER)
+
+            return if (!input.endsWith(DELIMITER))
+                handlePartialData(inputData)
+            else
+                inputData
         }
 
         fun sendData(data: SendableData) {
@@ -264,7 +296,7 @@ object SocketConnections {
                 withContext(Dispatchers.IO) {
                     try {
                         socOut?.write(data)
-                            ?: Logger.debug("Could not send to port $port: Connection socket null")
+                        ?: Logger.debug("Could not send to port $port: Connection socket null")
                     } catch (e: SocketException) {
                         Logger.debug("Could not send to port $port: Disconnect")
                     }
@@ -273,9 +305,8 @@ object SocketConnections {
         }
 
 
-        override fun toString(): String {
-            return "Connection@${serverSocket.inetAddress.toString().removePrefix("/")}:$port"
-        }
+        override fun toString(): String =
+            "Connection@${serverSocket.inetAddress.toString().removePrefix("/")}:$port"
     }
 
 

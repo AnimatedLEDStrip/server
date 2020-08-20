@@ -45,7 +45,5 @@ val options = Options().apply {
 }
 
 fun Options.addLongOption(longOpt: String, hasArg: Boolean, description: String) {
-    addOption(
-        Option.builder().longOpt(longOpt).desc(description).hasArg(hasArg).build()
-    )
+    addOption(Option.builder().longOpt(longOpt).desc(description).hasArg(hasArg).build())
 }

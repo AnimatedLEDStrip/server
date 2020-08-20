@@ -109,7 +109,7 @@ class SocketConnectionsTest {
         assertTrue {
             Regex(
                 "WARNING: Connection on port $port lost: " +
-                        "java.net.SocketException.*\n"
+                "java.net.SocketException.*\n"
             ).matches(
                 tempOut
                     .toString("utf-8")
