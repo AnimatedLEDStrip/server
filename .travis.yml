@@ -32,9 +32,6 @@ jobs:
       deploy:
         - provider: script
           script: mvn deploy --settings .maven.xml -DskipTests=true -B
-          on:
-            tags: false
-            branch: master
 
     - stage: deploy
       install: skip
@@ -45,8 +42,6 @@ jobs:
         - provider: script
           script: mvn site --settings .maven.xml -DskipTests=true -B && git add dokka
           on:
-            tags: false
-            branch: master
             condition: $DEPLOY_DOCS
         - provider: pages
           skip-cleanup: true
@@ -55,6 +50,4 @@ jobs:
           verbose: true
           local_dir: ./dokka
           on:
-            tags: false
-            branch: master
             condition: $DEPLOY_DOCS
