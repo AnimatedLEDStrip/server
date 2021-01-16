@@ -1,38 +1,41 @@
 /*
- *  Copyright (c) 2018-2020 AnimatedLEDStrip
+ * Copyright (c) 2018-2021 AnimatedLEDStrip
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *  THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 package animatedledstrip.server
 
-import animatedledstrip.animationutils.AnimationData
-import animatedledstrip.animationutils.animation
-import animatedledstrip.animationutils.color
-import animatedledstrip.animationutils.findAnimationOrNull
-import animatedledstrip.colors.ccpresets.CCBlue
-import animatedledstrip.leds.AnimatedLEDStrip
-import animatedledstrip.leds.StripInfo
-import animatedledstrip.utils.DELIMITER
-import animatedledstrip.utils.delayBlocking
-import animatedledstrip.utils.endAnimation
-import animatedledstrip.utils.jsonToAnimationData
+import animatedledstrip.animations.findAnimationOrNull
+import animatedledstrip.communication.DELIMITER
+import animatedledstrip.communication.decodeJson
+import animatedledstrip.leds.*
+import animatedledstrip.leds.animationmanagement.*
+import animatedledstrip.leds.colormanagement.clear
+import animatedledstrip.leds.colormanagement.currentStripColor
+import animatedledstrip.leds.locationmanagement.Location
+import animatedledstrip.leds.stripmanagement.LEDStrip
+import animatedledstrip.leds.stripmanagement.NativeLEDStrip
+import animatedledstrip.leds.stripmanagement.StripInfo
+import animatedledstrip.utils.ALSLogger
+import animatedledstrip.utils.Logger
+import co.touchlab.kermit.Severity
 import io.github.maxnz.parser.CommandParser
 import io.github.maxnz.parser.action
 import io.github.maxnz.parser.command
@@ -40,12 +43,6 @@ import io.github.maxnz.parser.commandGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.apache.commons.cli.CommandLine
-import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.HelpFormatter
-import org.pmw.tinylog.Configurator
-import org.pmw.tinylog.Level
-import org.pmw.tinylog.Logger
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -54,137 +51,38 @@ import java.net.BindException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
+actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
     args: Array<String>,
     ledClass: KClass<T>,
+    internal val pixelLocations: List<Location>?,
 ) {
 
     /** Is the server running */
-    internal var running = false
+    internal actual var running: Boolean = false
 
-
-    /* Get command line options */
-
-    private val cmdline: CommandLine =
-        DefaultParser().parse(options, args)
-
-
-    /* Set logging format and level based on command line options */
-
-    init {
-        val loggingPattern: String =
-            if (cmdline.hasOption("v"))
-                "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
-            else
-                "{{level}:|min-size=8} {message}"
-
-        assert(
-            if (cmdline.hasOption("v"))
-                loggingPattern == "{date:yyyy-MM-dd HH:mm:ss} [{thread}] {class}.{method}()\n{level}: {message}"
-            else
-                loggingPattern == "{{level}:|min-size=8} {message}"
-        )
-
-        val loggingLevel =
-            when {
-                cmdline.hasOption("t") -> Level.TRACE
-                cmdline.hasOption("d") -> Level.DEBUG
-                cmdline.hasOption("q") -> Level.OFF
-                else -> Level.INFO
-            }
-
-        Configurator.defaultConfig()
-            .formatPattern(loggingPattern)
-            .level(loggingLevel)
-            .addWriter(SocketWriter())
-            .activate()
-    }
-
-    init {
-        if (cmdline.hasOption("h")) {
-            HelpFormatter().printHelp("ledserver.jar", options)
-        }
-    }
-
-    /* Get properties file */
-
-    internal val propertyFileName: String =
-        cmdline.getOptionValue("f")
-        ?: "/etc/leds/led.config"
-
-    internal val properties =
-        Properties().apply {
-            try {
-                load(FileInputStream(propertyFileName))
-            } catch (e: FileNotFoundException) {
-                Logger.warn("File $propertyFileName not found")
-            }
-        }
-
-    /* Get port numbers */
-    internal val ports =
-        mutableListOf<Int>().apply {
-            cmdline.getOptionValue("P")?.split(' ')?.forEach {
-                requireNotNull(it.toIntOrNull()) { "Could not parse port \"$it\"" }
-                this += it.toInt()
-            }
-
-            properties.getProperty("ports")?.split(' ')?.forEach {
-                requireNotNull(it.toIntOrNull()) { "Could not parse port \"$it\"" }
-                this += it.toInt()
-            }
-        }
-
+    internal actual val ports: MutableList<Int> = mutableListOf()
 
     /* Arguments for creating the AnimatedLEDStrip instance */
 
-    internal val persistAnimations: Boolean =
-        !cmdline.hasOption("no-persist") &&
-        (cmdline.hasOption("persist") ||
-         properties.getProperty("persist")?.toBoolean() == true)
+    internal actual var persistAnimations: Boolean by Delegates.notNull()
 
+    /* Create strip info */
 
-    internal val numLEDs: Int =
-        cmdline.getOptionValue("n")?.toIntOrNull()
-        ?: properties.getProperty("numLEDs")?.toIntOrNull()
-        ?: 240
-
-    internal val pin: Int =
-        cmdline.getOptionValue("p")?.toIntOrNull()
-        ?: properties.getProperty("pin")?.toInt()
-        ?: 12
-
-    internal val imageDebuggingEnabled: Boolean =
-        cmdline.hasOption("i")
-
-    internal var outputFileName: String? =
-        cmdline.getOptionValue("o")
-
-    internal val rendersBeforeSave: Int =
-        cmdline.getOptionValue("r")?.toIntOrNull()
-        ?: properties.getProperty("renders")?.toIntOrNull()
-        ?: 1000
-
-    internal val threadCount: Int = 100
-
-    /* Create strip instance and animation handler */
-
-    val stripInfo: StripInfo
-    val leds: AnimatedLEDStrip
+    actual var stripInfo: StripInfo by Delegates.notNull()
 
     init {
-        stripInfo = StripInfo(
-            numLEDs = numLEDs,
-            pin = pin,
-            imageDebugging = imageDebuggingEnabled,
-            fileName = outputFileName,
-            rendersBeforeSave = rendersBeforeSave,
-            threadCount = threadCount,
-        )
+        parseOptions(args)
+    }
 
+    /* Create strip instance */
+
+    actual val leds: LEDStrip
+
+    init {
         /*
           Check validity of constructor before calling so user can be notified about
           what changes need to be made rather than just throwing an IllegalArgumentException
@@ -197,10 +95,10 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             "LED class primary constructor argument must be of type StripInfo"
         }
 
-        leds = ledConstructor.call(stripInfo)
+        leds = LEDStrip(stripInfo, ledConstructor.call(stripInfo))
 
         leds.startAnimationCallback = {
-            SocketConnections.sendAnimation(it)
+            SocketConnections.sendData(it)
             if (persistAnimations)
                 GlobalScope.launch(Dispatchers.IO) {
                     FileOutputStream(".animations/${it.fileName}").apply {
@@ -210,7 +108,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 }
         }
         leds.endAnimationCallback = {
-            SocketConnections.sendEndAnimation(it.endAnimation())
+            SocketConnections.sendData(it.endAnimation())
             if (File(".animations/${it.fileName}").exists())
                 Files.delete(Paths.get(".animations/${it.fileName}"))
         }
@@ -220,14 +118,12 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
     }
 
     val commandParser =
-        CommandParser<AnimatedLEDStripServer<T>, SocketConnections.Connection?>(
-            this
-        )
+        CommandParser<AnimatedLEDStripServer<T>, SocketConnections.Connection?>(this)
 
     init {
         commandParser.apply {
             fun reply(str: String, client: SocketConnections.Connection?) {
-                Logger.trace("Replying to client on port ${client?.port}: $str")
+                Logger.v("Command Parser") { "Replying to client on port ${client?.port}: $str" }
                 client?.sendString(str + DELIMITER)
             }
 
@@ -245,7 +141,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 description = "Stop the server"
 
                 action { _, _ ->
-                    Logger.warn("Shutting down server")
+                    Logger.w("Server") { "Shutting down server" }
                     stop()
                 }
             }
@@ -276,12 +172,30 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     commandGroup("set") {
                         description = "Set the global logging level"
 
+                        command("error") {
+                            description = "Set global logging level to error"
+
+                            action { _, _ ->
+                                ALSLogger.minSeverity = Severity.Error
+                                Logger.e { "Set logging level to error" }
+                            }
+                        }
+
+                        command("warn") {
+                            description = "Set global logging level to warn"
+
+                            action { _, _ ->
+                                ALSLogger.minSeverity = Severity.Warn
+                                Logger.w { "Set logging level to warn" }
+                            }
+                        }
+
                         command("info") {
                             description = "Set global logging level to info"
 
                             action { _, _ ->
-                                setLoggingLevel(Level.INFO)
-                                Logger.info("Set logging level to info")
+                                ALSLogger.minSeverity = Severity.Info
+                                Logger.i { "Set logging level to info" }
                             }
                         }
 
@@ -289,17 +203,17 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                             description = "Set global logging level to debug"
 
                             action { _, _ ->
-                                setLoggingLevel(Level.DEBUG)
-                                Logger.debug("Set logging level to debug")
+                                ALSLogger.minSeverity = Severity.Debug
+                                Logger.d { "Set logging level to debug" }
                             }
                         }
 
-                        command("trace") {
-                            description = "Set global logging level to trace"
+                        command("verbose") {
+                            description = "Set global logging level to verbose"
 
                             action { _, _ ->
-                                setLoggingLevel(Level.TRACE)
-                                Logger.trace("Set logging level to trace")
+                                ALSLogger.minSeverity = Severity.Verbose
+                                Logger.v { "Set logging level to verbose" }
                             }
                         }
                     }
@@ -308,7 +222,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         description = "Get the global logging level"
 
                         action { client, _ ->
-                            reply("Logging level is ${Logger.getLevel()}", client)
+                            reply("Logging level is ${ALSLogger.minSeverity}", client)
                         }
                     }
                 }
@@ -331,16 +245,33 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         client?.sendInfo()
                     }
                 }
+
+                command("color") {
+                    description = "Get strip color"
+
+                    action { client, _ ->
+                        client?.sendData(leds.currentStripColor())
+                    }
+                }
             }
 
             commandGroup("running") {
                 description = "Get information about currently running animations"
 
                 command("list") {
-                    description = "Print a list of all running animations"
+                    description = "Return all running animations"
 
                     action { client, _ ->
-                        reply("Running Animations: ${leds.runningAnimations.ids}", client)
+                        for (anim in leds.animationManager.runningAnimations.values)
+                            client?.sendRequestedData(anim.params)
+                    }
+                }
+
+                command("ids") {
+                    description = "Return a list of all running animation ids"
+
+                    action { client, _ ->
+                        reply("Running Animations: ${leds.animationManager.runningAnimations.keys}", client)
                     }
                 }
 
@@ -352,7 +283,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         if (args.isEmpty()) reply("ID of animation required", client)
                         args.forEach {
                             reply(
-                                leds.runningAnimations.entries.toMap()[it]?.data?.toHumanReadableString()
+                                leds.animationManager.runningAnimations.toMap()[it]?.params?.toString()
                                 ?: "$it: NOT FOUND",
                                 client,
                             )
@@ -368,7 +299,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                         if (args.isEmpty()) reply("ID of animation required", client)
                         args.forEach {
                             reply("Ending animation $it", client)
-                            leds.endAnimation(it)
+                            leds.animationManager.endAnimation(it)
                         }
                     }
                 }
@@ -416,7 +347,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                             else -> when (val portNum = port.toIntOrNull()) {
                                 null -> reply("""Invalid port: "$port"""", client)
                                 else -> {
-                                    Logger.debug("Adding port $portNum")
+                                    Logger.d { "Adding port $portNum" }
                                     when (SocketConnections.connections.containsKey(portNum)) {
                                         true -> reply("ERROR: Port $portNum already has a connection", client)
                                         false -> {
@@ -441,7 +372,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                             else -> when (val portNum = port.toIntOrNull()) {
                                 null -> reply("""Invalid port: "$port"""", client)
                                 else -> {
-                                    Logger.debug("Manually starting connection at port $portNum")
+                                    Logger.d { "Manually starting connection at port $portNum" }
                                     reply("Starting port $portNum", client)
                                     SocketConnections.connections.getOrDefault(portNum, null)?.open()
                                     ?: reply("ERROR: No connection on port $port", client)
@@ -461,7 +392,7 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                             else -> when (val portNum = port.toIntOrNull()) {
                                 null -> reply("""Invalid port: "$port"""", client)
                                 else -> {
-                                    Logger.debug("Manually stopping connection at port $portNum")
+                                    Logger.d { "Manually stopping connection at port $portNum" }
                                     reply("Stopping port $portNum", client)
                                     SocketConnections.connections.getOrDefault(portNum, null)?.close()
                                     ?: reply("ERROR: No connection on port $portNum", client)
@@ -475,12 +406,6 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
             Unit
         }
     }
-
-    /**
-     * The test animation
-     */
-    var testAnimation =
-        AnimationData().animation("Color").color(CCBlue)
 
     /* Start and stop methods */
 
@@ -499,8 +424,8 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                     File(".animations/").walk().forEach {
                         if (!it.isDirectory && it.name.endsWith(".anim")) try {
                             FileInputStream(it).apply {
-                                val obj = readAllBytes().toString().jsonToAnimationData()
-                                leds.startAnimation(obj)
+                                val obj = readAllBytes().toString().decodeJson() as AnimationToRunParams
+                                leds.animationManager.startAnimation(obj)
                                 close()
                             }
                         } catch (e: FileNotFoundException) {
@@ -517,28 +442,22 @@ class AnimatedLEDStripServer<T : AnimatedLEDStrip>(
                 SocketConnections.add(it, server = this)
                 SocketConnections.connections[it]?.open()
             } catch (e: BindException) {
-                Logger.error("Could not bind to port $it")
+                Logger.e { "Could not bind to port $it" }
             }
         }
-        if (cmdline.hasOption("T")) leds.startAnimation(testAnimation)
         return this
     }
 
     /** Stop the server */
     fun stop() {
         if (!running) return
-        leds.wholeStrip.setProlongedStripColor(0)
-        delayBlocking(500)
-        leds.toggleRender()
-        delayBlocking(2000)
+        leds.clear()
+        Thread.sleep(500)
+//        leds.toggleRender()
+        Thread.sleep(2000)
         running = false
     }
 
     internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) =
-        commandParser.parseCommand(command.removePrefix("CMD :"), client)
-
-    private fun setLoggingLevel(level: Level) {
-        Configurator.currentConfig().level(level).activate()
-    }
-
+        commandParser.parseCommand(command, client)
 }
