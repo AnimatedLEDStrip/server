@@ -23,7 +23,7 @@
 package animatedledstrip.server
 
 import animatedledstrip.animations.findAnimationOrNull
-import animatedledstrip.communication.DELIMITER
+import animatedledstrip.communication.Message
 import animatedledstrip.communication.decodeJson
 import animatedledstrip.leds.*
 import animatedledstrip.leds.animationmanagement.*
@@ -117,6 +117,58 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
         }
     }
 
+    /* Start and stop methods */
+
+    /**
+     * Start the server
+     *
+     * @return This server
+     */
+    fun start(): AnimatedLEDStripServer<T> {
+        leds.renderer.startRendering()
+
+        if (persistAnimations) {
+            val dir = File(".animations")
+            if (!dir.isDirectory)
+                dir.mkdirs()
+            else {
+                GlobalScope.launch {
+                    File(".animations/").walk().forEach {
+                        if (!it.isDirectory && it.name.endsWith(".anim")) try {
+                            FileInputStream(it).apply {
+                                val obj = readAllBytes().toString().decodeJson() as AnimationToRunParams
+                                leds.animationManager.startAnimation(obj)
+                                close()
+                            }
+                        } catch (e: FileNotFoundException) {
+                        }
+
+                    }
+                }
+            }
+        }
+
+        running = true
+        ports.forEach {
+            try {
+                SocketConnections.add(it, server = this)
+                SocketConnections.connections[it]?.open()
+            } catch (e: BindException) {
+                Logger.e { "Could not bind to port $it" }
+            }
+        }
+        return this
+    }
+
+    /** Stop the server */
+    fun stop() {
+        if (!running) return
+        leds.clear()
+        Thread.sleep(500)
+        leds.renderer.stopRendering()
+        running = false
+    }
+
     val commandParser =
         CommandParser<AnimatedLEDStripServer<T>, SocketConnections.Connection?>(this)
 
@@ -124,7 +176,7 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
         commandParser.apply {
             fun reply(str: String, client: SocketConnections.Connection?) {
                 Logger.v("Command Parser") { "Replying to client on port ${client?.port}: $str" }
-                client?.sendString(str + DELIMITER)
+                client?.sendData(Message(str))
             }
 
             val replyAction: AnimatedLEDStripServer<T>.(SocketConnections.Connection?, String) -> Unit =
@@ -406,58 +458,4 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
             Unit
         }
     }
-
-    /* Start and stop methods */
-
-    /**
-     * Start the server
-     *
-     * @return This server
-     */
-    fun start(): AnimatedLEDStripServer<T> {
-        if (persistAnimations) {
-            val dir = File(".animations")
-            if (!dir.isDirectory)
-                dir.mkdirs()
-            else {
-                GlobalScope.launch {
-                    File(".animations/").walk().forEach {
-                        if (!it.isDirectory && it.name.endsWith(".anim")) try {
-                            FileInputStream(it).apply {
-                                val obj = readAllBytes().toString().decodeJson() as AnimationToRunParams
-                                leds.animationManager.startAnimation(obj)
-                                close()
-                            }
-                        } catch (e: FileNotFoundException) {
-                        }
-
-                    }
-                }
-            }
-        }
-
-        running = true
-        ports.forEach {
-            try {
-                SocketConnections.add(it, server = this)
-                SocketConnections.connections[it]?.open()
-            } catch (e: BindException) {
-                Logger.e { "Could not bind to port $it" }
-            }
-        }
-        return this
-    }
-
-    /** Stop the server */
-    fun stop() {
-        if (!running) return
-        leds.clear()
-        Thread.sleep(500)
-//        leds.toggleRender()
-        Thread.sleep(2000)
-        running = false
-    }
-
-    internal fun parseTextCommand(command: String, client: SocketConnections.Connection?) =
-        commandParser.parseCommand(command, client)
 }

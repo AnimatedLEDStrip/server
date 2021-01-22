@@ -186,7 +186,7 @@ object SocketConnections {
                     }
                 }
 
-                Logger.i("Socket Connection") { "Connection on port $port Established" }
+                Logger.i("Socket Connection") { "Connection on port $port established" }
 
                 // Receive and process input
                 try {
@@ -231,7 +231,7 @@ object SocketConnections {
         private fun processData(input: String) {
             for (d in splitData(input)) {
                 if (d.isEmpty()) continue
-                when (val data = d.decodeJson()) {
+                when (val data = d.decodeJsonOrNull()) {
                     is Animation.AnimationInfo -> Logger.w("Socket Connection") { "Receiving AnimationInfo is not supported by server" }
                     is AnimationToRunParams -> server.leds.animationManager.startAnimation(data)
                     is ClientParams -> {
@@ -284,6 +284,7 @@ object SocketConnections {
                     is RunningAnimationParams -> Logger.w("Socket Connection") { "Receiving RunningAnimationParams is not supported by server" }
                     is Section -> server.leds.sectionManager.createSection(data)
                     is StripInfo -> Logger.w("Socket Connection") { "Receiving StripInfo is not supported by server" }
+                    null -> Logger.w("Socket Connection") { "Error parsing JSON: $data" }
                     else -> Logger.w("Socket Connection") { "Unrecognized data type: $data" }
                 }
             }

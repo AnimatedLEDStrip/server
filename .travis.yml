@@ -2,28 +2,32 @@
 language: java
 jdk: openjdk9
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.m2
-
-before_install:
-  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 branches:
   only:
     - master
     - /^travis.*/
+    - /.*-doc$/
 
 stages:
   - name: test
   - name: deploy
     if: branch = master AND type != pull_request
+  - name: deploy docs
+    if: (branch = master OR branch =~ ^.*-doc$) AND type != pull_request
 
 jobs:
   include:
     - stage: test
-      install: skip
+      install: ./gradlew jvmTestClasses
+      script: ./gradlew jvmTest
       after_success: bash <(curl -s https://codecov.io/bash)
 
     - stage: deploy
@@ -31,18 +35,17 @@ jobs:
       script: skip
       deploy:
         - provider: script
-          script: mvn deploy --settings .maven.xml -DskipTests=true -B
+          script: ./gradlew publish --stacktrace
 
-    - stage: deploy
+    - stage: deploy docs
       install: skip
       script: skip
       before_script:
-        - DEPLOY_DOCS=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout 2> /dev/null | grep -v SNAPSHOT) || echo "Snapshot detected, skipping doc deploy"
+        - "DEPLOY_DOCS=$(./gradlew properties | grep '^version:' | sed 's/version: //g' | grep -v SNAPSHOT) || echo 'Snapshot detected, skipping doc deploy'"
+      before_deploy:
+        - ./gradlew dokkaHtml
+        - git add -f dokka
       deploy:
-        - provider: script
-          script: mvn site --settings .maven.xml -DskipTests=true -B && git add dokka
-          on:
-            condition: $DEPLOY_DOCS
         - provider: pages
           skip-cleanup: true
           github-token: $GITHUB_TOKEN

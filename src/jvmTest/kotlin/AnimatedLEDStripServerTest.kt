@@ -26,6 +26,8 @@ import animatedledstrip.leds.emulation.EmulatedWS281x
 import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
@@ -35,7 +37,15 @@ import kotlin.test.assertTrue
 
 class AnimatedLEDStripServerTest : StringSpec(
     {
-
+        "test start stop" {
+            val server = newTestServer()
+            server.start()
+            server.running.shouldBeTrue()
+            server.leds.renderer.isRendering.shouldBeTrue()
+            server.stop()
+            server.running.shouldBeFalse()
+            server.leds.renderer.isRendering.shouldBeFalse()
+        }
     }
 ) {
 
@@ -308,19 +318,5 @@ class AnimatedLEDStripServerTest : StringSpec(
             " -v,--verbose           Enable verbose logging statements\n"
         )
 
-    }
-
-    @Test
-    fun testTestAnimation() {
-        val testServer =
-            AnimatedLEDStripServer(arrayOf("-qT"), EmulatedWS281x::class).start()
-        Thread.sleep(500)
-//        checkAllPixels(testServer.leds as EmulatedWS281x, 0xFF)
-        testServer.stop()
-    }
-
-    @Test
-    fun testPrimaryConstructor() {
-        AnimatedLEDStripServer(arrayOf("-q"), EmulatedWS281x::class)
     }
 }

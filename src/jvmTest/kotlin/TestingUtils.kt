@@ -23,6 +23,8 @@
 package animatedledstrip.test
 
 import animatedledstrip.communication.toUTF8String
+import animatedledstrip.leds.emulation.EmulatedWS281x
+import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.server.SocketConnections
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -31,6 +33,9 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertTrue
+
+fun newTestServer(args: Array<String> = arrayOf()): AnimatedLEDStripServer<EmulatedWS281x> =
+    AnimatedLEDStripServer(arrayOf("-n", "10") + args, EmulatedWS281x::class)
 
 private val exitStream = ByteArrayInputStream("exit\n".toByteArray())
 private var stream = ByteArrayInputStream("".toByteArray())

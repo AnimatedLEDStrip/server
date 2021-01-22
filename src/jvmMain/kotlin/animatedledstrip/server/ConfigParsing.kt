@@ -83,7 +83,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         try {
             load(FileInputStream(configFile))
         } catch (e: FileNotFoundException) {
-            Logger.w { "File $configFile not found" }
+            Logger.w("Config Parser") { "File $configFile not found" }
         }
     }
 
@@ -107,22 +107,22 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
 
     argParser.getOptionValue("p")?.split(' ')?.forEach {
         when (val port = it.toIntOrNull()) {
-            null -> Logger.e { "Could not parse port \"$it\"" }
-            in ports -> Logger.w { "Port $port already added" }
+            null -> Logger.e("Argument Parser") { "Could not parse port \"$it\"" }
+            in ports -> Logger.w("Argument Parser") { "Port $port already added" }
             else -> ports.add(port)
         }
     }
 
     configuration.getProperty("ports")?.split(' ')?.forEach {
         when (val port = it.toIntOrNull()) {
-            null -> Logger.e { "Could not parse port \"$it\"" }
-            in ports -> Logger.w { "Port $port already added" }
+            null -> Logger.e("Config Parser") { "Could not parse port \"$it\"" }
+            in ports -> Logger.w("Config Parser") { "Port $port already added" }
             else -> ports.add(port)
         }
     }
 
     persistAnimations = !argParser.hasOption("nopersist") &&
-                        (argParser.hasOption("persist") || configuration.getProperty("persist").toBoolean())
+                        (argParser.hasOption("persist") || configuration.getProperty("persist")?.toBoolean() ?: false)
 
     fun warnArgParseError(flag: String, value: String) {
         Logger.w("Argument Parser") { "Could not parse $flag \"$value\" from command line" }
