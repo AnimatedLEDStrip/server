@@ -47,7 +47,7 @@ repositories {
 }
 
 group = "io.github.animatedledstrip"
-version = "1.0.0-pre2-SNAPSHOT"
+version = "1.0.0-pre3-SNAPSHOT"
 description = "A library for creating an AnimatedLEDStrip server"
 
 kotlin {
@@ -80,7 +80,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(kotlin("reflect"))
-                api("io.github.animatedledstrip:animatedledstrip-core:1.0.0-pre2.1")
+                api("io.github.animatedledstrip:animatedledstrip-core:1.0.0-pre3-SNAPSHOT")
             }
         }
         val commonTest by getting {
@@ -93,10 +93,16 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.0-pre2.1")
+                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.0-pre3-SNAPSHOT")
 
                 api("commons-cli:commons-cli:1.4")
                 implementation("io.github.maxnz:interactive-command-parser:0.1")
+
+                api("io.ktor:ktor-server-core:1.5.0")
+                api("io.ktor:ktor-server-netty:1.5.0")
+                api("io.ktor:ktor-serialization:1.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+                api("ch.qos.logback:logback-classic:1.2.3")
             }
         }
         val jvmTest by getting {

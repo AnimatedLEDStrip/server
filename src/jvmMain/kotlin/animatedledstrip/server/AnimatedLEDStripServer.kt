@@ -157,6 +157,7 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
                 Logger.e { "Could not bind to port $it" }
             }
         }
+        httpServer(this)
         return this
     }
 
