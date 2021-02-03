@@ -25,7 +25,7 @@ package animatedledstrip.server
 import animatedledstrip.communication.serializer
 import animatedledstrip.leds.animationmanagement.*
 import animatedledstrip.leds.colormanagement.clear
-import animatedledstrip.leds.colormanagement.currentStripColor
+import animatedledstrip.leds.colormanagement.pixelActualColorList
 import animatedledstrip.leds.sectionmanagement.Section
 import io.ktor.application.call
 import io.ktor.application.install
@@ -166,7 +166,7 @@ fun Route.sectionRoute(ledServer: AnimatedLEDStripServer<*>) {
             val name: String = call.parameters["name"] ?: return@get call.respondText("Name of section required")
             call.respondRedirect("/section/$name", permanent = true)
         }
-        post("/newSection") {
+        post {
             val newSection = call.receive<Section>()
             if (ledServer.leds.sectionManager.getSectionOrNull(newSection.name) != null)
                 return@post call.respondText("Section ${newSection.name} already exists",
@@ -188,7 +188,7 @@ fun Route.startRoute(ledServer: AnimatedLEDStripServer<*>) {
 fun Route.stripRoute(ledServer: AnimatedLEDStripServer<*>) {
     route("/strip") {
         get("/color") {
-            call.respond(ledServer.leds.currentStripColor())
+            call.respond(ledServer.leds.pixelActualColorList)
         }
         get("/info") {
             call.respond(ledServer.leds.stripInfo)

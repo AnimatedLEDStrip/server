@@ -4,13 +4,10 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.animatedledstrip/animatedledstrip-server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.animatedledstrip/animatedledstrip-server)
 
 # AnimatedLEDStrip Server
-An AnimatedLEDStrip server creates a way for clients to control the LED strip.
+An AnimatedLEDStrip server handles the communications to and from clients.
+
 
 ## Creating a Server
 The server library is combined with a device library to run a server on that device.
 See the [wiki](https://github.com/AnimatedLEDStrip/server/wiki/Creating-a-Server)
 for instructions.
-
-## Note About Building
-Because we use the dokka plugin to generate our documentation, we must build using Java <=9
-> https://www.oracle.com/technetwork/java/javase/downloads/java-archive-javase9-3934878.html

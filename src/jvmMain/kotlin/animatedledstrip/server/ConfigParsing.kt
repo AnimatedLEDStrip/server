@@ -36,7 +36,6 @@ val options = Options().apply {
     addOption("f", "config", true, "Specify a config to load instead of /etc/leds/led.config")
 
     addLongOption("log-level", true, "Set the minimum severity level for logs that will be printed")
-    addOption("p", "ports", true, "Add ports for clients to connect to")
 
     addLongOption("persist", false, "Persist animations across restarts")
     addLongOption("nopersist",
@@ -104,22 +103,6 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         }
     }
     ALSLogger.minSeverity = loggingSeverity
-
-    argParser.getOptionValue("p")?.split(' ')?.forEach {
-        when (val port = it.toIntOrNull()) {
-            null -> Logger.e("Argument Parser") { "Could not parse port \"$it\"" }
-            in ports -> Logger.w("Argument Parser") { "Port $port already added" }
-            else -> ports.add(port)
-        }
-    }
-
-    configuration.getProperty("ports")?.split(' ')?.forEach {
-        when (val port = it.toIntOrNull()) {
-            null -> Logger.e("Config Parser") { "Could not parse port \"$it\"" }
-            in ports -> Logger.w("Config Parser") { "Port $port already added" }
-            else -> ports.add(port)
-        }
-    }
 
     persistAnimations = !argParser.hasOption("nopersist") &&
                         (argParser.hasOption("persist") || configuration.getProperty("persist")?.toBoolean() ?: false)

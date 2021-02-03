@@ -24,7 +24,6 @@ package animatedledstrip.test
 
 import animatedledstrip.leds.emulation.EmulatedWS281x
 import animatedledstrip.server.AnimatedLEDStripServer
-import animatedledstrip.server.SocketConnections
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -49,9 +48,9 @@ class AnimatedLEDStripServerTest : StringSpec(
     }
 ) {
 
-    init {
-        SocketConnections.hostIP = "0.0.0.0"
-    }
+//    init {
+//        SocketConnections.hostIP = "0.0.0.0"
+//    }
 
     @Test
     fun testStartStop() = runBlocking {

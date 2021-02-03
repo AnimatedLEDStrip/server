@@ -27,7 +27,6 @@ import animatedledstrip.utils.TestLogger
 import co.touchlab.kermit.Severity
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 class ConfigParsingTests : StringSpec(
@@ -106,42 +105,42 @@ class ConfigParsingTests : StringSpec(
             ALSLogger.minSeverity shouldBe Severity.Error
         }
 
-        "command line ports error" {
-            TestLogger.startLogCapture()
-            newTestServer(arrayOf("-p", "x"))
-            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error, "Could not parse port \"x\"", "Argument Parser"))
-            TestLogger.stopLogCapture()
-        }
+//        "command line ports error" {
+//            TestLogger.startLogCapture()
+//            newTestServer(arrayOf("-p", "x"))
+//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error, "Could not parse port \"x\"", "Argument Parser"))
+//            TestLogger.stopLogCapture()
+//        }
+//
+//        "command line ports already exists" {
+//            TestLogger.startLogCapture()
+//            newTestServer(arrayOf("-p", "5 5"))
+//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn, "Port 5 already added", "Argument Parser"))
+//            TestLogger.stopLogCapture()
+//        }
 
-        "command line ports already exists" {
-            TestLogger.startLogCapture()
-            newTestServer(arrayOf("-p", "5 5"))
-            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn, "Port 5 already added", "Argument Parser"))
-            TestLogger.stopLogCapture()
-        }
+//        "command line ports success" {
+//            val server = newTestServer(arrayOf("-p", "5 6 7"))
+//            server.ports.shouldContainExactly(5, 6, 7)
+//        }
 
-        "command line ports success" {
-            val server = newTestServer(arrayOf("-p", "5 6 7"))
-            server.ports.shouldContainExactly(5, 6, 7)
-        }
+//        "config file ports error" {
+//            TestLogger.startLogCapture()
+//            newTestServer(arrayOf("-p", "x"))
+//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error, "Could not parse port \"x\"", "Argument Parser"))
+//            TestLogger.stopLogCapture()
+//        }
 
-        "config file ports error" {
-            TestLogger.startLogCapture()
-            newTestServer(arrayOf("-p", "x"))
-            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error, "Could not parse port \"x\"", "Argument Parser"))
-            TestLogger.stopLogCapture()
-        }
-
-        "config file ports already exists" {
-            TestLogger.startLogCapture()
-            newTestServer(arrayOf("-p", "5 5"))
-            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn, "Port 5 already added", "Argument Parser"))
-            TestLogger.stopLogCapture()
-        }
-
-        "config file ports success" {
-            val server = newTestServer(arrayOf("-p", "5 6 7"))
-            server.ports.shouldContainExactly(5, 6, 7)
-        }
+//        "config file ports already exists" {
+//            TestLogger.startLogCapture()
+//            newTestServer(arrayOf("-p", "5 5"))
+//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn, "Port 5 already added", "Argument Parser"))
+//            TestLogger.stopLogCapture()
+//        }
+//
+//        "config file ports success" {
+//            val server = newTestServer(arrayOf("-p", "5 6 7"))
+//            server.ports.shouldContainExactly(5, 6, 7)
+//        }
     }
 )

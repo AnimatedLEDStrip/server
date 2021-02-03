@@ -35,8 +35,6 @@ expect class AnimatedLEDStripServer<T : NativeLEDStrip>(
 ) {
     internal var running: Boolean
 
-    internal val ports: MutableList<Int>
-
     internal var persistAnimations: Boolean
 
     internal var stripInfo: StripInfo
