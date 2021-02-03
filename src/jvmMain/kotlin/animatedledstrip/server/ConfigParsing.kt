@@ -91,19 +91,27 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
     }
 
     // Parse for logging severity
-    val loggingSeverity = when (argParser.getOptionValue("log-level")?.toLowerCase()) {
+    val loggingSeverity = when (val argL = argParser.getOptionValue("log-level")?.toLowerCase()) {
         "verbose" -> Severity.Verbose
         "debug" -> Severity.Debug
         "info" -> Severity.Info
         "warn" -> Severity.Warn
         "error" -> Severity.Error
-        else -> when (configuration.getProperty("log-level")?.toLowerCase()) {
-            "verbose" -> Severity.Verbose
-            "debug" -> Severity.Debug
-            "info" -> Severity.Info
-            "warn" -> Severity.Warn
-            "error" -> Severity.Error
-            else -> Severity.Warn
+        else -> {
+            if (argL != null)
+                Logger.w("Argument Parser") { "Could not parse log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)" }
+            when (val confL = configuration.getProperty("log-level")?.toLowerCase()) {
+                "verbose" -> Severity.Verbose
+                "debug" -> Severity.Debug
+                "info" -> Severity.Info
+                "warn" -> Severity.Warn
+                "error" -> Severity.Error
+                else -> {
+                    if (confL != null)
+                        Logger.w("Config Parser") { "Could not parse log-level \"$confL\" in config (must be one of verbose, debug, info, warn, error)" }
+                    Severity.Warn
+                }
+            }
         }
     }
     ALSLogger.minSeverity = loggingSeverity
