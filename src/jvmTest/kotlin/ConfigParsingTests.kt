@@ -104,43 +104,5 @@ class ConfigParsingTests : StringSpec(
             newTestServer(arrayOf("-f", "src/jvmTest/resources/log-error.config"))
             ALSLogger.minSeverity shouldBe Severity.Error
         }
-
-//        "command line ports error" {
-//            TestLogger.startLogCapture()
-//            newTestServer(arrayOf("-p", "x"))
-//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error, "Could not parse port \"x\"", "Argument Parser"))
-//            TestLogger.stopLogCapture()
-//        }
-//
-//        "command line ports already exists" {
-//            TestLogger.startLogCapture()
-//            newTestServer(arrayOf("-p", "5 5"))
-//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn, "Port 5 already added", "Argument Parser"))
-//            TestLogger.stopLogCapture()
-//        }
-
-//        "command line ports success" {
-//            val server = newTestServer(arrayOf("-p", "5 6 7"))
-//            server.ports.shouldContainExactly(5, 6, 7)
-//        }
-
-//        "config file ports error" {
-//            TestLogger.startLogCapture()
-//            newTestServer(arrayOf("-p", "x"))
-//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error, "Could not parse port \"x\"", "Argument Parser"))
-//            TestLogger.stopLogCapture()
-//        }
-
-//        "config file ports already exists" {
-//            TestLogger.startLogCapture()
-//            newTestServer(arrayOf("-p", "5 5"))
-//            TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn, "Port 5 already added", "Argument Parser"))
-//            TestLogger.stopLogCapture()
-//        }
-//
-//        "config file ports success" {
-//            val server = newTestServer(arrayOf("-p", "5 6 7"))
-//            server.ports.shouldContainExactly(5, 6, 7)
-//        }
     }
 )

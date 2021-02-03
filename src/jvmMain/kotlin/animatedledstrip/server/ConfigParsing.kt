@@ -22,11 +22,14 @@
 
 package animatedledstrip.server
 
+import animatedledstrip.leds.locationmanagement.Location
 import animatedledstrip.leds.stripmanagement.StripInfo
 import animatedledstrip.utils.ALSLogger
 import animatedledstrip.utils.Logger
 import co.touchlab.kermit.Severity
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.apache.commons.cli.*
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.*
@@ -43,7 +46,8 @@ val options = Options().apply {
                   "Don't persist animations across restarts (overrides --persist and persist=true in config)")
 
     addOption("n", "numleds", true, "Specify number of LEDs in the strip (default 240)")
-    addOption("P", "pin", true, "Specify pin number the LED strip is connected to (default 12)")
+    addOption("l", "locations-file", true, "Specify a file with the locations of all pixels")
+    addOption("p", "pin", true, "Specify pin number the LED strip is connected to (default 12)")
     addLongOption("render-delay",
                   false,
                   "Specify the time in milliseconds between renders of the LED strip (default 10)")
@@ -151,7 +155,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         }
 
     val pin: Int? =
-        when (val argPin = argParser.getOptionValue("P")) {
+        when (val argPin = argParser.getOptionValue("p")) {
             null -> when (val configPin = configuration.getProperty("pin")) {
                 null -> defaultStripInfo.pin
                 else -> when (val configPinNum = configPin.toIntOrNull()) {
@@ -164,7 +168,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
             }
             else -> when (val argPinNum = argPin.toIntOrNull()) {
                 null -> {
-                    warnArgParseError("-P/--pin", argPin)
+                    warnArgParseError("-p/--pin", argPin)
                     defaultStripInfo.pin
                 }
                 else -> argPinNum
@@ -232,7 +236,17 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
                         (argParser.hasOption("3") || (configuration.getProperty("3d")?.toBoolean()
                                                       ?: defaultStripInfo.is3DSupported))
 
-    val ledLocations = pixelLocations // TODO: Support file input
+    val locationsFile: String? =
+        argParser.getOptionValue("locations-file") ?: configuration.getProperty("locations-file")
+
+    val ledLocations = if (locationsFile != null)
+        csvReader().readAll(File(locationsFile)).mapIndexed { i, l ->
+            val x = l.getOrNull(0)?.toDoubleOrNull() ?: error("Could not parse first column of row $i properly")
+            val y = l.getOrNull(1)?.toDoubleOrNull() ?: error("Could not parse second column of row $i properly")
+            val z = l.getOrNull(2)?.toDoubleOrNull() ?: error("Could not parse third column of row $i properly")
+            Location(x, y, z)
+        }
+    else pixelLocations
 
     stripInfo = StripInfo(numLEDs = numLEDs,
                           pin = pin,

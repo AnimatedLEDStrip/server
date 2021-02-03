@@ -97,6 +97,7 @@ kotlin {
 
                 api("commons-cli:commons-cli:1.4")
                 implementation("io.github.maxnz:interactive-command-parser:0.1")
+                implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.0")
 
                 api("io.ktor:ktor-server-core:1.5.0")
                 api("io.ktor:ktor-server-netty:1.5.0")
