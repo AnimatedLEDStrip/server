@@ -8,3 +8,4 @@
 !pom.xml
 !.maven.xml
 *.csv
+!src/jvmTest/resources/locations/*.csv

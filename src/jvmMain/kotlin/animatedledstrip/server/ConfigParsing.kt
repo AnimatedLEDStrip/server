@@ -49,7 +49,7 @@ val options = Options().apply {
     addOption("l", "locations-file", true, "Specify a file with the locations of all pixels")
     addOption("p", "pin", true, "Specify pin number the LED strip is connected to (default 12)")
     addLongOption("render-delay",
-                  false,
+                  true,
                   "Specify the time in milliseconds between renders of the LED strip (default 10)")
 
     addLongOption("log-renders", false, "Enable strip color logging")
@@ -99,7 +99,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         "error" -> Severity.Error
         else -> {
             if (argL != null)
-                Logger.w("Argument Parser") { "Could not parse log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)" }
+                Logger.w("Argument Parser") { "Could not parse --log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)" }
             when (val confL = configuration.getProperty("log-level")?.toLowerCase()) {
                 "verbose" -> Severity.Verbose
                 "debug" -> Severity.Debug
@@ -155,7 +155,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
             }
             else -> when (val argLEDNum = argLEDs.toIntOrNull()) {
                 null -> {
-                    warnArgParseError("-n/--numLEDs", argLEDs)
+                    warnArgParseError("-n/--numleds", argLEDs)
                     defaultStripInfo.numLEDs
                 }
                 else -> argLEDNum
@@ -233,28 +233,53 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         }
 
     val is1DSupported = !argParser.hasOption("no1d") &&
-                        (argParser.hasOption("1") || (configuration.getProperty("1d")?.toBoolean()
-                                                      ?: defaultStripInfo.is1DSupported))
+                        (argParser.hasOption("1d") || (configuration.getProperty("1d")?.toBoolean()
+                                                       ?: defaultStripInfo.is1DSupported))
 
     val is2DSupported = !argParser.hasOption("no2d") &&
-                        (argParser.hasOption("2") || (configuration.getProperty("2d")?.toBoolean()
-                                                      ?: defaultStripInfo.is2DSupported))
+                        (argParser.hasOption("2d") || (configuration.getProperty("2d")?.toBoolean()
+                                                       ?: defaultStripInfo.is2DSupported))
 
     val is3DSupported = !argParser.hasOption("no3d") &&
-                        (argParser.hasOption("3") || (configuration.getProperty("3d")?.toBoolean()
-                                                      ?: defaultStripInfo.is3DSupported))
+                        (argParser.hasOption("3d") || (configuration.getProperty("3d")?.toBoolean()
+                                                       ?: defaultStripInfo.is3DSupported))
 
-    val locationsFile: String? =
+    val locationsFileName: String? =
         argParser.getOptionValue("locations-file") ?: configuration.getProperty("locations-file")
 
-    val ledLocations = if (locationsFile != null)
-        csvReader().readAll(File(locationsFile)).mapIndexed { i, l ->
-            val x = l.getOrNull(0)?.toDoubleOrNull() ?: error("Could not parse first column of row $i properly")
-            val y = l.getOrNull(1)?.toDoubleOrNull() ?: error("Could not parse second column of row $i properly")
-            val z = l.getOrNull(2)?.toDoubleOrNull() ?: error("Could not parse third column of row $i properly")
-            Location(x, y, z)
+    val locationsFile: File? = if (locationsFileName != null) File(locationsFileName) else null
+
+    val ledLocations = when {
+        locationsFile?.exists() == false -> {
+            Logger.w("LED Locations File Parser") { "File $locationsFileName does not exist" }
+            null
         }
-    else pixelLocations
+        locationsFile != null -> {
+            var discard = false
+            val locations: MutableList<Location> = mutableListOf()
+            for ((i, l) in csvReader().readAll(locationsFile).withIndex()) {
+                val x = l.getOrNull(0)?.toDoubleOrNull() ?: run {
+                    Logger.e("LED Locations File Parser") { "Could not parse first column of row ${i + 1} properly, aborting and using defaults" }
+                    discard = true
+                    null
+                }
+                val y = l.getOrNull(1)?.toDoubleOrNull() ?: run {
+                    Logger.e("LED Locations File Parser") { "Could not parse second column of row ${i + 1} properly, aborting and using defaults" }
+                    discard = true
+                    null
+                }
+                val z = l.getOrNull(2)?.toDoubleOrNull() ?: run {
+                    Logger.e("LED Locations File Parser") { "Could not parse third column of row ${i + 1} properly, aborting and using defaults" }
+                    discard = true
+                    null
+                }
+                if (x != null && y != null && z != null) locations.add(Location(x, y, z))
+                else break
+            }
+            if (discard) pixelLocations else locations
+        }
+        else -> pixelLocations
+    }
 
     stripInfo = StripInfo(numLEDs = numLEDs,
                           pin = pin,

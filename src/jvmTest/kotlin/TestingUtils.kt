@@ -33,7 +33,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertTrue
 
-fun newTestServer(args: Array<String> = arrayOf()): AnimatedLEDStripServer<EmulatedWS281x> =
+fun newTestServer(vararg args: String): AnimatedLEDStripServer<EmulatedWS281x> =
     AnimatedLEDStripServer(arrayOf("-n", "10") + args, EmulatedWS281x::class)
 
 private val exitStream = ByteArrayInputStream("exit\n".toByteArray())
