@@ -37,6 +37,8 @@ expect class AnimatedLEDStripServer<T : NativeLEDStrip>(
 
     internal var persistAnimations: Boolean
 
+    internal var persistentAnimationDirectory: String
+
     internal var stripInfo: StripInfo
 
     val leds: LEDStrip
