@@ -157,6 +157,17 @@ class ConfigParsingTests : StringSpec(
                           "--nopersist").persistAnimations.shouldBeFalse()
         }
 
+        "command line persist-dir" {
+            newTestServer("--persist-dir", "src/jvmTest/resources/persist").persistentAnimationDirectory shouldBe
+                    "src/jvmTest/resources/persist"
+            newTestServer().persistentAnimationDirectory shouldBe "./"
+        }
+
+        "config file persist-dir" {
+            newTestServer("-f", configPath("persist", "persist-dir.config")).persistentAnimationDirectory shouldBe
+                    "src/jvmTest/resources/persist"
+        }
+
         "command line numLEDs" {
             AnimatedLEDStripServer(arrayOf("-n", "10"), EmulatedWS281x::class).stripInfo.numLEDs shouldBe 10
             AnimatedLEDStripServer(arrayOf("--numleds", "15"), EmulatedWS281x::class).stripInfo.numLEDs shouldBe 15

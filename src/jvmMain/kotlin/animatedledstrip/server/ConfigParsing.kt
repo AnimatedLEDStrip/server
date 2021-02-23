@@ -44,6 +44,7 @@ val options = Options().apply {
     addLongOption("nopersist",
                   false,
                   "Don't persist animations across restarts (overrides --persist and persist=true in config)")
+    addLongOption("persist-dir", true, "Directory to store persistent animations")
 
     addOption("n", "numleds", true, "Specify number of LEDs in the strip (default 240)")
     addOption("l", "locations-file", true, "Specify a file with the locations of all pixels")
@@ -117,7 +118,12 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
     ALSLogger.minSeverity = loggingSeverity
 
     persistAnimations = !argParser.hasOption("nopersist") &&
-                        (argParser.hasOption("persist") || configuration.getProperty("persist")?.toBoolean() ?: false)
+                        (argParser.hasOption("persist") || configuration.getProperty("persist")
+                            ?.toBoolean() ?: persistAnimations)
+
+    persistentAnimationDirectory = argParser.getOptionValue("persist-dir")
+                                   ?: configuration.getProperty("persist-dir")
+                                   ?: persistentAnimationDirectory
 
     fun warnArgParseError(flag: String, value: String) {
         Logger.w("Argument Parser") { "Could not parse $flag \"$value\" from command line" }
