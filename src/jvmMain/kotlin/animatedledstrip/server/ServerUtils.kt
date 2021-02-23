@@ -35,4 +35,4 @@ fun AnimatedLEDStripServer<*>.waitUntilStop() {
 }
 
 val RunningAnimationParams.fileName: String
-    get() = "$id.anim"
+    get() = "$id.json"
