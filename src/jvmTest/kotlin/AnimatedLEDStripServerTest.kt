@@ -22,6 +22,10 @@
 
 package animatedledstrip.test
 
+import animatedledstrip.animations.parameters.PercentDistance
+import animatedledstrip.colors.ColorContainer
+import animatedledstrip.colors.ccpresets.randomColorList
+import animatedledstrip.leds.animationmanagement.AnimationToRunParams
 import animatedledstrip.leds.stripmanagement.NativeLEDStrip
 import animatedledstrip.server.AnimatedLEDStripServer
 import io.kotest.assertions.throwables.shouldThrow
@@ -29,7 +33,10 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.maps.shouldContainKeys
+import io.kotest.matchers.paths.shouldExist
+import io.kotest.matchers.paths.shouldNotExist
 import kotlinx.coroutines.delay
+import java.nio.file.Paths
 
 class AnimatedLEDStripServerTest : StringSpec(
     {
@@ -64,6 +71,34 @@ class AnimatedLEDStripServerTest : StringSpec(
             shouldThrow<IllegalArgumentException> {
                 AnimatedLEDStripServer(arrayOf(), BadStrip2::class)
             }
+        }
+
+        "test save persistent animation" {
+            val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist-save")
+
+            val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test",
+                                            doubleParams = mutableMapOf("maximumInfluence" to 3.0, "spacing" to 10.0),
+                                            distanceParams = mutableMapOf("offset" to PercentDistance(0.0, 50.0, 0.0))).prepare(server.leds.sectionManager.getSection(""))
+
+            server.savePersistentAnimation(anim)
+            delay(100)
+            Paths.get("src/jvmTest/resources/persist-save/.animations/test.json").shouldExist()
+        }
+
+        "test delete persistent animation" {
+            val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist-delete")
+
+            val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test2",
+                                            doubleParams = mutableMapOf("maximumInfluence" to 3.0, "spacing" to 10.0),
+                                            distanceParams = mutableMapOf("offset" to PercentDistance(0.0, 50.0, 0.0))).prepare(server.leds.sectionManager.getSection(""))
+
+            server.savePersistentAnimation(anim)
+            delay(100)
+            Paths.get("src/jvmTest/resources/persist-delete/.animations/test2.json").shouldExist()
+            delay(500)
+            server.deletePersistentAnimation(anim)
+            delay(100)
+            Paths.get("src/jvmTest/resources/persist-delete/.animations/test2.json").shouldNotExist()
         }
 
         "test load persistent animations" {

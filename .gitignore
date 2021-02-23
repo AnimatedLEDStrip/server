@@ -9,3 +9,5 @@
 !.maven.xml
 *.csv
 !src/jvmTest/resources/locations/*.csv
+src/jvmTest/resources/persist-save/.animations/*
+src/jvmTest/resources/persist-delete/.animations/*
