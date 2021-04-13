@@ -27,7 +27,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Create test classes for testing
-        run: ./gradlew jvmTestClasses
+        run: ls -l && ./gradlew jvmTestClasses
 
       - name: Test
         run: ./gradlew jvmTest jsTest
