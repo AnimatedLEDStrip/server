@@ -80,7 +80,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(kotlin("reflect"))
-                api("io.github.animatedledstrip:animatedledstrip-core:1.0.0")
+                api("io.github.animatedledstrip:animatedledstrip-core:1.0.0-pre6.1")
             }
         }
         val commonTest by getting {
