@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew jvmTestClasses
 
       - name: Test
-        run: ./gradlew jvmTest jsTest
+        run: ./gradlew jvmTest
       - name: Upload coverage
         uses: codecov/codecov-action@v1.3.1
 
