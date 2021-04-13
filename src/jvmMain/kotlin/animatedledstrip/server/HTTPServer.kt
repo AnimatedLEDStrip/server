@@ -22,8 +22,12 @@
 
 package animatedledstrip.server
 
+import animatedledstrip.animations.groups.AnimationGroup
 import animatedledstrip.communication.serializer
-import animatedledstrip.leds.animationmanagement.*
+import animatedledstrip.leds.animationmanagement.AnimationToRunParams
+import animatedledstrip.leds.animationmanagement.RunningAnimationParams
+import animatedledstrip.leds.animationmanagement.endAnimation
+import animatedledstrip.leds.animationmanagement.startAnimation
 import animatedledstrip.leds.colormanagement.clear
 import animatedledstrip.leds.colormanagement.pixelActualColorList
 import animatedledstrip.leds.sectionmanagement.Section
@@ -99,16 +103,10 @@ fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
             val name = call.parameters["name"] ?: return@get call.respondText("Name of animation required")
             call.respondRedirect("/animation/$name", permanent = true)
         }
-//        post("/newOrderedGroup") {
-//            val newGroup = call.receive<OrderedAnimationGroup>()
-//            ledServer.leds.animationManager.addNewAnimation(newGroup)
-//            call.respond(newGroup.info)
-//        }
-//        post("/newRandomizedGroup") {
-//            val newGroup = call.receive<RandomizedAnimationGroup>()
-//            ledServer.leds.animationManager.addNewAnimation(newGroup)
-//            call.respond(newGroup.info)
-//        }
+        post("/newGroup") {
+            val newGroup = call.receive<AnimationGroup.NewAnimationGroupInfo>()
+            ledServer.leds.animationManager.addNewGroup(newGroup)
+        }
     }
 }
 
