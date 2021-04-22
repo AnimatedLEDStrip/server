@@ -166,10 +166,11 @@ tasks.jacocoTestReport {
     }
 }
 
+val javadoc = tasks.named("javadoc")
+
 val javadocJar by tasks.creating(Jar::class) {
-    dependsOn.add(tasks.dokkaJavadoc)
     archiveClassifier.set("javadoc")
-    from(tasks.dokkaJavadoc)
+    from(javadoc)
 }
 
 publishing {
