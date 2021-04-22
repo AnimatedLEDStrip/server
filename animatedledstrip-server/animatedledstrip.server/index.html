@@ -1,89 +1,309 @@
-<HTML>
-<HEAD>
-<meta charset="UTF-8">
-<title>animatedledstrip.server - animatedledstrip-server</title>
-<link rel="stylesheet" href="../../style.css">
-</HEAD>
-<BODY>
-<a href="../index.html">animatedledstrip-server</a>&nbsp;/&nbsp;<a href="./index.html">animatedledstrip.server</a><br/>
-<br/>
-<h2>Package animatedledstrip.server</h2>
-<h3>Types</h3>
-<table>
-<tbody>
-<tr>
-<td>
-<h4><a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a></h4>
-</td>
-<td>
-<code><span class="keyword">class </span><span class="identifier">AnimatedLEDStripServer</span><span class="symbol">&lt;</span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">&gt;</span></code></td>
-</tr>
-<tr>
-<td>
-<h4><a href="-socket-connections/index.html">SocketConnections</a></h4>
-</td>
-<td>
-<p>An object for creating, tracking and using connections that clients can connect to</p>
-<code><span class="keyword">object </span><span class="identifier">SocketConnections</span></code></td>
-</tr>
-<tr>
-<td>
-<h4><a href="-socket-writer/index.html">SocketWriter</a></h4>
-</td>
-<td>
-<code><span class="keyword">class </span><span class="identifier">SocketWriter</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">Writer</span></code></td>
-</tr>
-</tbody>
-</table>
-<h3>Extensions for External Classes</h3>
-<table>
-<tbody>
-<tr>
-<td>
-<h4><a href="animatedledstrip.animationutils.-animation-data/index.html">animatedledstrip.animationutils.AnimationData</a></h4>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td>
-<h4><a href="org.apache.commons.cli.-options/index.html">org.apache.commons.cli.Options</a></h4>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3>Properties</h3>
-<table>
-<tbody>
-<tr>
-<td>
-<h4><a href="options.html">options</a></h4>
-</td>
-<td>
-<code><span class="keyword">val </span><span class="identifier">options</span><span class="symbol">: </span><span class="identifier">Options</span></code></td>
-</tr>
-</tbody>
-</table>
-<h3>Functions</h3>
-<table>
-<tbody>
-<tr>
-<td>
-<h4><a href="start-server.html">startServer</a></h4>
-</td>
-<td>
-<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<span class="identifier">AnimatedLEDStrip</span><span class="symbol">&gt;</span> <span class="identifier">startServer</span><span class="symbol">(</span><span class="identifier" id="animatedledstrip.server$startServer(kotlin.Array((kotlin.String)), kotlin.reflect.KClass((animatedledstrip.server.startServer.T)))/args">args</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html"><span class="identifier">Array</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="animatedledstrip.server$startServer(kotlin.Array((kotlin.String)), kotlin.reflect.KClass((animatedledstrip.server.startServer.T)))/ledClass">ledClass</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html"><span class="identifier">KClass</span></a><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-<tr>
-<td>
-<h4><a href="wait-until-stop.html">waitUntilStop</a></h4>
-</td>
-<td>
-<code><span class="keyword">fun </span><a href="-animated-l-e-d-strip-server/index.html"><span class="identifier">AnimatedLEDStripServer</span></a><span class="symbol">&lt;</span><span class="identifier">*</span><span class="symbol">&gt;</span><span class="symbol">.</span><span class="identifier">waitUntilStop</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
-</tr>
-</tbody>
-</table>
-</BODY>
-</HTML>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>animatedledstrip.server</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+    <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+    <link href="../../styles/style.css" rel="Stylesheet">
+    <link href="../../styles/logo-styles.css" rel="Stylesheet">
+    <link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
+    <link href="../../styles/main.css" rel="Stylesheet">
+    <script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+    <script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+    <script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+    <script type="text/javascript" src="../../scripts/main.js" async="async"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="logo"></div>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+        <script type="text/javascript" src="../../scripts/pages.js"></script>
+        <script type="text/javascript" src="../../scripts/main.js"></script>
+        <div class="main-content" id="content" pageIds="animatedledstrip.server////PointingToDeclaration//909712733">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../index.html">animatedledstrip-server</a>/<a href="index.html">animatedledstrip.server</a></div>
+            <div class="pull-right d-flex">
+              <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button><button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/jvmMain">jvm</button></div>
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Package animatedledstrip.</span><wbr></wbr><span>server</span></h1>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="">Types</h2>
+              <div class="table" data-togglable="Types"><a data-name="%5Banimatedledstrip.server%2FAnimatedLEDStripServer%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F909712733" anchor-label="AnimatedLEDStripServer" id="%5Banimatedledstrip.server%2FAnimatedLEDStripServer%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F909712733" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2FAnimatedLEDStripServer%2F%2F%2FPointingToDeclaration%2F%5D%2FClasslikes%2F909712733"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right">
+  <div class="platform-tags ">
+    <div class="platform-tag common-like">common</div>
+  </div>
+</span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">class <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;<a href="-animated-l-e-d-strip-server/index.html">T</a> : <span data-unresolved-link="animatedledstrip.leds.stripmanagement/NativeLEDStrip///PointingToDeclaration/">NativeLEDStrip</span>&gt;(args: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;, ledClass: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html">KClass</a>&lt;<a href="-animated-l-e-d-strip-server/index.html">T</a>&gt;, pixelLocations: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<span data-unresolved-link="animatedledstrip.leds.locationmanagement/Location///PointingToDeclaration/">Location</span>&gt;?)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="%5Banimatedledstrip.server%2F%2FaddLongOption%2Forg.apache.commons.cli.Options%23kotlin.String%23kotlin.Boolean%23kotlin.String%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="addLongOption" id="%5Banimatedledstrip.server%2F%2FaddLongOption%2Forg.apache.commons.cli.Options%23kotlin.String%23kotlin.Boolean%23kotlin.String%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="add-long-option.html">addLongOption</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FaddLongOption%2Forg.apache.commons.cli.Options%23kotlin.String%23kotlin.Boolean%23kotlin.String%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <span data-unresolved-link="org.apache.commons.cli/Options///PointingToDeclaration/">Options</span>.<a href="add-long-option.html">addLongOption</a>(longOpt: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>, hasArg: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>, description: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FanimationRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="animationRoute" id="%5Banimatedledstrip.server%2F%2FanimationRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="animation-route.html">animationRoute</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FanimationRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <span data-unresolved-link="io.ktor.routing/Route///PointingToDeclaration/">Route</span>.<a href="animation-route.html">animationRoute</a>(ledServer: <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FhttpServer%2F%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="httpServer" id="%5Banimatedledstrip.server%2F%2FhttpServer%2F%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="http-server.html">httpServer</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FhttpServer%2F%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <a href="http-server.html">httpServer</a>(ledServer: <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;): <span data-unresolved-link="io.ktor.server.netty/NettyApplicationEngine///PointingToDeclaration/">NettyApplicationEngine</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FparseOptions%2Fanimatedledstrip.server.AnimatedLEDStripServer%5B*%5D%23kotlin.Array%5Bkotlin.String%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="parseOptions" id="%5Banimatedledstrip.server%2F%2FparseOptions%2Fanimatedledstrip.server.AnimatedLEDStripServer%5B*%5D%23kotlin.Array%5Bkotlin.String%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="parse-options.html">parseOptions</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FparseOptions%2Fanimatedledstrip.server.AnimatedLEDStripServer%5B*%5D%23kotlin.Array%5Bkotlin.String%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;.<a href="parse-options.html">parseOptions</a>(args: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FrunningRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="runningRoute" id="%5Banimatedledstrip.server%2F%2FrunningRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="running-route.html">runningRoute</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FrunningRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <span data-unresolved-link="io.ktor.routing/Route///PointingToDeclaration/">Route</span>.<a href="running-route.html">runningRoute</a>(ledServer: <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FsectionRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="sectionRoute" id="%5Banimatedledstrip.server%2F%2FsectionRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="section-route.html">sectionRoute</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FsectionRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <span data-unresolved-link="io.ktor.routing/Route///PointingToDeclaration/">Route</span>.<a href="section-route.html">sectionRoute</a>(ledServer: <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FstartRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="startRoute" id="%5Banimatedledstrip.server%2F%2FstartRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="start-route.html">startRoute</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FstartRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <span data-unresolved-link="io.ktor.routing/Route///PointingToDeclaration/">Route</span>.<a href="start-route.html">startRoute</a>(ledServer: <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FstartServer%2F%23kotlin.Array%5Bkotlin.String%5D%23kotlin.reflect.KClass%5BTypeParam%28bounds%3D%5Banimatedledstrip.leds.stripmanagement.NativeLEDStrip%5D%29%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="startServer" id="%5Banimatedledstrip.server%2F%2FstartServer%2F%23kotlin.Array%5Bkotlin.String%5D%23kotlin.reflect.KClass%5BTypeParam%28bounds%3D%5Banimatedledstrip.leds.stripmanagement.NativeLEDStrip%5D%29%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="start-server.html">startServer</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FstartServer%2F%23kotlin.Array%5Bkotlin.String%5D%23kotlin.reflect.KClass%5BTypeParam%28bounds%3D%5Banimatedledstrip.leds.stripmanagement.NativeLEDStrip%5D%29%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun &lt;<a href="start-server.html">T</a> : <span data-unresolved-link="animatedledstrip.leds.stripmanagement/NativeLEDStrip///PointingToDeclaration/">NativeLEDStrip</span>&gt; <a href="start-server.html">startServer</a>(args: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;, ledClass: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html">KClass</a>&lt;<a href="start-server.html">T</a>&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FstripRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="stripRoute" id="%5Banimatedledstrip.server%2F%2FstripRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="strip-route.html">stripRoute</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FstripRoute%2Fio.ktor.routing.Route%23animatedledstrip.server.AnimatedLEDStripServer%5B*%5D%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <span data-unresolved-link="io.ktor.routing/Route///PointingToDeclaration/">Route</span>.<a href="strip-route.html">stripRoute</a>(ledServer: <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2FwaitUntilStop%2Fanimatedledstrip.server.AnimatedLEDStripServer%5B*%5D%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" anchor-label="waitUntilStop" id="%5Banimatedledstrip.server%2F%2FwaitUntilStop%2Fanimatedledstrip.server.AnimatedLEDStripServer%5B*%5D%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="wait-until-stop.html">waitUntilStop</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FwaitUntilStop%2Fanimatedledstrip.server.AnimatedLEDStripServer%5B*%5D%23%2FPointingToDeclaration%2F%5D%2FFunctions%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace">fun <a href="-animated-l-e-d-strip-server/index.html">AnimatedLEDStripServer</a>&lt;*&gt;.<a href="wait-until-stop.html">waitUntilStop</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="%5Banimatedledstrip.server%2F%2FfileName%2Fanimatedledstrip.leds.animationmanagement.RunningAnimationParams%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" anchor-label="fileName" id="%5Banimatedledstrip.server%2F%2FfileName%2Fanimatedledstrip.leds.animationmanagement.RunningAnimationParams%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="file-name.html">fileName</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2FfileName%2Fanimatedledstrip.leds.animationmanagement.RunningAnimationParams%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><a data-name="%5Banimatedledstrip.server%2F%2FfileName%2Fanimatedledstrip.leds.animationmanagement.RunningAnimationParams%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" anchor-label="fileName" id="%5Banimatedledstrip.server%2F%2FfileName%2Fanimatedledstrip.leds.animationmanagement.RunningAnimationParams%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a><div class="symbol monospace">val <span data-unresolved-link="animatedledstrip.leds.animationmanagement/RunningAnimationParams///PointingToDeclaration/">RunningAnimationParams</span>.<a href="file-name.html">fileName</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="%5Banimatedledstrip.server%2F%2Foptions%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" anchor-label="options" id="%5Banimatedledstrip.server%2F%2Foptions%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="options.html">options</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="%5Banimatedledstrip.server%2F%2Foptions%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><a data-name="%5Banimatedledstrip.server%2F%2Foptions%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" anchor-label="options" id="%5Banimatedledstrip.server%2F%2Foptions%2F%23%2FPointingToDeclaration%2F%5D%2FProperties%2F880348890" data-filterable-set=":dokkaHtml/jvmMain"></a><div class="symbol monospace">val <a href="options.html">options</a>: <span data-unresolved-link="org.apache.commons.cli/Options///PointingToDeclaration/">Options</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2020 Copyright</span><span class="pull-right"><span>Sponsored and developed by dokka</span><a href="https://github.com/Kotlin/dokka"><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
