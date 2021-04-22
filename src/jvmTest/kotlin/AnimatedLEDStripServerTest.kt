@@ -73,7 +73,7 @@ class AnimatedLEDStripServerTest : StringSpec(
             }
         }
 
-        "test save persistent animation" {
+        "test save persistent animation".config(enabled = false) {
             val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist-save")
 
             val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test",
@@ -88,7 +88,7 @@ class AnimatedLEDStripServerTest : StringSpec(
             Paths.get("src/jvmTest/resources/persist-save/.animations/test.json").shouldExist()
         }
 
-        "test delete persistent animation" {
+        "test delete persistent animation".config(enabled = false) {
             val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist-delete")
 
             val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test2",
