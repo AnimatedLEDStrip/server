@@ -59,7 +59,7 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
 
     internal actual var persistAnimations: Boolean = false
 
-    internal actual var persistentAnimationDirectory: String = "./.animations"
+    internal actual var persistentAnimationDirectory: String = "."  // Will become ./.animations
         set(value) {
             field = "${if (value.endsWith("/")) value.removeSuffix("/") else value}/.animations"
         }
@@ -134,6 +134,8 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
         }
     }
 
+    val httpServer = httpServer(this)
+
     /* Start and stop methods */
 
     /**
@@ -146,16 +148,18 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
 
         if (persistAnimations) loadPersistentAnimations()
 
+        httpServer.start(wait = false)
+
         running = true
-        httpServer(this)
         return this
     }
 
     /** Stop the server */
     fun stop() {
         if (!running) return
+        httpServer.stop(10000, 30000)
         leds.clear()
-        Thread.sleep(500)
+        Thread.sleep(500) // Give renderer time to render the clear
         leds.renderer.stopRendering()
         running = false
     }

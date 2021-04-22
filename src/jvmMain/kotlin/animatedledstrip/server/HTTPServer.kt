@@ -47,7 +47,7 @@ import io.ktor.serialization.json
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 
-fun httpServer(ledServer: AnimatedLEDStripServer<*>) {
+fun httpServer(ledServer: AnimatedLEDStripServer<*>) =
     embeddedServer(Netty, port = 8080) {
         install(ContentNegotiation) {
             json(serializer)
@@ -73,8 +73,7 @@ fun httpServer(ledServer: AnimatedLEDStripServer<*>) {
             startRoute(ledServer)
             stripRoute(ledServer)
         }
-    }.start(true)
-}
+    }
 
 fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
     route("/animation") {

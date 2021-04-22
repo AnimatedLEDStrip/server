@@ -159,13 +159,13 @@ class ConfigParsingTests : StringSpec(
 
         "command line persist-dir" {
             newTestServer("--persist-dir", "src/jvmTest/resources/persist").persistentAnimationDirectory shouldBe
-                    "src/jvmTest/resources/persist"
-            newTestServer().persistentAnimationDirectory shouldBe "./"
+                    "src/jvmTest/resources/persist/.animations"
+            newTestServer().persistentAnimationDirectory shouldBe "./.animations"
         }
 
         "config file persist-dir" {
             newTestServer("-f", configPath("persist", "persist-dir.config")).persistentAnimationDirectory shouldBe
-                    "src/jvmTest/resources/persist"
+                    "src/jvmTest/resources/persist/.animations"
         }
 
         "command line numLEDs" {

@@ -78,7 +78,10 @@ class AnimatedLEDStripServerTest : StringSpec(
 
             val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test",
                                             doubleParams = mutableMapOf("maximumInfluence" to 3.0, "spacing" to 10.0),
-                                            distanceParams = mutableMapOf("offset" to PercentDistance(0.0, 50.0, 0.0))).prepare(server.leds.sectionManager.getSection(""))
+                                            distanceParams = mutableMapOf("offset" to PercentDistance(0.0,
+                                                                                                      50.0,
+                                                                                                      0.0))).prepare(
+                server.leds.sectionManager.getSection(""))
 
             server.savePersistentAnimation(anim)
             delay(100)
@@ -90,7 +93,10 @@ class AnimatedLEDStripServerTest : StringSpec(
 
             val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test2",
                                             doubleParams = mutableMapOf("maximumInfluence" to 3.0, "spacing" to 10.0),
-                                            distanceParams = mutableMapOf("offset" to PercentDistance(0.0, 50.0, 0.0))).prepare(server.leds.sectionManager.getSection(""))
+                                            distanceParams = mutableMapOf("offset" to PercentDistance(0.0,
+                                                                                                      50.0,
+                                                                                                      0.0)))
+                .prepare(server.leds.sectionManager.getSection(""))
 
             server.savePersistentAnimation(anim)
             delay(100)
@@ -106,19 +112,12 @@ class AnimatedLEDStripServerTest : StringSpec(
 
             server.loadPersistentAnimations()
             delay(1000)
-            server.leds.animationManager.runningAnimations.shouldContainKeys("1056352",
-                                                                             "14155905",
-                                                                             "23602685",
+            server.leds.animationManager.runningAnimations.shouldContainKeys("23602685",
                                                                              "40202146",
                                                                              "44470329",
                                                                              "51140794",
                                                                              "65067451",
-                                                                             "66985505",
-                                                                             "68789875",
-                                                                             "73450949",
-                                                                             "75952557",
-                                                                             "84029121",
-                                                                             "86472599")
+                                                                             "84029121")
         }
     }
 )
