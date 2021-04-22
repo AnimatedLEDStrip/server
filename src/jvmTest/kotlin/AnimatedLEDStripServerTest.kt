@@ -84,7 +84,7 @@ class AnimatedLEDStripServerTest : StringSpec(
                 server.leds.sectionManager.getSection(""))
 
             server.savePersistentAnimation(anim)
-            delay(100)
+            delay(500)
             Paths.get("src/jvmTest/resources/persist-save/.animations/test.json").shouldExist()
         }
 
@@ -99,11 +99,11 @@ class AnimatedLEDStripServerTest : StringSpec(
                 .prepare(server.leds.sectionManager.getSection(""))
 
             server.savePersistentAnimation(anim)
-            delay(100)
+            delay(500)
             Paths.get("src/jvmTest/resources/persist-delete/.animations/test2.json").shouldExist()
             delay(500)
             server.deletePersistentAnimation(anim)
-            delay(100)
+            delay(500)
             Paths.get("src/jvmTest/resources/persist-delete/.animations/test2.json").shouldNotExist()
         }
 

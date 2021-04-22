@@ -188,7 +188,7 @@ class ConfigParsingTests : StringSpec(
                                    EmulatedWS281x::class).stripInfo.numLEDs shouldBe 30
             TestLogger.startLogCapture()
             shouldThrow<IllegalArgumentException> {
-                AnimatedLEDStripServer(arrayOf("-f", configPath("num-leds", "numleds-bad.config")),
+                AnimatedLEDStripServer(arrayOf("-f", configPath("num-leds", "numLEDs-bad.config")),
                                        EmulatedWS281x::class)
             }
             TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn,
