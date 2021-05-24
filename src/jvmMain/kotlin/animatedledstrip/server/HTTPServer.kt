@@ -82,7 +82,7 @@ fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
         }
         get("{name}") {
             val name: String = call.parameters["name"] ?: return@get call.respondText("Name of animation required")
-            val anim = ledServer.leds.animationManager.findAnimationOrNull(name.toString())
+            val anim = ledServer.leds.animationManager.findAnimationOrNull(name)
                        ?: return@get call.respondText("Animation $name not found",
                                                       status = HttpStatusCode.NotFound)
             call.respond(anim.info)
@@ -104,7 +104,12 @@ fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
         }
         post("/newGroup") {
             val newGroup = call.receive<AnimationGroup.NewAnimationGroupInfo>()
-            ledServer.leds.animationManager.addNewGroup(newGroup)
+            val addedGroup = ledServer.leds.animationManager.addNewGroup(newGroup)
+            if (addedGroup != null) {
+                call.respond(addedGroup.info)
+            } else {
+                call.respondText("Animation already exists", status = HttpStatusCode.Conflict)
+            }
         }
     }
 }
