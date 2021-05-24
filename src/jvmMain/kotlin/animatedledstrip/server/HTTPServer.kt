@@ -28,9 +28,11 @@ import animatedledstrip.leds.animationmanagement.AnimationToRunParams
 import animatedledstrip.leds.animationmanagement.RunningAnimationParams
 import animatedledstrip.leds.animationmanagement.endAnimation
 import animatedledstrip.leds.animationmanagement.startAnimation
+import animatedledstrip.leds.colormanagement.PixelColorType
 import animatedledstrip.leds.colormanagement.clear
 import animatedledstrip.leds.colormanagement.pixelActualColorList
 import animatedledstrip.leds.sectionmanagement.Section
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CORS
@@ -68,6 +70,7 @@ fun httpServer(ledServer: AnimatedLEDStripServer<*>) =
                 call.respondText("Success")
             }
             animationRoute(ledServer)
+            pixelsRoute(ledServer)
             runningRoute(ledServer)
             sectionRoute(ledServer)
             startRoute(ledServer)
@@ -110,6 +113,62 @@ fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
             } else {
                 call.respondText("Animation already exists", status = HttpStatusCode.Conflict)
             }
+        }
+    }
+}
+
+fun Route.pixelsRoute(ledServer: AnimatedLEDStripServer<*>) {
+    suspend fun getPixelColor(call: ApplicationCall, colorType: PixelColorType) {
+        val id = (call.parameters["id"] ?: return call.respondText("Pixel number required",
+                                                                   status = HttpStatusCode.BadRequest))
+        val pixelNum = id.toIntOrNull() ?: return call.respondText("Invalid pixel number $id",
+                                                                   status = HttpStatusCode.BadRequest)
+
+        try {
+            call.respond(ledServer.leds.colorManager.getPixelColor(pixelNum, colorType))
+        } catch (e: IllegalArgumentException) {
+            call.respondText(e.message!!, status = HttpStatusCode.BadRequest)
+        }
+    }
+    suspend fun setPixelColor(call: ApplicationCall, colorType: PixelColorType) {
+        val id = (call.parameters["id"] ?: return call.respondText("Pixel number required",
+                                                                   status = HttpStatusCode.BadRequest))
+        val pixelNum = id.toIntOrNull() ?: return call.respondText("Invalid pixel number $id",
+                                                                   status = HttpStatusCode.BadRequest)
+
+        val color = call.receive<Int>()
+
+        try {
+            ledServer.leds.colorManager.setPixelColor(pixelNum, color, colorType)
+            call.respondText("Pixel $pixelNum $colorType color set to $color")
+        } catch (e: IllegalArgumentException) {
+            call.respondText(e.message!!, status = HttpStatusCode.BadRequest)
+        }
+    }
+    route("/pixels") {
+        get("{id}/actual") {
+            getPixelColor(call, PixelColorType.ACTUAL)
+        }
+        get("{id}/fade") {
+            getPixelColor(call, PixelColorType.FADE)
+        }
+        get("{id}/prolonged") {
+            getPixelColor(call, PixelColorType.PROLONGED)
+        }
+        get("{id}/temporary") {
+            getPixelColor(call, PixelColorType.TEMPORARY)
+        }
+        post("{id}/actual") {
+            setPixelColor(call, PixelColorType.ACTUAL)
+        }
+        post("{id}/fade") {
+            setPixelColor(call, PixelColorType.FADE)
+        }
+        post("{id}/prolonged") {
+            setPixelColor(call, PixelColorType.PROLONGED)
+        }
+        post("{id}/temporary") {
+            setPixelColor(call, PixelColorType.TEMPORARY)
         }
     }
 }
