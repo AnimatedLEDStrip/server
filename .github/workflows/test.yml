@@ -31,8 +31,10 @@ jobs:
       - name: Create test classes for testing
         run: ./gradlew jvmTestClasses
 
+#      - name: Test
+#        run: ./gradlew jvmTest
       - name: Test
-        run: ./gradlew jvmTest
+        run: ./gradlew koverXmlReport
       - name: Upload coverage
         uses: codecov/codecov-action@v1.3.1
 
