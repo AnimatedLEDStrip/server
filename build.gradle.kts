@@ -27,21 +27,22 @@ tasks.wrapper {
 plugins {
     kotlin("multiplatform") version "1.6.21"
     kotlin("plugin.serialization") version "1.4.21"
-    id("org.jetbrains.dokka") version "1.4.20"
+    id("org.jetbrains.dokka") version "1.6.21"
     id("io.kotest") version "0.2.6"
-    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.5.0"
+//    jacoco
     id("java-library")
     signing
     id("de.marcphilipp.nexus-publish") version "0.4.0"
-    id("io.codearte.nexus-staging") version "0.22.0"
+    id("io.codearte.nexus-staging") version "0.30.0"
 }
 
-jacoco {
-    toolVersion = "0.8.6"
-}
+//jacoco {
+//    toolVersion = "0.8.6"
+//}
 
 repositories {
-    jcenter()
+//    jcenter()
     mavenCentral()
     mavenLocal()
 }
@@ -87,8 +88,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("io.kotest:kotest-assertions-core:4.3.2")
-                implementation("io.kotest:kotest-property:4.3.2")
+                implementation("io.kotest:kotest-assertions-core:5.3.0")
+                implementation("io.kotest:kotest-property:5.3.0")
             }
         }
         val jvmMain by getting {
@@ -109,8 +110,8 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:1.10.4")
-                implementation("io.kotest:kotest-runner-junit5:4.3.2")
+                implementation("io.mockk:mockk:1.12.4")
+                implementation("io.kotest:kotest-runner-junit5:5.3.0")
                 implementation("io.kotest:kotest-framework-engine-jvm:4.3.2")
             }
         }
@@ -128,7 +129,7 @@ kotlin {
 
 tasks.named<Test>("jvmTest") {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)
+//    finalizedBy(tasks.jacocoTestReport)
     filter {
         isFailOnNoMatchingTests = false
     }
@@ -143,28 +144,36 @@ tasks.named<Test>("jvmTest") {
     systemProperties = System.getProperties().map { it.key.toString() to it.value }.toMap()
 }
 
-tasks.jacocoTestReport {
-    val coverageSourceDirs = arrayOf(
-        "${projectDir}/src/commonMain/kotlin",
-        "${projectDir}/src/jvmMain/kotlin"
-    )
-
-    val classFiles = File("${buildDir}/classes/kotlin/jvm/main/")
-        .walkBottomUp()
-        .toSet()
-
-
-    classDirectories.setFrom(classFiles)
-    sourceDirectories.setFrom(files(coverageSourceDirs))
-
-    executionData.setFrom(files("${buildDir}/jacoco/jvmTest.exec"))
-
-    reports {
-        xml.isEnabled = true
-        csv.isEnabled = true
-        html.isEnabled = true
+tasks.test {
+    extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
+        isDisabled = false
+        binaryReportFile.set(file("$buildDir/reports/result.bin"))
+        includes = listOf("animatedledstrip.*")
     }
 }
+
+//tasks.jacocoTestReport {
+//    val coverageSourceDirs = arrayOf(
+//        "${projectDir}/src/commonMain/kotlin",
+//        "${projectDir}/src/jvmMain/kotlin"
+//    )
+//
+//    val classFiles = File("${buildDir}/classes/kotlin/jvm/main/")
+//        .walkBottomUp()
+//        .toSet()
+//
+//
+//    classDirectories.setFrom(classFiles)
+//    sourceDirectories.setFrom(files(coverageSourceDirs))
+//
+//    executionData.setFrom(files("${buildDir}/jacoco/jvmTest.exec"))
+//
+//    reports {
+//        xml.isEnabled = true
+//        csv.isEnabled = true
+//        html.isEnabled = true
+//    }
+//}
 
 val javadoc = tasks.named("javadoc")
 
