@@ -33,7 +33,7 @@ plugins {
     id("java-library")
     signing
     id("de.marcphilipp.nexus-publish") version "0.4.0"
-    id("io.codearte.nexus-staging") version "0.22.0"
+    id("io.codearte.nexus-staging") version "0.30.0"
 }
 
 jacoco {
@@ -87,8 +87,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("io.kotest:kotest-assertions-core:4.3.2")
-                implementation("io.kotest:kotest-property:4.3.2")
+                implementation("io.kotest:kotest-assertions-core:5.3.0")
+                implementation("io.kotest:kotest-property:5.3.0")
             }
         }
         val jvmMain by getting {
@@ -109,8 +109,8 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:1.10.4")
-                implementation("io.kotest:kotest-runner-junit5:4.3.2")
+                implementation("io.mockk:mockk:1.12.4")
+                implementation("io.kotest:kotest-runner-junit5:5.3.0")
                 implementation("io.kotest:kotest-framework-engine-jvm:4.3.2")
             }
         }
