@@ -112,7 +112,7 @@ kotlin {
                 implementation(kotlin("test-junit"))
                 implementation("io.mockk:mockk:1.12.4")
                 implementation("io.kotest:kotest-runner-junit5:5.3.0")
-                implementation("io.kotest:kotest-framework-engine-jvm:4.3.2")
+                implementation("io.kotest:kotest-framework-engine-jvm:5.4.0")
             }
         }
 //        val jsMain by getting
