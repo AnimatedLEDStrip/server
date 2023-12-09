@@ -22,6 +22,7 @@
 
 package animatedledstrip.server
 
+import animatedledstrip.leds.animationmanagement.AnimationToRunParams
 import animatedledstrip.leds.animationmanagement.RunningAnimationParams
 import animatedledstrip.leds.stripmanagement.NativeLEDStrip
 import kotlin.reflect.KClass
@@ -33,6 +34,9 @@ fun <T : NativeLEDStrip> startServer(args: Array<String>, ledClass: KClass<T>) {
 fun AnimatedLEDStripServer<*>.waitUntilStop() {
     while (running) Thread.sleep(1)
 }
+
+val AnimationToRunParams.fileName: String
+    get() = "$id.json"
 
 val RunningAnimationParams.fileName: String
     get() = "$id.json"

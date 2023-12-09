@@ -32,6 +32,7 @@ import animatedledstrip.leds.colormanagement.PixelColorType
 import animatedledstrip.leds.colormanagement.clear
 import animatedledstrip.leds.colormanagement.pixelActualColorList
 import animatedledstrip.leds.sectionmanagement.Section
+import co.touchlab.kermit.Logger
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
@@ -73,6 +74,7 @@ fun httpServer(ledServer: AnimatedLEDStripServer<*>) =
             pixelsRoute(ledServer)
             runningRoute(ledServer)
             sectionRoute(ledServer)
+            saveRoute(ledServer)
             startRoute(ledServer)
             stripRoute(ledServer)
         }
@@ -86,8 +88,10 @@ fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
         get("{name}") {
             val name: String = call.parameters["name"] ?: return@get call.respondText("Name of animation required")
             val anim = ledServer.leds.animationManager.findAnimationOrNull(name)
-                       ?: return@get call.respondText("Animation $name not found",
-                                                      status = HttpStatusCode.NotFound)
+                       ?: return@get call.respondText(
+                           "Animation $name not found",
+                           status = HttpStatusCode.NotFound
+                       )
             call.respond(anim.info)
         }
     }
@@ -119,10 +123,14 @@ fun Route.animationRoute(ledServer: AnimatedLEDStripServer<*>) {
 
 fun Route.pixelsRoute(ledServer: AnimatedLEDStripServer<*>) {
     suspend fun getPixelColor(call: ApplicationCall, colorType: PixelColorType) {
-        val id = (call.parameters["id"] ?: return call.respondText("Pixel number required",
-                                                                   status = HttpStatusCode.BadRequest))
-        val pixelNum = id.toIntOrNull() ?: return call.respondText("Invalid pixel number $id",
-                                                                   status = HttpStatusCode.BadRequest)
+        val id = (call.parameters["id"] ?: return call.respondText(
+            "Pixel number required",
+            status = HttpStatusCode.BadRequest
+        ))
+        val pixelNum = id.toIntOrNull() ?: return call.respondText(
+            "Invalid pixel number $id",
+            status = HttpStatusCode.BadRequest
+        )
 
         try {
             call.respond(ledServer.leds.colorManager.getPixelColor(pixelNum, colorType))
@@ -130,11 +138,16 @@ fun Route.pixelsRoute(ledServer: AnimatedLEDStripServer<*>) {
             call.respondText(e.message!!, status = HttpStatusCode.BadRequest)
         }
     }
+
     suspend fun setPixelColor(call: ApplicationCall, colorType: PixelColorType) {
-        val id = (call.parameters["id"] ?: return call.respondText("Pixel number required",
-                                                                   status = HttpStatusCode.BadRequest))
-        val pixelNum = id.toIntOrNull() ?: return call.respondText("Invalid pixel number $id",
-                                                                   status = HttpStatusCode.BadRequest)
+        val id = (call.parameters["id"] ?: return call.respondText(
+            "Pixel number required",
+            status = HttpStatusCode.BadRequest
+        ))
+        val pixelNum = id.toIntOrNull() ?: return call.respondText(
+            "Invalid pixel number $id",
+            status = HttpStatusCode.BadRequest
+        )
 
         val color = call.receive<Int>()
 
@@ -182,21 +195,29 @@ fun Route.runningRoute(ledServer: AnimatedLEDStripServer<*>) {
             call.respond(ledServer.leds.animationManager.runningAnimations.keys.toList())
         }
         get("{id}") {
-            val id = call.parameters["id"] ?: return@get call.respondText("Animation ID required",
-                                                                          status = HttpStatusCode.BadRequest)
+            val id = call.parameters["id"] ?: return@get call.respondText(
+                "Animation ID required",
+                status = HttpStatusCode.BadRequest
+            )
             val animParams: RunningAnimationParams =
                 ledServer.leds.animationManager.runningAnimations[id]?.params
-                ?: return@get call.respondText("Animation $id not running",
-                                               status = HttpStatusCode.NotFound)
+                ?: return@get call.respondText(
+                    "Animation $id not running",
+                    status = HttpStatusCode.NotFound
+                )
             call.respond(animParams)
         }
         delete("{id}") {
-            val id = call.parameters["id"] ?: return@delete call.respondText("Animation ID required",
-                                                                             status = HttpStatusCode.BadRequest)
+            val id = call.parameters["id"] ?: return@delete call.respondText(
+                "Animation ID required",
+                status = HttpStatusCode.BadRequest
+            )
             val animParams: RunningAnimationParams =
                 ledServer.leds.animationManager.runningAnimations[id]?.params
-                ?: return@delete call.respondText("Animation $id not running",
-                                                  status = HttpStatusCode.NotFound)
+                ?: return@delete call.respondText(
+                    "Animation $id not running",
+                    status = HttpStatusCode.NotFound
+                )
             ledServer.leds.animationManager.endAnimation(animParams.id)
             call.respond(animParams)
         }
@@ -211,8 +232,10 @@ fun Route.sectionRoute(ledServer: AnimatedLEDStripServer<*>) {
         get("{name}") {
             val name: String = call.parameters["name"] ?: return@get call.respondText("Name of section required")
             val section = ledServer.leds.sectionManager.getSectionOrNull(name)
-                          ?: return@get call.respondText("Section $name not found",
-                                                         status = HttpStatusCode.NotFound)
+                          ?: return@get call.respondText(
+                              "Section $name not found",
+                              status = HttpStatusCode.NotFound
+                          )
             call.respond(section)
         }
     }
@@ -230,8 +253,10 @@ fun Route.sectionRoute(ledServer: AnimatedLEDStripServer<*>) {
         post {
             val newSection = call.receive<Section>()
             if (ledServer.leds.sectionManager.getSectionOrNull(newSection.name) != null)
-                return@post call.respondText("Section ${newSection.name} already exists",
-                                             status = HttpStatusCode.Conflict)
+                return@post call.respondText(
+                    "Section ${newSection.name} already exists",
+                    status = HttpStatusCode.Conflict,
+                )
             call.respond(ledServer.leds.sectionManager.createSection(newSection))
         }
     }
@@ -242,6 +267,31 @@ fun Route.startRoute(ledServer: AnimatedLEDStripServer<*>) {
         post {
             val animParams = call.receive<AnimationToRunParams>()
             call.respond(ledServer.leds.animationManager.startAnimation(animParams).params)
+        }
+        post("{id}") {
+            val id: String = call.parameters["id"] ?: return@post call.respondText("ID of saved animation required")
+            if (ledServer.savedAnimations.containsKey(id))
+                call.respond(ledServer.leds.animationManager.startAnimation(ledServer.savedAnimations[id]!!).params)
+            else
+                call.respondText(
+                    "No saved animation with ID $id found",
+                    status = HttpStatusCode.NotFound,
+                )
+        }
+    }
+}
+
+fun Route.saveRoute(ledServer: AnimatedLEDStripServer<*>) {
+    route("/save") {
+        post {
+            val animParams = call.receive<AnimationToRunParams>()
+            ledServer.addSavedAnimation(animParams)
+            call.respondText("Saved ${animParams.id}")
+        }
+    }
+    route("/saved") {
+        get {
+            call.respond(ledServer.savedAnimations)
         }
     }
 }
@@ -256,6 +306,7 @@ fun Route.stripRoute(ledServer: AnimatedLEDStripServer<*>) {
         }
         post("/clear") {
             ledServer.leds.clear()
+            call.respondText("Cleared strip")
         }
     }
 }

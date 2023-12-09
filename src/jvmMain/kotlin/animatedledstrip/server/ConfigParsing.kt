@@ -24,8 +24,7 @@ package animatedledstrip.server
 
 import animatedledstrip.leds.locationmanagement.Location
 import animatedledstrip.leds.stripmanagement.StripInfo
-import animatedledstrip.utils.ALSLogger
-import animatedledstrip.utils.Logger
+import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.apache.commons.cli.*
@@ -35,23 +34,34 @@ import java.io.FileNotFoundException
 import java.util.*
 import kotlin.system.exitProcess
 
+//val ArgumentParserLogger = Logger.withTag("Argument Parser")
+//
+//val ConfigParserLogger = Logger.withTag("Config Parser")
+//
+//val LocationsParserLogger = Logger.withTag("LED Locations File Parser")
+
+
 val options = Options().apply {
     addOption("f", "config", true, "Specify a config to load instead of /etc/leds/led.config")
 
     addLongOption("log-level", true, "Set the minimum severity level for logs that will be printed")
 
     addLongOption("persist", false, "Persist animations across restarts")
-    addLongOption("nopersist",
-                  false,
-                  "Don't persist animations across restarts (overrides --persist and persist=true in config)")
-    addLongOption("persist-dir", true, "Directory to store persistent animations")
+    addLongOption(
+        "nopersist",
+        false,
+        "Don't persist animations across restarts (overrides --persist and persist=true in config)"
+    )
+    addLongOption("anim-dir", true, "Directory to store saved and persistent animations")
 
     addOption("n", "numleds", true, "Specify number of LEDs in the strip (default 240)")
     addOption("l", "locations-file", true, "Specify a file with the locations of all pixels")
     addOption("p", "pin", true, "Specify pin number the LED strip is connected to (default 12)")
-    addLongOption("render-delay",
-                  true,
-                  "Specify the time in milliseconds between renders of the LED strip (default 10)")
+    addLongOption(
+        "render-delay",
+        true,
+        "Specify the time in milliseconds between renders of the LED strip (default 10)"
+    )
 
     addLongOption("log-renders", false, "Enable strip color logging")
     addLongOption("log-file", true, "Specify the output file name for strip color logging")
@@ -87,50 +97,50 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         try {
             load(FileInputStream(configFile))
         } catch (e: FileNotFoundException) {
-            Logger.w("Config Parser") { "File $configFile not found" }
+//            /*ConfigParser*/Logger.w("File $configFile not found")
         }
     }
 
     // Parse for logging severity
-    val loggingSeverity = when (val argL = argParser.getOptionValue("log-level")?.toLowerCase()) {
+    val loggingSeverity = when (val argL = argParser.getOptionValue("log-level")?.lowercase(Locale.getDefault())) {
         "verbose" -> Severity.Verbose
         "debug" -> Severity.Debug
         "info" -> Severity.Info
         "warn" -> Severity.Warn
         "error" -> Severity.Error
         else -> {
-            if (argL != null)
-                Logger.w("Argument Parser") { "Could not parse --log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)" }
-            when (val confL = configuration.getProperty("log-level")?.toLowerCase()) {
+//            if (argL != null)
+//            /*ArgumentParser*/ Logger.w("Could not parse --log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)")
+            when (val confL = configuration.getProperty("log-level")?.lowercase(Locale.getDefault())) {
                 "verbose" -> Severity.Verbose
                 "debug" -> Severity.Debug
                 "info" -> Severity.Info
                 "warn" -> Severity.Warn
                 "error" -> Severity.Error
                 else -> {
-                    if (confL != null)
-                        Logger.w("Config Parser") { "Could not parse log-level \"$confL\" in config (must be one of verbose, debug, info, warn, error)" }
+//                    if (confL != null)
+//                    /*ConfigParser*/ Logger.w("Could not parse log-level \"$confL\" in config (must be one of verbose, debug, info, warn, error)")
                     Severity.Warn
                 }
             }
         }
     }
-    ALSLogger.minSeverity = loggingSeverity
+//    Logger.setMinSeverity(loggingSeverity)
 
     persistAnimations = !argParser.hasOption("nopersist") &&
                         (argParser.hasOption("persist") || configuration.getProperty("persist")
                             ?.toBoolean() ?: persistAnimations)
 
-    persistentAnimationDirectory = argParser.getOptionValue("persist-dir")
-                                   ?: configuration.getProperty("persist-dir")
-                                   ?: persistentAnimationDirectory
+    storedAnimationsDirectory = argParser.getOptionValue("anim-dir")
+                                ?: configuration.getProperty("anim-dir")
+                                ?: storedAnimationsDirectory
 
     fun warnArgParseError(flag: String, value: String) {
-        Logger.w("Argument Parser") { "Could not parse $flag \"$value\" from command line" }
+//        /*ArgumentParser*/Logger.w("Could not parse $flag \"$value\" from command line")
     }
 
     fun warnConfigParseError(prop: String, value: String) {
-        Logger.w("Config Parser") { "Could not parse $prop \"$value\" in config" }
+//        /*ConfigParser*/Logger.w("Could not parse $prop \"$value\" in config")
     }
 
     val defaultStripInfo = StripInfo()
@@ -257,7 +267,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
 
     val ledLocations = when {
         locationsFile?.exists() == false -> {
-            Logger.w("LED Locations File Parser") { "File $locationsFileName does not exist" }
+            /*LocationsParser*/Logger.w("File $locationsFileName does not exist")
             null
         }
         locationsFile != null -> {
@@ -265,17 +275,17 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
             val locations: MutableList<Location> = mutableListOf()
             for ((i, l) in csvReader().readAll(locationsFile).withIndex()) {
                 val x = l.getOrNull(0)?.toDoubleOrNull() ?: run {
-                    Logger.e("LED Locations File Parser") { "Could not parse first column of row ${i + 1} properly, aborting and using defaults" }
+                    /*LocationsParser*/Logger.e("Could not parse first column of row ${i + 1} properly, aborting and using defaults")
                     discard = true
                     null
                 }
                 val y = l.getOrNull(1)?.toDoubleOrNull() ?: run {
-                    Logger.e("LED Locations File Parser") { "Could not parse second column of row ${i + 1} properly, aborting and using defaults" }
+                    /*LocationsParser*/Logger.e("Could not parse second column of row ${i + 1} properly, aborting and using defaults")
                     discard = true
                     null
                 }
                 val z = l.getOrNull(2)?.toDoubleOrNull() ?: run {
-                    Logger.e("LED Locations File Parser") { "Could not parse third column of row ${i + 1} properly, aborting and using defaults" }
+                    /*LocationsParser*/Logger.e("Could not parse third column of row ${i + 1} properly, aborting and using defaults")
                     discard = true
                     null
                 }
@@ -287,14 +297,16 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         else -> pixelLocations
     }
 
-    stripInfo = StripInfo(numLEDs = numLEDs,
-                          pin = pin,
-                          renderDelay = renderDelay,
-                          isRenderLoggingEnabled = isRenderLoggingEnabled,
-                          renderLogFile = renderLogFile,
-                          rendersBetweenLogSaves = rendersBetweenLogSaves,
-                          is1DSupported = is1DSupported,
-                          is2DSupported = is2DSupported,
-                          is3DSupported = is3DSupported,
-                          ledLocations = ledLocations)
+    stripInfo = StripInfo(
+        numLEDs = numLEDs,
+        pin = pin,
+        renderDelay = renderDelay,
+        isRenderLoggingEnabled = isRenderLoggingEnabled,
+        renderLogFile = renderLogFile,
+        rendersBetweenLogSaves = rendersBetweenLogSaves,
+        is1DSupported = is1DSupported,
+        is2DSupported = is2DSupported,
+        is3DSupported = is3DSupported,
+        ledLocations = ledLocations
+    )
 }

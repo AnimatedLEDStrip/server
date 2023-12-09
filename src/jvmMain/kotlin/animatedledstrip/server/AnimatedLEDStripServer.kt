@@ -32,41 +32,47 @@ import animatedledstrip.leds.locationmanagement.Location
 import animatedledstrip.leds.stripmanagement.LEDStrip
 import animatedledstrip.leds.stripmanagement.NativeLEDStrip
 import animatedledstrip.leds.stripmanagement.StripInfo
-import animatedledstrip.utils.Logger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
+class AnimatedLEDStripServer<T : NativeLEDStrip>(
     args: Array<String>,
     ledClass: KClass<T>,
-    internal val pixelLocations: List<Location>?,
+    internal val pixelLocations: List<Location>? = null,
 ) {
 
     /** Is the server running */
-    internal actual var running: Boolean = false
+    internal var running: Boolean = false
 
     /* Arguments for creating the AnimatedLEDStrip instance */
 
-    internal actual var persistAnimations: Boolean = false
+    internal var persistAnimations: Boolean = false
 
-    internal actual var persistentAnimationDirectory: String = "."  // Will become ./.animations
+    internal var storedAnimationsDirectory: String = "."  // Will become ./.animations
         set(value) {
             field = "${if (value.endsWith("/")) value.removeSuffix("/") else value}/.animations"
         }
 
+    internal val persistentAnimationDirectory: String
+        get() = "$storedAnimationsDirectory/persistent"
+
+    internal val savedAnimationDirectory: String
+        get() = "$storedAnimationsDirectory/saved"
+
+
     /* Create strip info */
 
-    actual var stripInfo: StripInfo by Delegates.notNull()
+    var stripInfo: StripInfo by Delegates.notNull()
 
     init {
         parseOptions(args)
@@ -74,7 +80,9 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
 
     /* Create strip instance */
 
-    actual val leds: LEDStrip
+    val leds: LEDStrip
+
+    val savedAnimations: MutableMap<String, AnimationToRunParams> = mutableMapOf()
 
     init {
         /*
@@ -97,15 +105,19 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
         leds.endAnimationCallback = {
             if (persistAnimations) deletePersistentAnimation(it)
         }
+
+        loadSavedAnimations()
     }
 
     internal fun savePersistentAnimation(newAnim: RunningAnimationParams) {
-        GlobalScope.launch(Dispatchers.IO) {
+        val scope = CoroutineScope(EmptyCoroutineContext)
+        scope.launch(Dispatchers.IO) {
             FileOutputStream("$persistentAnimationDirectory/${newAnim.fileName}").apply {
                 write(newAnim.sourceParams.json())
                 close()
             }
         }
+        scope.cancel()
     }
 
     internal fun deletePersistentAnimation(anim: RunningAnimationParams) {
@@ -115,10 +127,11 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
 
     internal fun loadPersistentAnimations() {
         val dir = File(persistentAnimationDirectory)
+        val scope = CoroutineScope(EmptyCoroutineContext)
         when {
             !dir.exists() -> dir.mkdirs()
-            !dir.isDirectory -> Logger.w("Persist Animation Handler") { "$persistentAnimationDirectory should be a directory" }
-            else -> GlobalScope.launch {
+            !dir.isDirectory -> Logger.w("$persistentAnimationDirectory should be a directory")
+            else -> scope.launch {
                 File(persistentAnimationDirectory).walk().forEach {
                     if (!it.isDirectory && it.name.endsWith(".json"))
                         try {
@@ -127,11 +140,52 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
                                 leds.animationManager.startAnimation(obj, obj.id)
                                 close()
                             }
-                        } catch (e: FileNotFoundException) {
+                        } catch (_: FileNotFoundException) {
                         }
                 }
             }
         }
+        scope.cancel()
+    }
+
+    fun addSavedAnimation(newAnim: AnimationToRunParams) {
+        Logger.i(newAnim.toString())
+        savedAnimations[newAnim.id] = newAnim
+        FileOutputStream("$savedAnimationDirectory/${newAnim.fileName}").apply {
+            write(newAnim.json())
+            close()
+        }
+    }
+
+    fun deleteSavedAnimation(id: String) {
+        savedAnimations.remove(id)
+        if (File("$savedAnimationDirectory/$id.json").exists())
+            Files.delete(Paths.get("$savedAnimationDirectory/$id.json"))
+    }
+
+    internal fun loadSavedAnimations() {
+        val dir = File(savedAnimationDirectory)
+        val scope = CoroutineScope(EmptyCoroutineContext)
+        when {
+            !dir.exists() -> dir.mkdirs()
+            !dir.isDirectory -> Logger.w("$savedAnimationDirectory should be a directory")
+            else -> scope.launch {
+                File(savedAnimationDirectory).walk().forEach {
+                    if (!it.isDirectory && it.name.endsWith(".json"))
+                        try {
+                            FileInputStream(it).apply {
+                                val obj = readAllBytes().toUTF8String().decodeJson() as AnimationToRunParams
+                                savedAnimations[obj.id] = obj
+                                close()
+                            }
+                        } catch (_: FileNotFoundException) {
+                        } catch (e: Exception) {
+                            Logger.e("Failed to decode ${it.name}: $e")
+                        }
+                }
+            }
+        }
+        scope.cancel()
     }
 
     val httpServer = httpServer(this)
@@ -163,5 +217,4 @@ actual class AnimatedLEDStripServer<T : NativeLEDStrip> actual constructor(
         leds.renderer.stopRendering()
         running = false
     }
-
 }
