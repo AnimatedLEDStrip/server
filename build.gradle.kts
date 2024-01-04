@@ -94,9 +94,9 @@ kotlin {
                 implementation("io.github.maxnz:interactive-command-parser:0.1")
                 implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.0")
 
-                api("io.ktor:ktor-server-core:1.5.0")
-                api("io.ktor:ktor-server-netty:1.5.0")
-                api("io.ktor:ktor-serialization:1.5.0")
+                api("io.ktor:ktor-server-core:1.6.8")
+                api("io.ktor:ktor-server-netty:1.6.8")
+                api("io.ktor:ktor-serialization:1.6.8")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
                 api("ch.qos.logback:logback-classic:1.4.3")
             }
