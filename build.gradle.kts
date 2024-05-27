@@ -32,8 +32,8 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
     id("java-library")
     signing
-    id("de.marcphilipp.nexus-publish") version "0.4.0"
-    id("io.codearte.nexus-staging") version "0.30.0"
+    id("maven-publish")
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 repositories {
@@ -77,7 +77,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(kotlin("reflect"))
-                api("io.github.animatedledstrip:animatedledstrip-core:1.0.3")
+                api("io.github.animatedledstrip:animatedledstrip-core:1.0.4")
             }
         }
         val commonTest by getting {
@@ -90,11 +90,11 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.3")
+                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.4")
 
-                api("commons-cli:commons-cli:1.4")
+                api("commons-cli:commons-cli:1.8.0")
                 implementation("io.github.maxnz:interactive-command-parser:0.1")
-                implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.0")
+                implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 
                 api("io.ktor:ktor-server-core:1.6.8")
                 api("io.ktor:ktor-server-netty:1.6.8")

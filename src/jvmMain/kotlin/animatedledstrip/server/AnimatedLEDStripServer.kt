@@ -22,9 +22,7 @@
 
 package animatedledstrip.server
 
-import animatedledstrip.animations.Animation
 import animatedledstrip.communication.decodeJson
-import animatedledstrip.communication.toUTF8String
 import animatedledstrip.leds.animationmanagement.AnimationToRunParams
 import animatedledstrip.leds.animationmanagement.RunningAnimationParams
 import animatedledstrip.leds.animationmanagement.startAnimation
@@ -34,10 +32,11 @@ import animatedledstrip.leds.stripmanagement.LEDStrip
 import animatedledstrip.leds.stripmanagement.NativeLEDStrip
 import animatedledstrip.leds.stripmanagement.StripInfo
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
