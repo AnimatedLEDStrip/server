@@ -25,11 +25,11 @@ tasks.wrapper {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.6.21"
-    kotlin("plugin.serialization") version "1.6.21"
-    id("org.jetbrains.dokka") version "1.6.21"
+    kotlin("multiplatform") version "1.9.23"
+    kotlin("plugin.serialization") version "1.9.23"
+    id("org.jetbrains.dokka") version "1.9.20"
     id("io.kotest") version "0.3.9"
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.kotlinx.kover") version "0.7.6"
     id("java-library")
     signing
     id("de.marcphilipp.nexus-publish") version "0.4.0"
@@ -46,6 +46,8 @@ version = "1.2.0-SNAPSHOT"
 description = "A library for creating an AnimatedLEDStrip server"
 
 kotlin {
+    jvmToolchain(8)
+
     jvm {
 //        compilations.all {
 //            kotlinOptions.jvmTarget = "1.8"
