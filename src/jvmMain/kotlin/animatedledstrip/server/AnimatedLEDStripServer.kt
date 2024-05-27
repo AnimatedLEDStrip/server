@@ -22,6 +22,7 @@
 
 package animatedledstrip.server
 
+import animatedledstrip.animations.Animation
 import animatedledstrip.communication.decodeJson
 import animatedledstrip.communication.toUTF8String
 import animatedledstrip.leds.animationmanagement.AnimationToRunParams
@@ -131,19 +132,16 @@ class AnimatedLEDStripServer<T : NativeLEDStrip>(
         when {
             !dir.exists() -> dir.mkdirs()
             !dir.isDirectory -> Logger.w("$persistentAnimationDirectory should be a directory")
-            else -> scope.launch {
-                File(persistentAnimationDirectory).walk().forEach {
+            else ->
+                dir.walk().forEach {
                     if (!it.isDirectory && it.name.endsWith(".json"))
                         try {
-                            FileInputStream(it).apply {
-                                val obj = readAllBytes().toUTF8String().decodeJson() as AnimationToRunParams
-                                leds.animationManager.startAnimation(obj, obj.id)
-                                close()
-                            }
-                        } catch (_: FileNotFoundException) {
+                            val obj = it.readText().decodeJson() as AnimationToRunParams
+                            leds.animationManager.startAnimation(obj, obj.id)
+                        } catch (e: Exception) {
+                            Logger.e("Failed to decode ${it.name}: $e")
                         }
                 }
-            }
         }
         scope.cancel()
     }
@@ -173,12 +171,8 @@ class AnimatedLEDStripServer<T : NativeLEDStrip>(
                 File(savedAnimationDirectory).walk().forEach {
                     if (!it.isDirectory && it.name.endsWith(".json"))
                         try {
-                            FileInputStream(it).apply {
-                                val obj = readAllBytes().toUTF8String().decodeJson() as AnimationToRunParams
-                                savedAnimations[obj.id] = obj
-                                close()
-                            }
-                        } catch (_: FileNotFoundException) {
+                            val obj = it.readText().decodeJson() as AnimationToRunParams
+                            savedAnimations[obj.id] = obj
                         } catch (e: Exception) {
                             Logger.e("Failed to decode ${it.name}: $e")
                         }

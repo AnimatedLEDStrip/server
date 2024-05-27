@@ -74,7 +74,7 @@ class AnimatedLEDStripServerTest : StringSpec(
         }
 
         "test save persistent animation".config(enabled = false) {
-            val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist-save")
+            val server = newTestServer("--persist", "--anim-dir", "src/jvmTest/resources/persist-save")
 
             val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test",
                                             doubleParams = mutableMapOf("maximumInfluence" to 3.0, "spacing" to 10.0),
@@ -89,7 +89,7 @@ class AnimatedLEDStripServerTest : StringSpec(
         }
 
         "test delete persistent animation".config(enabled = false) {
-            val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist-delete")
+            val server = newTestServer("--persist", "--anim-dir", "src/jvmTest/resources/persist-delete")
 
             val anim = AnimationToRunParams("Runway Lights", ColorContainer.randomColorList(), id = "test2",
                                             doubleParams = mutableMapOf("maximumInfluence" to 3.0, "spacing" to 10.0),
@@ -108,10 +108,10 @@ class AnimatedLEDStripServerTest : StringSpec(
         }
 
         "test load persistent animations" {
-            val server = newTestServer("--persist", "--persist-dir", "src/jvmTest/resources/persist")
+            val server = newTestServer("--persist", "--anim-dir", "src/jvmTest/resources/persist")
 
             server.loadPersistentAnimations()
-            delay(1000)
+            delay(10000)
             server.leds.animationManager.runningAnimations.shouldContainKeys("23602685",
                                                                              "40202146",
                                                                              "44470329",

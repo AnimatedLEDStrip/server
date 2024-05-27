@@ -46,7 +46,7 @@ version = "1.2.0-SNAPSHOT"
 description = "A library for creating an AnimatedLEDStrip server"
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(16)
 
     jvm {
 //        compilations.all {
@@ -100,7 +100,7 @@ kotlin {
                 api("io.ktor:ktor-server-netty:1.6.8")
                 api("io.ktor:ktor-serialization:1.6.8")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
-                api("ch.qos.logback:logback-classic:1.4.3")
+                api("ch.qos.logback:logback-classic:1.5.6")
             }
         }
         val jvmTest by getting {
@@ -137,7 +137,7 @@ tasks.named<Test>("jvmTest") {
                        org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED)
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
-    systemProperties = System.getProperties().map { it.key.toString() to it.value }.toMap()
+//    systemProperties = System.getProperties().map { it.key.toString() to it.value }.toMap()
 }
 
 //tasks.jacocoTestReport {
