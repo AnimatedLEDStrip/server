@@ -46,7 +46,7 @@ version = "1.2.0-SNAPSHOT"
 description = "A library for creating an AnimatedLEDStrip server"
 
 kotlin {
-    jvmToolchain(16)
+    jvmToolchain(8)
 
     jvm {
 //        compilations.all {
@@ -100,7 +100,7 @@ kotlin {
                 api("io.ktor:ktor-server-netty:1.6.8")
                 api("io.ktor:ktor-serialization:1.6.8")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
-                api("ch.qos.logback:logback-classic:1.5.6")
+//                api("ch.qos.logback:logback-classic:1.5.6")
             }
         }
         val jvmTest by getting {
