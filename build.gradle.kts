@@ -77,7 +77,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(kotlin("reflect"))
-                api("io.github.animatedledstrip:animatedledstrip-core:1.0.4")
+                api("io.github.animatedledstrip:animatedledstrip-core:1.0.5")
             }
         }
         val commonTest by getting {
@@ -90,7 +90,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.4")
+                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.5")
 
                 api("commons-cli:commons-cli:1.8.0")
                 implementation("io.github.maxnz:interactive-command-parser:0.1")
