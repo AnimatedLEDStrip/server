@@ -213,6 +213,11 @@ signing {
     sign(publishing.publications)
 }
 
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    val signingTasks = tasks.withType<Sign>()
+    mustRunAfter(signingTasks)
+}
+
 nexusPublishing {
     repositories {
         sonatype {
