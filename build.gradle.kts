@@ -42,7 +42,7 @@ repositories {
 }
 
 group = "io.github.animatedledstrip"
-version = "1.2.0-SNAPSHOT"
+version = "1.1.2"
 description = "A library for creating an AnimatedLEDStrip server"
 
 kotlin {
