@@ -31,7 +31,7 @@ import animatedledstrip.leds.locationmanagement.Location
 import animatedledstrip.leds.stripmanagement.LEDStrip
 import animatedledstrip.leds.stripmanagement.NativeLEDStrip
 import animatedledstrip.leds.stripmanagement.StripInfo
-import co.touchlab.kermit.Logger
+import animatedledstrip.utils.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel

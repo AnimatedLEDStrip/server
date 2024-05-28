@@ -28,7 +28,6 @@ import animatedledstrip.server.AnimatedLEDStripServer
 import animatedledstrip.utils.ALSLogger
 import animatedledstrip.utils.TestLogger
 import co.touchlab.kermit.Severity
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -41,12 +40,13 @@ class ConfigParsingTests : StringSpec(
     {
         afterEach {
             ALSLogger.minSeverity = Severity.Warn
+            TestLogger.minSeverity = Severity.Warn
         }
 
         fun configPath(directory: String, file: String): String =
             "src/jvmTest/resources/configs/$directory/$file"
 
-        "config file not found".config(enabled = false) {
+        "config file not found" {
             TestLogger.startLogCapture()
             val server = newTestServer("-f", "src/jvmTest/resources/configs/notaconfig.notaconfig")
             TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn,
@@ -56,69 +56,69 @@ class ConfigParsingTests : StringSpec(
             server.leds.renderer.close()
         }
 
-        "command line log level verbose".config(enabled = false) {
+        "command line log level verbose" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("--log-level", "verbose")
             ALSLogger.minSeverity shouldBe Severity.Verbose
         }
 
-        "config file log level verbose".config(enabled = false) {
+        "config file log level verbose" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("-f", configPath("log-level", "log-verbose.config"))
             ALSLogger.minSeverity shouldBe Severity.Verbose
         }
 
-        "command line log level debug".config(enabled = false) {
+        "command line log level debug" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("--log-level", "debug")
             ALSLogger.minSeverity shouldBe Severity.Debug
         }
 
-        "config file log level debug".config(enabled = false) {
+        "config file log level debug" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("-f", configPath("log-level", "log-debug.config"))
             ALSLogger.minSeverity shouldBe Severity.Debug
         }
 
-        "command line log level info".config(enabled = false) {
+        "command line log level info" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("--log-level", "info")
             ALSLogger.minSeverity shouldBe Severity.Info
         }
 
-        "config file log level info".config(enabled = false) {
+        "config file log level info" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("-f", configPath("log-level", "log-info.config"))
             ALSLogger.minSeverity shouldBe Severity.Info
         }
 
-        "command line log level warn".config(enabled = false) {
+        "command line log level warn" {
             ALSLogger.minSeverity = Severity.Error
             ALSLogger.minSeverity shouldBe Severity.Error
             newTestServer("--log-level", "warn")
             ALSLogger.minSeverity shouldBe Severity.Warn
         }
 
-        "config file log level warn".config(enabled = false) {
+        "config file log level warn" {
             ALSLogger.minSeverity = Severity.Error
             ALSLogger.minSeverity shouldBe Severity.Error
             newTestServer("-f", configPath("log-level", "log-warn.config"))
             ALSLogger.minSeverity shouldBe Severity.Warn
         }
 
-        "command line log level error".config(enabled = false) {
+        "command line log level error" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("--log-level", "error")
             ALSLogger.minSeverity shouldBe Severity.Error
         }
 
-        "config file log level error".config(enabled = false) {
+        "config file log level error" {
             ALSLogger.minSeverity shouldBe Severity.Warn
             newTestServer("-f", configPath("log-level", "log-error.config"))
             ALSLogger.minSeverity shouldBe Severity.Error
         }
 
-        "command line log level parse error".config(enabled = false) {
+        "command line log level parse error" {
             ALSLogger.minSeverity = Severity.Error
             ALSLogger.minSeverity shouldBe Severity.Error
             TestLogger.startLogCapture()
@@ -130,7 +130,7 @@ class ConfigParsingTests : StringSpec(
             ALSLogger.minSeverity shouldBe Severity.Warn
         }
 
-        "config file log level parse error".config(enabled = false) {
+        "config file log level parse error" {
             ALSLogger.minSeverity = Severity.Error
             ALSLogger.minSeverity shouldBe Severity.Error
             TestLogger.startLogCapture()
@@ -394,7 +394,7 @@ class ConfigParsingTests : StringSpec(
             )
         }
 
-        "locations file missing".config(enabled = false) {
+        "locations file missing" {
             TestLogger.startLogCapture()
             newTestServer("-l", "src/jvmTest/resources/locations/test-missing.csv")
             TestLogger.logs.shouldContain(TestLogger.Log(Severity.Warn,
@@ -403,7 +403,7 @@ class ConfigParsingTests : StringSpec(
             TestLogger.stopLogCapture()
         }
 
-        "locations file parse error".config(enabled = false) {
+        "locations file parse error" {
             TestLogger.startLogCapture()
             newTestServer("-l", "src/jvmTest/resources/locations/bad-test1.csv")
             TestLogger.logs.shouldContain(TestLogger.Log(Severity.Error,
