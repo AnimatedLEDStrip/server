@@ -23,7 +23,6 @@
 package animatedledstrip.server
 
 import animatedledstrip.communication.decodeJson
-import animatedledstrip.communication.toUTF8String
 import animatedledstrip.leds.animationmanagement.AnimationToRunParams
 import animatedledstrip.leds.animationmanagement.RunningAnimationParams
 import animatedledstrip.leds.animationmanagement.startAnimation
@@ -32,11 +31,11 @@ import animatedledstrip.leds.locationmanagement.Location
 import animatedledstrip.leds.stripmanagement.LEDStrip
 import animatedledstrip.leds.stripmanagement.NativeLEDStrip
 import animatedledstrip.leds.stripmanagement.StripInfo
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.*
+import animatedledstrip.utils.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -50,6 +49,9 @@ class AnimatedLEDStripServer<T : NativeLEDStrip>(
     ledClass: KClass<T>,
     internal val pixelLocations: List<Location>? = null,
 ) {
+    private val logger = Logger.withTag("LED Server")
+
+    private val fileOpsScope = CoroutineScope(EmptyCoroutineContext)
 
     /** Is the server running */
     internal var running: Boolean = false
@@ -110,82 +112,76 @@ class AnimatedLEDStripServer<T : NativeLEDStrip>(
     }
 
     internal fun savePersistentAnimation(newAnim: RunningAnimationParams) {
-        val scope = CoroutineScope(EmptyCoroutineContext)
-        scope.launch(Dispatchers.IO) {
+        fileOpsScope.launch(Dispatchers.IO) {
             FileOutputStream("$persistentAnimationDirectory/${newAnim.fileName}").apply {
                 write(newAnim.sourceParams.json())
                 close()
             }
         }
-        scope.cancel()
     }
 
     internal fun deletePersistentAnimation(anim: RunningAnimationParams) {
         if (File("$persistentAnimationDirectory/${anim.fileName}").exists())
-            Files.delete(Paths.get("$persistentAnimationDirectory/${anim.fileName}"))
+            fileOpsScope.launch(Dispatchers.IO) {
+                Files.delete(Paths.get("$persistentAnimationDirectory/${anim.fileName}"))
+            }
     }
 
     internal fun loadPersistentAnimations() {
         val dir = File(persistentAnimationDirectory)
-        val scope = CoroutineScope(EmptyCoroutineContext)
         when {
-            !dir.exists() -> dir.mkdirs()
-            !dir.isDirectory -> Logger.w("$persistentAnimationDirectory should be a directory")
-            else -> scope.launch {
-                File(persistentAnimationDirectory).walk().forEach {
+            !dir.exists() -> fileOpsScope.launch(Dispatchers.IO) { dir.mkdirs() }
+            !dir.isDirectory -> logger.w("$persistentAnimationDirectory should be a directory")
+            else -> fileOpsScope.launch(Dispatchers.IO) {
+                dir.walk().forEach {
                     if (!it.isDirectory && it.name.endsWith(".json"))
                         try {
-                            FileInputStream(it).apply {
-                                val obj = readAllBytes().toUTF8String().decodeJson() as AnimationToRunParams
-                                leds.animationManager.startAnimation(obj, obj.id)
-                                close()
-                            }
-                        } catch (_: FileNotFoundException) {
+                            val obj = it.readText().decodeJson() as AnimationToRunParams
+                            leds.animationManager.startAnimation(obj, obj.id)
+                        } catch (e: Exception) {
+                            logger.w("Failed to decode ${it.name}: $e")
                         }
                 }
             }
         }
-        scope.cancel()
     }
 
     fun addSavedAnimation(newAnim: AnimationToRunParams) {
-        Logger.i(newAnim.toString())
+        logger.i("Saved ${newAnim.id}: $newAnim")
         savedAnimations[newAnim.id] = newAnim
-        FileOutputStream("$savedAnimationDirectory/${newAnim.fileName}").apply {
-            write(newAnim.json())
-            close()
+        fileOpsScope.launch(Dispatchers.IO) {
+            FileOutputStream("$savedAnimationDirectory/${newAnim.fileName}").apply {
+                write(newAnim.json())
+                close()
+            }
         }
     }
 
     fun deleteSavedAnimation(id: String) {
         savedAnimations.remove(id)
         if (File("$savedAnimationDirectory/$id.json").exists())
-            Files.delete(Paths.get("$savedAnimationDirectory/$id.json"))
+            fileOpsScope.launch(Dispatchers.IO) {
+                Files.delete(Paths.get("$savedAnimationDirectory/$id.json"))
+            }
     }
 
     internal fun loadSavedAnimations() {
         val dir = File(savedAnimationDirectory)
-        val scope = CoroutineScope(EmptyCoroutineContext)
         when {
-            !dir.exists() -> dir.mkdirs()
-            !dir.isDirectory -> Logger.w("$savedAnimationDirectory should be a directory")
-            else -> scope.launch {
-                File(savedAnimationDirectory).walk().forEach {
+            !dir.exists() -> fileOpsScope.launch(Dispatchers.IO) { dir.mkdirs() }
+            !dir.isDirectory -> logger.w("$savedAnimationDirectory should be a directory")
+            else -> fileOpsScope.launch(Dispatchers.IO) {
+                dir.walk().forEach {
                     if (!it.isDirectory && it.name.endsWith(".json"))
                         try {
-                            FileInputStream(it).apply {
-                                val obj = readAllBytes().toUTF8String().decodeJson() as AnimationToRunParams
-                                savedAnimations[obj.id] = obj
-                                close()
-                            }
-                        } catch (_: FileNotFoundException) {
+                            val obj = it.readText().decodeJson() as AnimationToRunParams
+                            savedAnimations[obj.id] = obj
                         } catch (e: Exception) {
-                            Logger.e("Failed to decode ${it.name}: $e")
+                            logger.w("Failed to decode ${it.name}: $e")
                         }
                 }
             }
         }
-        scope.cancel()
     }
 
     val httpServer = httpServer(this)

@@ -21,19 +21,19 @@
  */
 
 tasks.wrapper {
-    gradleVersion = "7.4.2"
+    gradleVersion = "8.7"
 }
 
 plugins {
-    kotlin("multiplatform") version "1.6.21"
-    kotlin("plugin.serialization") version "1.6.21"
-    id("org.jetbrains.dokka") version "1.6.21"
+    kotlin("multiplatform") version "1.9.23"
+    kotlin("plugin.serialization") version "1.9.23"
+    id("org.jetbrains.dokka") version "1.9.20"
     id("io.kotest") version "0.3.9"
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.kotlinx.kover") version "0.7.6"
     id("java-library")
     signing
-    id("de.marcphilipp.nexus-publish") version "0.4.0"
-    id("io.codearte.nexus-staging") version "0.30.0"
+    id("maven-publish")
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 repositories {
@@ -46,6 +46,8 @@ version = "1.2.0-SNAPSHOT"
 description = "A library for creating an AnimatedLEDStrip server"
 
 kotlin {
+    jvmToolchain(8)
+
     jvm {
 //        compilations.all {
 //            kotlinOptions.jvmTarget = "1.8"
@@ -75,38 +77,38 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(kotlin("reflect"))
-                api("io.github.animatedledstrip:animatedledstrip-core:1.1.0-SNAPSHOT")
+                api("io.github.animatedledstrip:animatedledstrip-core:1.0.5")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("io.kotest:kotest-assertions-core:5.3.0")
-                implementation("io.kotest:kotest-property:5.3.0")
+                implementation("io.kotest:kotest-assertions-core:5.9.0")
+                implementation("io.kotest:kotest-property:5.9.0")
             }
         }
         val jvmMain by getting {
             dependencies {
-                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.1.0-SNAPSHOT")
+                api("io.github.animatedledstrip:animatedledstrip-core-jvm:1.0.5")
 
-                api("commons-cli:commons-cli:1.4")
+                api("commons-cli:commons-cli:1.8.0")
                 implementation("io.github.maxnz:interactive-command-parser:0.1")
-                implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.0")
+                implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 
                 api("io.ktor:ktor-server-core:1.6.8")
                 api("io.ktor:ktor-server-netty:1.6.8")
                 api("io.ktor:ktor-serialization:1.6.8")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
-                api("ch.qos.logback:logback-classic:1.4.3")
+//                api("ch.qos.logback:logback-classic:1.5.6")
             }
         }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:1.12.4")
-                implementation("io.kotest:kotest-runner-junit5:5.3.0")
-                implementation("io.kotest:kotest-framework-engine-jvm:4.3.2")
+                implementation("io.mockk:mockk:1.13.11")
+                implementation("io.kotest:kotest-runner-junit5:5.9.0")
+                implementation("io.kotest:kotest-framework-engine-jvm:5.9.0")
             }
         }
 //        val jsMain by getting
@@ -135,7 +137,7 @@ tasks.named<Test>("jvmTest") {
                        org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED)
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
-    systemProperties = System.getProperties().map { it.key.toString() to it.value }.toMap()
+//    systemProperties = System.getProperties().map { it.key.toString() to it.value }.toMap()
 }
 
 //tasks.jacocoTestReport {
@@ -209,6 +211,11 @@ signing {
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
+}
+
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    val signingTasks = tasks.withType<Sign>()
+    mustRunAfter(signingTasks)
 }
 
 nexusPublishing {

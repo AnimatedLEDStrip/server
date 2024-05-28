@@ -24,7 +24,9 @@ package animatedledstrip.server
 
 import animatedledstrip.leds.locationmanagement.Location
 import animatedledstrip.leds.stripmanagement.StripInfo
-import co.touchlab.kermit.Logger
+import animatedledstrip.utils.ALSLogger
+import animatedledstrip.utils.Logger
+import animatedledstrip.utils.TestLogger
 import co.touchlab.kermit.Severity
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.apache.commons.cli.*
@@ -34,11 +36,11 @@ import java.io.FileNotFoundException
 import java.util.*
 import kotlin.system.exitProcess
 
-//val ArgumentParserLogger = Logger.withTag("Argument Parser")
-//
-//val ConfigParserLogger = Logger.withTag("Config Parser")
-//
-//val LocationsParserLogger = Logger.withTag("LED Locations File Parser")
+val ArgumentParserLogger = Logger.withTag("Argument Parser")
+
+val ConfigParserLogger = Logger.withTag("Config Parser")
+
+val LocationsParserLogger = Logger.withTag("LED Locations File Parser")
 
 
 val options = Options().apply {
@@ -91,13 +93,13 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
 
     val configFile: String =
         argParser.getOptionValue("f")
-        ?: "/etc/leds/led.config"
+            ?: "/etc/leds/led.config"
 
     val configuration: Properties = Properties().apply {
         try {
             load(FileInputStream(configFile))
         } catch (e: FileNotFoundException) {
-//            /*ConfigParser*/Logger.w("File $configFile not found")
+            ConfigParserLogger.w("File $configFile not found")
         }
     }
 
@@ -109,8 +111,8 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
         "warn" -> Severity.Warn
         "error" -> Severity.Error
         else -> {
-//            if (argL != null)
-//            /*ArgumentParser*/ Logger.w("Could not parse --log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)")
+            if (argL != null)
+                ArgumentParserLogger.w("Could not parse --log-level \"$argL\" from command line (must be one of verbose, debug, info, warn, error)")
             when (val confL = configuration.getProperty("log-level")?.lowercase(Locale.getDefault())) {
                 "verbose" -> Severity.Verbose
                 "debug" -> Severity.Debug
@@ -118,29 +120,30 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
                 "warn" -> Severity.Warn
                 "error" -> Severity.Error
                 else -> {
-//                    if (confL != null)
-//                    /*ConfigParser*/ Logger.w("Could not parse log-level \"$confL\" in config (must be one of verbose, debug, info, warn, error)")
+                    if (confL != null)
+                        ConfigParserLogger.w("Could not parse log-level \"$confL\" in config (must be one of verbose, debug, info, warn, error)")
                     Severity.Warn
                 }
             }
         }
     }
-//    Logger.setMinSeverity(loggingSeverity)
+    ALSLogger.minSeverity = loggingSeverity
+    TestLogger.minSeverity = loggingSeverity
 
     persistAnimations = !argParser.hasOption("nopersist") &&
-                        (argParser.hasOption("persist") || configuration.getProperty("persist")
-                            ?.toBoolean() ?: persistAnimations)
+            (argParser.hasOption("persist") || configuration.getProperty("persist")
+                ?.toBoolean() ?: persistAnimations)
 
     storedAnimationsDirectory = argParser.getOptionValue("anim-dir")
-                                ?: configuration.getProperty("anim-dir")
-                                ?: storedAnimationsDirectory
+        ?: configuration.getProperty("anim-dir")
+                ?: storedAnimationsDirectory
 
     fun warnArgParseError(flag: String, value: String) {
-//        /*ArgumentParser*/Logger.w("Could not parse $flag \"$value\" from command line")
+        ArgumentParserLogger.w("Could not parse $flag \"$value\" from command line")
     }
 
     fun warnConfigParseError(prop: String, value: String) {
-//        /*ConfigParser*/Logger.w("Could not parse $prop \"$value\" in config")
+        ConfigParserLogger.w("Could not parse $prop \"$value\" in config")
     }
 
     val defaultStripInfo = StripInfo()
@@ -158,22 +161,27 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
                             warnConfigParseError("numleds", configLEDs2)
                             defaultStripInfo.numLEDs
                         }
+
                         else -> configLEDNum
                     }
                 }
+
                 else -> when (val configLEDNum = configLEDs1.toIntOrNull()) {
                     null -> {
                         warnConfigParseError("numLEDs", configLEDs1)
                         defaultStripInfo.numLEDs
                     }
+
                     else -> configLEDNum
                 }
             }
+
             else -> when (val argLEDNum = argLEDs.toIntOrNull()) {
                 null -> {
                     warnArgParseError("-n/--numleds", argLEDs)
                     defaultStripInfo.numLEDs
                 }
+
                 else -> argLEDNum
             }
         }
@@ -187,14 +195,17 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
                         warnConfigParseError("pin", configPin)
                         defaultStripInfo.pin
                     }
+
                     else -> configPinNum
                 }
             }
+
             else -> when (val argPinNum = argPin.toIntOrNull()) {
                 null -> {
                     warnArgParseError("-p/--pin", argPin)
                     defaultStripInfo.pin
                 }
+
                 else -> argPinNum
             }
         }
@@ -208,21 +219,24 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
                         warnConfigParseError("render-delay", configDelay)
                         defaultStripInfo.renderDelay
                     }
+
                     else -> configDelayNum
                 }
             }
+
             else -> when (val argDelayNum = argDelay.toLongOrNull()) {
                 null -> {
                     warnArgParseError("--render-delay", argDelay)
                     defaultStripInfo.renderDelay
                 }
+
                 else -> argDelayNum
             }
         }
 
     val isRenderLoggingEnabled: Boolean =
         argParser.hasOption("log-renders") || (configuration.getProperty("log-renders")
-                                                   ?.toBoolean() ?: defaultStripInfo.isRenderLoggingEnabled)
+            ?.toBoolean() ?: defaultStripInfo.isRenderLoggingEnabled)
 
     val renderLogFile: String? =
         argParser.getOptionValue("log-file") ?: configuration.getProperty("log-file") ?: defaultStripInfo.renderLogFile
@@ -236,29 +250,32 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
                         warnConfigParseError("log-render-count", configCount)
                         defaultStripInfo.rendersBetweenLogSaves
                     }
+
                     else -> configCountNum
                 }
             }
+
             else -> when (val argCountNum = argCount.toIntOrNull()) {
                 null -> {
                     warnArgParseError("--log-render-count", argCount)
                     defaultStripInfo.rendersBetweenLogSaves
                 }
+
                 else -> argCountNum
             }
         }
 
     val is1DSupported = !argParser.hasOption("no1d") &&
-                        (argParser.hasOption("1d") || (configuration.getProperty("1d")?.toBoolean()
-                                                       ?: defaultStripInfo.is1DSupported))
+            (argParser.hasOption("1d") || (configuration.getProperty("1d")?.toBoolean()
+                ?: defaultStripInfo.is1DSupported))
 
     val is2DSupported = !argParser.hasOption("no2d") &&
-                        (argParser.hasOption("2d") || (configuration.getProperty("2d")?.toBoolean()
-                                                       ?: defaultStripInfo.is2DSupported))
+            (argParser.hasOption("2d") || (configuration.getProperty("2d")?.toBoolean()
+                ?: defaultStripInfo.is2DSupported))
 
     val is3DSupported = !argParser.hasOption("no3d") &&
-                        (argParser.hasOption("3d") || (configuration.getProperty("3d")?.toBoolean()
-                                                       ?: defaultStripInfo.is3DSupported))
+            (argParser.hasOption("3d") || (configuration.getProperty("3d")?.toBoolean()
+                ?: defaultStripInfo.is3DSupported))
 
     val locationsFileName: String? =
         argParser.getOptionValue("locations-file") ?: configuration.getProperty("locations-file")
@@ -267,25 +284,26 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
 
     val ledLocations = when {
         locationsFile?.exists() == false -> {
-            /*LocationsParser*/Logger.w("File $locationsFileName does not exist")
+            LocationsParserLogger.w("File $locationsFileName does not exist")
             null
         }
+
         locationsFile != null -> {
             var discard = false
             val locations: MutableList<Location> = mutableListOf()
             for ((i, l) in csvReader().readAll(locationsFile).withIndex()) {
                 val x = l.getOrNull(0)?.toDoubleOrNull() ?: run {
-                    /*LocationsParser*/Logger.e("Could not parse first column of row ${i + 1} properly, aborting and using defaults")
+                    LocationsParserLogger.e("Could not parse first column of row ${i + 1} properly, aborting and using defaults")
                     discard = true
                     null
                 }
                 val y = l.getOrNull(1)?.toDoubleOrNull() ?: run {
-                    /*LocationsParser*/Logger.e("Could not parse second column of row ${i + 1} properly, aborting and using defaults")
+                    LocationsParserLogger.e("Could not parse second column of row ${i + 1} properly, aborting and using defaults")
                     discard = true
                     null
                 }
                 val z = l.getOrNull(2)?.toDoubleOrNull() ?: run {
-                    /*LocationsParser*/Logger.e("Could not parse third column of row ${i + 1} properly, aborting and using defaults")
+                    LocationsParserLogger.e("Could not parse third column of row ${i + 1} properly, aborting and using defaults")
                     discard = true
                     null
                 }
@@ -294,6 +312,7 @@ fun AnimatedLEDStripServer<*>.parseOptions(args: Array<String>) {
             }
             if (discard) pixelLocations else locations
         }
+
         else -> pixelLocations
     }
 
