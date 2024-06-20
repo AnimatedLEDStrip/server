@@ -98,7 +98,7 @@ kotlin {
 
                 api("io.ktor:ktor-server-core:1.6.8")
                 api("io.ktor:ktor-server-netty:1.6.8")
-                api("io.ktor:ktor-serialization:1.6.8")
+                api("io.ktor:ktor-serialization:2.3.12")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
 //                api("ch.qos.logback:logback-classic:1.5.6")
             }
